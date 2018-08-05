@@ -1,0 +1,34 @@
+@ECHO OFF
+SETLOCAL
+
+SET SCRIPTS_PATH=%~d0%~p0
+SET MAKE_BSA_PY="%SCRIPTS_PATH%make_bsa.py"
+
+SET ORIGINAL=%~f1
+SET DUPLICATE=%~f1_Packed
+SET BSARCH="%SCRIPTS_PATH%bsarch.exe"
+SET LOG=%DUPLICATE%\Log.TXT
+
+SET PATH=%PATH%;%SCRIPTS_PATH%
+
+>CON ECHO Starting up...
+>CON ECHO SCRIPTS_PATH is %SCRIPTS_PATH%
+
+>CON ECHO make_bsa.py is set at %MAKE_BSA_PY%
+>CON ECHO bsarch.exe is set at %BSARCH%
+
+>CON ECHO Akkrand's BSA Packing Script v1.0.0
+
+>CON ECHO Finding Python 3.x path
+>CON CALL FIND_PYTHON_PATH
+IF ERRORLEVEL 1 GOTO pythonError
+
+>CON ECHO Found Python 3.x path
+ROBOCOPY "%ORIGINAL%" "%DUPLICATE%" /MIR
+
+>"%LOG%" %PYTHON3% %MAKE_BSA_PY% "%DUPLICATE%" %BSARCH%
+
+GOTO :EOF
+
+:pythonError
+>CON ECHO Error finding Python path

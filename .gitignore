@@ -1,0 +1,10 @@
+desktop.ini
+
+__pycache__/
+AdpcmTools/
+GraphicsTools/
+NvnTools/
+test me/
+test me_Converted/
+TestLoadOrder/
+TestLoadOrder_Converted/

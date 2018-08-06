@@ -12,14 +12,8 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 SET SDK_PATH=%SCRIPTS_PATH%
 
 SET NVN_TEXTPKG="%SDK_PATH%NvnTools\NvnTexpkg.exe"
-SET TEXCONVEXE="%SCRIPTS_PATH%texconv.exe"
-SET TEXTDIAG="%SCRIPTS_PATH%\texdiag.exe"
-SET NVDDSINFOEXE="%SCRIPTS_PATH%nvddsinfo.exe"
-SET XTRACTOR="%SCRIPTS_PATH%XTX-Extractor-master\xtx_extract.py"
 
 >CON ECHO Starting up...
->CON ECHO SCRIPTS_PATH is %SCRIPTS_PATH%
->CON ECHO bsarch.exe is set at %BSARCH%
 IF EXIST %NVN_TEXTPKG% (
 	SET HAS_SDK=true
 ) ELSE (
@@ -28,11 +22,6 @@ IF EXIST %NVN_TEXTPKG% (
 
 >CON ECHO SDK Path is %SDK_PATH%
 >CON ECHO HAS_SDK is set as %HAS_SDK%
->CON ECHO NvnTexpkg is at %NVN_TEXTPKG%
->CON ECHO texconv.exe is set at %TEXCONVEXE%
->CON ECHO textdiag.exe is set at %TEXTDIAG%
->CON ECHO nvddsinfo.exe is set at %NVDDSINFOEXE%
->CON ECHO XTX-Extractor-master is set at %XTRACTOR%
 >CON ECHO convert_mod.py is set at %CONVERT_MOD_PY%
 
 >CON ECHO Akkrand's Mod Converter v1.0.3

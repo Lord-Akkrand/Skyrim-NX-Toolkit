@@ -1,4 +1,9 @@
 desktop.ini
+Archive.exe
+texconv.exe
+nvddsinfo.exe
+texdiag.exe
+bsarch.exe
 
 __pycache__/
 AdpcmTools/

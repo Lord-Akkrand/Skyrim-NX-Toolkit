@@ -4,6 +4,8 @@ import sys
 import re
 import os.path
 import shutil
+import logging
+import util
 
 import subprocess
 
@@ -19,7 +21,7 @@ def LoadOrder(origin, target, loadOrderName):
 	if not os.access(targetData, os.F_OK):
 		logging.debug("Error creating targetData")
 		sys.exit(1)
-
+	
 	loadOrderTxt = os.path.join(origin, loadOrderName + ".txt")
 	loadOrder = open(loadOrderTxt, 'r').read()
 	#logging.debug("LOAD ORDER <" + loadOrder + ">")
@@ -54,8 +56,8 @@ def LoadOrder(origin, target, loadOrderName):
 			alPattern = re.compile(alPattern, flags)
 		al = re.search(alPattern, buffer)
 		if al == None:
-			logging.debug("Cannot find " + aln + ", bailing")
-			logging.debug("BUFFER" + buffer + "ENDBUFFER")
+			logging.error("Cannot find " + aln + ", bailing")
+			logging.error("BUFFER" + buffer + "ENDBUFFER")
 			sys.exit(1)
 		retVal = al.group(1)
 		logging.debug("<" + retVal + ">")
@@ -74,7 +76,7 @@ def LoadOrder(origin, target, loadOrderName):
 		tfPattern = "([;]*sTestFile" + tfn + r"=[^\n]*)\n"
 		tf = re.search(tfPattern, newSkyrimIni)
 		if tf == None:
-			logging.debug("Cannot find " + tfn + ", bailing")
+			logging.error("Cannot find " + tfn + ", bailing")
 			sys.exit(1)
 		retVal = tf.group(1)
 		logging.debug("<" + retVal + ">")
@@ -164,7 +166,7 @@ def LoadOrder(origin, target, loadOrderName):
 		if plugin.startswith("#"):
 			logging.debug("Passing on " + plugin)
 		else:
-			logging.debug("Adding " + plugin)
+			logging.info("Adding " + plugin)
 			for file in os.listdir(pluginFolder):
 				logging.debug("   Found " + file)
 				filename = pluginFolder + "\\" + file
@@ -179,7 +181,7 @@ def LoadOrder(origin, target, loadOrderName):
 
 	def WriteIniFile(file, buffer):
 		newSkyrimIniFile = target + "\\" + file
-		logging.debug("Write out new " + newSkyrimIniFile)
+		logging.info("Writing " + file)
 		with open(newSkyrimIniFile, "w+") as f:
 			f.write(buffer)
 
@@ -201,4 +203,5 @@ if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
 	loadOrderName = sys.argv[3]
+	util.InitialiseLog(os.path.join(origin, loadOrderName) + ".log")
 	LoadOrder(origin, target, loadOrderName)

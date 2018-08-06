@@ -49,47 +49,56 @@ import sys
 import re
 import os.path
 import sizes
+import util
+import logging
 
 import subprocess
 
-def ConvertDDS(texconv, basePath, ddsFileName, ddsInfo, texdiag, has_sdk):
+def ConvertDDS(script_path, basePath, ddsFileName, has_sdk):
 	relativeFilename = ddsFileName.replace(basePath, '')
 
 	'''
-	print("This is texconv: ", texconv)
-	print("This is the base path: ", basePath)
-	print("This is dds file: ", ddsFileName)
-	print("This is the relative dds file: ", relativeFilename)
-	print("This is ddsinfo text file: ", ddsInfo)
-	print("This is texdiag text file: ", texdiag)
-	print("HAS_SDK: ", has_sdk)
+	logging.debug("This is texconv: " + " " +  texconv)
+	logging.debug("This is the base path: " + " " +  basePath)
+	logging.debug("This is dds file: " + " " +  ddsFileName)
+	logging.debug("This is the relative dds file: " + " " +  relativeFilename)
+	logging.debug("This is ddsinfo text file: " + " " +  ddsInfo)
+	logging.debug("This is texdiag text file: " + " " +  texdiag)
+	logging.debug("HAS_SDK: " + " " +  has_sdk)
 	'''
-	print("convert_dds.py 2.0")
+	
+	logging.debug("convert_dds.py 2.0")
 	hasSDK = has_sdk == 'true'
 
 	relativePathList = relativeFilename[1:].split('\\')
-	print('PATH')
+	logging.debug('PATH')
 	for path in relativePathList:
-		print(path)
-	print('END PATH')
-	buffer = open(ddsInfo, 'r').read()
-	print('DDSINFO START')
-	print(buffer)
-	print('DDSINFO END')
+		logging.debug(path)
+	logging.debug('END PATH')
+	
+	nvddsinfo = os.path.join(script_path, "nvddsinfo.exe")
+	logging.debug(nvddsinfo + " " +  ddsFileName)
+	dds_buffer, dds_err = util.RunCommandLine([nvddsinfo, ddsFileName])
+	
+	logging.debug('DDSINFO START')
+	logging.debug(dds_buffer)
+	logging.debug('DDSINFO END')
 
-	tdBuffer = open(texdiag, 'r').read()
-	print('TEXDIAG START')
-	print(tdBuffer)
-	print('TEXDIAG END')
+	texdiag = os.path.join(script_path, "texdiag.exe")
+	logging.debug(texdiag + " " + ddsFileName)
+	td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])
+	logging.debug('TEXDIAG START')
+	logging.debug(td_buffer)
+	logging.debug('TEXDIAG END')
 
 	def getIntPattern(name):
 		namePattern = name + r": ([\d]+)"
-		nameReturn = re.search(namePattern, buffer)
+		nameReturn = re.search(namePattern, dds_buffer)
 		if nameReturn != None:
 			nameReturn = nameReturn.group(1)
 		else:
 			nameReturn = -1
-		print(name + " is :" + str(nameReturn))
+		logging.debug(name + " is :" + str(nameReturn))
 		return int(nameReturn)
 
 	def lerp(x, a, b):
@@ -101,38 +110,38 @@ def ConvertDDS(texconv, basePath, ddsFileName, ddsInfo, texdiag, has_sdk):
 	linearSize = height * width
 
 	fourCCPattern = r"FourCC: '(....)'"
-	fourCC = re.search(fourCCPattern, buffer)
+	fourCC = re.search(fourCCPattern, dds_buffer)
 	if fourCC != None:
 		fourCC = fourCC.group(1)
 	else:
 		fourCC = '----'
 		diffPattern = r"format = \b(.*)\b"
 		tdFormat = ''
-		m = re.search(diffPattern, tdBuffer)
+		m = re.search(diffPattern, td_buffer)
 		if m != None:
 			tdFormat = m.group(1)
-			print("Format is <" + tdFormat + ">")
+			logging.debug("Format is <" + tdFormat + ">")
 		for formatInfo in sizes.Formats:
 			if formatInfo[1] == tdFormat:
 				fourCC = formatInfo[0]
 
-	print("FourCC is " + str(fourCC))
+	logging.debug("FourCC is " + str(fourCC))
 
 	maxSize = sizes.DefaultSizeLimit
 	forceFormat = None
 	shouldRun = False
-	print('File is ' + relativeFilename)
+	logging.debug('File is ' + relativeFilename)
 	for rule in sizes.Rules:
 		rulePath = rule['Path']
 		pathStart = rulePath[0]
 		match = False
-		print('Checking rule: ' + str(rule))
+		logging.debug('Checking rule: ' + str(rule))
 		for iP in range(len(relativePathList)):
 			path = relativePathList[iP]
 			m = re.search(pathStart, path)
 			if m != None:
 				# we have the start of a match.  See if it bears out.
-				print('on the trail of ' + pathStart)
+				logging.debug('on the trail of ' + pathStart)
 				match = True
 				for iL in range(1, len(rulePath)):
 					pathOngoing = rulePath[iL]
@@ -147,20 +156,20 @@ def ConvertDDS(texconv, basePath, ddsFileName, ddsInfo, texdiag, has_sdk):
 						internalIdx += 1
 						m = re.search(pathOngoing, nextPath)
 						match = m != None
-						print('ongoing into ' + nextPath + ' == ' + pathOngoing)
+						logging.debug('ongoing into ' + nextPath + ' == ' + pathOngoing)
 						if match == True:
 							break
 					if match == False:
 						break
 			if match:
-				print('APPLYING RULE [' + rule['Name'] + ']')
+				logging.debug('APPLYING RULE [' + rule['Name'] + ']')
 				if 'Size' in rule:
 					maxSize = rule['Size']
 				if 'Format' in rule:
 					formatRule = rule['Format']
 					if formatRule[0] != fourCC:
 						forceFormat = formatRule[1]
-						print('Forcing Format from ' + fourCC + ' to ' + forceFormat)
+						logging.debug('Forcing Format from ' + fourCC + ' to ' + forceFormat)
 						
 				break
 
@@ -171,12 +180,12 @@ def ConvertDDS(texconv, basePath, ddsFileName, ddsInfo, texdiag, has_sdk):
 	else:
 		convertTable = sizes.ConvertFromTo
 
-	print("Check force conversion for fourCC " + fourCC)
+	logging.debug("Check force conversion for fourCC " + fourCC)
 	for conv in convertTable:
-		print('Checking ' + conv[0])
+		logging.debug('Checking ' + conv[0])
 		if fourCC == conv[0]:
 			forceFormat = conv[1][1]
-			print('Match.  Force convert to ' + forceFormat)
+			logging.debug('Match.  Force convert to ' + forceFormat)
 			break
 
 	shouldRun = shouldRun or linearSize > maxSize
@@ -193,33 +202,30 @@ def ConvertDDS(texconv, basePath, ddsFileName, ddsInfo, texdiag, has_sdk):
 			newHeight = int(height * resizePercentage)
 			newLinearSize = newWidth * newHeight
 			newMipmaps -= 1
-			print('Resizing ' + str(resizePercentage) + ' results in ' + str(newWidth) + 'x' + str(newHeight))
-			
-		commandLine = '"' + texconv + '"  -pow2 -fl 9.3 -y'
-		
+			logging.debug('Resizing ' + str(resizePercentage) + ' results in ' + str(newWidth) + 'x' + str(newHeight))
+		texconv = os.path.join(script_path, "texconv.exe")
+		commandLine = [texconv, "-pow2", "-fl", "9.3", "-y"]
 		if newWidth < width:
-			commandLine += " -w " + str(newWidth)
+			commandLine += ["-w", str(newWidth)]
 		if newHeight < height:
-			commandLine += " -h " + str(newHeight)
+			commandLine += ["-h", str(newHeight)]
 		if newMipmaps < mipmaps:
-			commandLine += " -m " + str(newMipmaps)
+			commandLine += ["-m", str(newMipmaps)]
 		
 		if forceFormat != None:
-			commandLine += " -f " + forceFormat
+			commandLine += ["-f", forceFormat]
 		elif fourCC == "DX10" and not hasSDK:
-			commandLine += " -f BC3_UNORM"
-		commandLine += ' "' + ddsFileName + '"'
-		print('Command Line <' + commandLine + '>')
-		subprocess.call(commandLine, shell=True)
+			commandLine += ["-f", BC3_UNORM]
+		
+		commandLine += [ddsFileName]
+		output, err = util.RunCommandLine(commandLine)
 	else:
-		print("TexConv will not run")
+		logging.debug("TexConv will not run")
 
 
 if __name__ == '__main__':
-	texconv = sys.argv[1]
+	script_path = sys.argv[1]
 	basePath = sys.argv[2]
 	ddsFileName = sys.argv[3]
-	ddsInfo = sys.argv[4]
-	texdiag = sys.argv[5]
-	has_sdk = sys.argv[6]
-	ConvertDDS(texconv, basePath, ddsFileName, ddsInfo, texdiag, has_sdk)
+	has_sdk = sys.argv[4]
+	ConvertDDS(script_path, basePath, ddsFileName, has_sdk)

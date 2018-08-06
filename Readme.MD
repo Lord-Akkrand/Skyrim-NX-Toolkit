@@ -19,8 +19,6 @@ Scripts/
 Scripts/DRAG_ONTO_ME.BAT (and other files)
 Scripts/GraphicsTools/... (2 dlls)
 Scripts/NvnTools/NvnTextPkg.exe (and other files)
-Scripts/test me
-Scripts/test me_Converted
 Scripts/XTX-Extractor-master
 ```
 

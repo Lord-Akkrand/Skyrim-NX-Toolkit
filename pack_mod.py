@@ -1,26 +1,28 @@
 #! python3
 
 import sys
-import re
 import os.path
+import inspect, os
 import shutil
 import subprocess
 import util
+import logging
 
 import bitflag
 
-def PackMod(mod_name, target, bsarch):
-	script_path = bsarch.replace("bsarch.exe", "")
+def PackMod(mod_name, target):
+	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+	bsarch = os.path.join(script_path, "bsarch.exe")
 	targetData = target + r"\Data"
 	'''
-	print("This is the target: ", target)
-	print("This is the target Data: ", targetData)
-	print("This is the mod name " + mod_name)
+	logging.debug("This is the target: " + target)
+	logging.debug("This is the target Data: " + targetData)
+	logging.debug("This is the mod name " + mod_name)
 	'''
-	print("pack_mod.py 2.0")
+	logging.info("Pack Mod")
 
 	data_list = os.listdir(targetData)
-	print(str(data_list))
+	logging.debug(str(data_list))
 
 	BSAGroups = {
 		"Textures":["textures", "facetint"],
@@ -32,7 +34,7 @@ def PackMod(mod_name, target, bsarch):
 		for folder in BSAGroups[bsaName]:
 			ReverseBSAGroups[folder] = bsaName
 
-	print(str(ReverseBSAGroups))
+	logging.debug(str(ReverseBSAGroups))
 	MakeBSAs = {}
 	def AddBSA(name, folder, MakeBSAs):
 		if name not in MakeBSAs:
@@ -55,7 +57,7 @@ def PackMod(mod_name, target, bsarch):
 		return ""
 		
 	for path in data_list:
-		print('Checking path ' + path)
+		logging.debug('Checking path ' + path)
 		full_path = os.path.join(targetData, path)
 		if os.path.isdir(full_path):
 			if path == "sound":
@@ -109,11 +111,11 @@ def PackMod(mod_name, target, bsarch):
 
 	MakeBSAOrder = ["", "Meshes", "Textures"]
 
-	print("Make BSAs: \n" + str(MakeBSAs))
+	logging.debug("Make BSAs: \n" + str(MakeBSAs))
 	for bsa_subname in MakeBSAOrder:
-		print("Make BSA <" + bsa_subname + ">")
+		logging.debug("Make BSA <" + bsa_subname + ">")
 		if bsa_subname in MakeBSAs:
-			print("<" + bsa_subname + "> in MakeBSAs")
+			logging.debug("<" + bsa_subname + "> in MakeBSAs")
 			folder_list = MakeBSAs[bsa_subname]
 			bsa_file_suffix = bsa_subname
 			if bsa_file_suffix != "":
@@ -143,5 +145,5 @@ def PackMod(mod_name, target, bsarch):
 if __name__ == '__main__':
 	mod_name = sys.argv[1]
 	target = sys.argv[2]
-	bsarch = sys.argv[3]
-	ConvertMod(mod_name, target, bsarch)
+	util.InitialiseLog(target + ".log")
+	ConvertMod(mod_name, target)

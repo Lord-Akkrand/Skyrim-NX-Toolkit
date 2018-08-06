@@ -1,44 +1,51 @@
 #! python3
 
+import inspect, os
+
 import sys
-import re
 import os.path
 import shutil
 import subprocess
 import util
+import logging
 import convert_dds
 
 import bitflag
 
-def UnpackMod(origin, target, bsarch):
-	script_path = bsarch.replace("bsarch.exe", "")
+def UnpackMod(origin, target):
+	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+	bsarch = os.path.join(script_path, "bsarch.exe")
 	targetData = target + r"\Data"
 	mod_name = os.path.basename(origin)
 	'''
-	print("This is the origin: ", origin)
-	print("This is the target: ", target)
-	print("This is the target Data: ", targetData)
-	print("This is the mod name " + mod_name)
+	logging.debug("This is the origin: " + origin)
+	logging.debug("This is the target: " + target)
+	logging.debug("This is the target Data: " + targetData)
+	logging.debug("This is the mod name " + mod_name)
 	'''
-	print("unpack_mod.py 2.0")
+	logging.info("Unpack Mod")
 
 	def CopyFile(file, filename):
 		newFileName = targetData + "\\" + file
-		print(filename + "->" + newFileName)
+		logging.debug(filename + "->" + newFileName)
 		shutil.copy2(filename, newFileName)
 
 	def UnpackBSA(file, filename):
+		commandLine = [bsarch, "unpack", filename, targetData]
+		util.RunCommandLine(commandLine)
+		'''
 		commandLine = '"' + bsarch + '" unpack "' + filename + '" "' + targetData + '"'
-		print("Command Line:\n" + str(commandLine))
+		logging.debug("Command Line:\n" + str(commandLine))
 		p = subprocess.Popen(commandLine, shell=True)
 		(output, err) = p.communicate()
 		p_status = p.wait()
+		'''
 
 	BSAsToUnpack = []
 	FilesToRename = []
 		
 	for file in os.listdir(targetData):
-		print("   Found " + file)
+		logging.debug("   Found " + file)
 		filename = os.path.join(targetData, file)
 		if file.endswith(".bsa"):
 			BSAsToUnpack.append( (file, filename) )
@@ -58,5 +65,5 @@ def UnpackMod(origin, target, bsarch):
 if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
-	bsarch = sys.argv[3]
-	UnpackMod(origin, target, bsarch)
+	util.InitialiseLog(origin + ".log")
+	UnpackMod(origin, target)

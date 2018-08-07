@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import util
 import logging
+import archive_bsa
 
 import bitflag
 
@@ -42,6 +43,7 @@ def PackMod(mod_name, target):
 		logging.debug("Remove Tree <" + tree + ">")
 		try:
 			shutil.rmtree(tree, ignore_errors=True)
+			os.rmdir(tree)
 		except FileNotFoundError:
 			pass
 
@@ -94,7 +96,7 @@ def PackMod(mod_name, target):
 			flags.SetFlag(Flag_RetainName)
 		if "grass" in lower_case_data_list:
 			flags.SetFlag(Flag_RetainName)
-		if "script" in lower_case_data_list:
+		if "scripts" in lower_case_data_list:
 			flags.SetFlag(Flag_RetainName)
 		if "music" in lower_case_data_list:
 			flags.SetFlag(Flag_RetainName)
@@ -120,9 +122,10 @@ def PackMod(mod_name, target):
 			bsa_file_suffix = bsa_subname
 			if bsa_file_suffix != "":
 				bsa_file_suffix = " - " + bsa_file_suffix
-			temp_data = os.path.join(targetData, "Data" + bsa_file_suffix)
+			temp = os.path.join(targetData, "Temp" + bsa_file_suffix)
+			temp_data = os.path.join(temp, "Data")
 			
-			RemoveTree(temp_data)
+			RemoveTree(temp)
 			
 			for folder in folder_list:
 				from_folder = os.path.join(targetData, folder)
@@ -130,19 +133,23 @@ def PackMod(mod_name, target):
 				shutil.move(from_folder, to_folder)
 			bsa_filename = mod_name + bsa_file_suffix + ".bsa"
 			target_bsa = os.path.join(targetData, bsa_filename)
-			
-			archive_flags = GetArchiveFlags(folder_list, temp_data)
-			
-			flags_arg = "-sse -af:" + str(archive_flags)
-			commandLine = [bsarch, "pack", temp_data, target_bsa, "-sse", "-af:"+archive_flags]
-			#commandLine = '"' + bsarch + '" pack "' + temp_data + '" "' + target_bsa + '" ' + flags_arg
-			util.RunCommandLine(commandLine)
+			useArchive = True
+			if useArchive:
+				bsa_filename = archive_bsa.ArchiveBSA(temp, bsa_filename)
+				shutil.move(bsa_filename, target_bsa)
+			else:
+				archive_flags = GetArchiveFlags(folder_list, temp_data)
+				
+				flags_arg = "-sse -af:" + str(archive_flags)
+				commandLine = [bsarch, "pack", temp_data, target_bsa, "-sse", "-af:"+archive_flags]
+				#commandLine = '"' + bsarch + '" pack "' + temp_data + '" "' + target_bsa + '" ' + flags_arg
+				util.RunCommandLine(commandLine)
 
-			checkCommandLine = [bsarch, target_bsa]
-			#checkCommandLine = '"' + bsarch + '" "' + target_bsa + '"'
-			util.RunCommandLine(checkCommandLine)
+				checkCommandLine = [bsarch, target_bsa]
+				#checkCommandLine = '"' + bsarch + '" "' + target_bsa + '"'
+				util.RunCommandLine(checkCommandLine)
 			
-			RemoveTree(temp_data)
+			RemoveTree(temp)
 			bsaList.append(target_bsa)
 	return bsaList
 

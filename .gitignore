@@ -1,14 +1,23 @@
+# Annoying Windows Files
 desktop.ini
+
+# Utilities
 Archive.exe
 texconv.exe
 nvddsinfo.exe
 texdiag.exe
 bsarch.exe
 
+# Compiled Python
+*.pyc
 __pycache__/
+
+# SDK Folders
 AdpcmTools/
 GraphicsTools/
 NvnTools/
+
+# Test Folders
 test me/
 test me_Archived/
 test me_Converted/

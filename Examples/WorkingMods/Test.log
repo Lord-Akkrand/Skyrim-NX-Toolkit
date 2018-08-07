@@ -6,7 +6,7 @@ This is the load order name: Test
 Load Order Test
 Create empty target Data
 ESP Start at 4
-LOAD ORDER LIST <['MyIniTweaks', 'CheatRoom', 'LAL']>
+LOAD ORDER LIST <['MyIniTweaks', 'LooseMod', 'CheatRoom', 'LAL']>
 Attempt to open C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\BuiltLoadOrder\Skyrim.ini
 Language ini <Skyrim_de.ini>
 Language ini <Skyrim_en.ini>
@@ -61,13 +61,23 @@ MyValue <0>
 ***bEnableMotionEvents=1
 ->bEnableMotionEvents=0
 ***
+Found LooseMod
+Adding LooseMod
+   Found LooseFolder
+   Found LooseMod.bsa
+sResourceArchiveList=Skyrim - Misc.bsa, Skyrim - Shaders.bsa, Skyrim - Interface.bsa, Skyrim - Animations.bsa, Skyrim - Meshes0.bsa, Skyrim - Meshes1.bsa, Skyrim - Sounds.bsa, LooseMod.bsa
+C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\WorkingMods\LooseMod\LooseMod.bsa->C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\BuiltLoadOrder\Data\LooseMod.bsa
+   Found LooseMod.esp
+sTestFile4=LooseMod.esp
+C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\WorkingMods\LooseMod\LooseMod.esp->C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\BuiltLoadOrder\Data\LooseMod.esp
+   Found SomeLooseFile.test
 Found CheatRoom
 Adding CheatRoom
    Found CheatRoom.bsa
-sResourceArchiveList=Skyrim - Misc.bsa, Skyrim - Shaders.bsa, Skyrim - Interface.bsa, Skyrim - Animations.bsa, Skyrim - Meshes0.bsa, Skyrim - Meshes1.bsa, Skyrim - Sounds.bsa, CheatRoom.bsa
+sResourceArchiveList=Skyrim - Misc.bsa, Skyrim - Shaders.bsa, Skyrim - Interface.bsa, Skyrim - Animations.bsa, Skyrim - Meshes0.bsa, Skyrim - Meshes1.bsa, Skyrim - Sounds.bsa, LooseMod.bsa, CheatRoom.bsa
 C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\WorkingMods\CheatRoom\CheatRoom.bsa->C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\BuiltLoadOrder\Data\CheatRoom.bsa
    Found CheatRoom.esp
-sTestFile4=CheatRoom.esp
+sTestFile5=CheatRoom.esp
 C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\WorkingMods\CheatRoom\CheatRoom.esp->C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\BuiltLoadOrder\Data\CheatRoom.esp
 Found LAL
 Adding LAL
@@ -75,10 +85,10 @@ Adding LAL
 sResourceArchiveList2=Skyrim - Voices_en0.bsa, Skyrim - Voices_en1.bsa, Skyrim - Textures0.bsa, Skyrim - Textures1.bsa, Skyrim - Textures2.bsa, Skyrim - Textures3.bsa, LAL - Textures.bsa
 C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\WorkingMods\LAL\LAL - Textures.bsa->C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\BuiltLoadOrder\Data\LAL - Textures.bsa
    Found LAL.bsa
-sResourceArchiveList=Skyrim - Misc.bsa, Skyrim - Shaders.bsa, Skyrim - Interface.bsa, Skyrim - Animations.bsa, Skyrim - Meshes0.bsa, Skyrim - Meshes1.bsa, Skyrim - Sounds.bsa, CheatRoom.bsa, LAL.bsa
+sResourceArchiveList=Skyrim - Misc.bsa, Skyrim - Shaders.bsa, Skyrim - Interface.bsa, Skyrim - Animations.bsa, Skyrim - Meshes0.bsa, Skyrim - Meshes1.bsa, Skyrim - Sounds.bsa, LooseMod.bsa, CheatRoom.bsa, LAL.bsa
 C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\WorkingMods\LAL\LAL.bsa->C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\BuiltLoadOrder\Data\LAL.bsa
    Found LAL.esp
-sTestFile5=LAL.esp
+sTestFile6=LAL.esp
 C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\WorkingMods\LAL\LAL.esp->C:\Users\anmarshall\Google Drive\Skyrim Switch\Converters\Skyrim-NX-Toolkit\Examples\BuiltLoadOrder\Data\LAL.esp
    Found LAL.ini
 INI <[Interface]>

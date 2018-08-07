@@ -43,6 +43,11 @@ def UnpackMod(origin, target):
 		elif file.endswith(".esp") or file.endswith(".ini"):
 			newFileName = os.path.join(targetData, mod_name + file[-4:])
 			shutil.copy2(filename, newFileName)
+		else:
+			if os.path.isdir(filename):
+				shutil.copytree(filename, os.path.join(targetData, file))
+			else:
+				shutil.copy2(filename, os.path.join(targetData, file))
 			
 	for bsaToUnpack in BSAsToUnpack:
 		(file, filename) = bsaToUnpack

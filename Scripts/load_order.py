@@ -179,6 +179,11 @@ def LoadOrder(origin, target, loadOrderName):
 					InsertMainBSA(file, filename)
 				elif file.endswith(".ini"):
 					InsertIni(filename)
+				else:
+					if os.path.isdir(filename):
+						shutil.copytree(filename, os.path.join(targetData, file))
+					else:
+						shutil.copy2(filename, os.path.join(targetData, file))
 
 	def WriteIniFile(file, buffer):
 		newSkyrimIniFile = target + "\\" + file

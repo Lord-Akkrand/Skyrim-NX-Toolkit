@@ -1,4 +1,5 @@
 4
 MyIniTweaks
+LooseMod
 CheatRoom
 LAL

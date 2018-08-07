@@ -16,6 +16,7 @@ def LoadOrder(origin, target, loadOrderName):
 	logging.debug("This is the target Data: " + targetData)
 	logging.debug("This is the load order name: " + loadOrderName)
 
+	logging.info("Load Order " + loadOrderName)
 	logging.debug("Create empty target Data")
 	os.mkdir(targetData)
 	if not os.access(targetData, os.F_OK):
@@ -65,11 +66,6 @@ def LoadOrder(origin, target, loadOrderName):
 	sResourceArchiveList = GetArchiveList("sResourceArchiveList", newSkyrimIni)
 	sResourceArchiveList2 = GetArchiveList("sResourceArchiveList2", newSkyrimIni)
 
-	if loadOrderStart <= 4:
-		logging.debug("Hyrule.esp will not be loaded, so removing Skyrim - Hyrule.bsa from sResourceArchiveList")
-		sResourceArchiveList.replace(", Skyrim - Hyrule.bsa", "")
-		print ("sResourceArchiveList is now:\n" + sResourceArchiveList)
-
 	def GetTestFile(tfn):
 		tfn = str(tfn)
 		logging.debug("Find test file " + tfn)
@@ -115,6 +111,11 @@ def LoadOrder(origin, target, loadOrderName):
 		newResourceArchiveList += ", " + name
 		logging.debug(newResourceArchiveList)
 		CopyFile(file, filename)
+		
+	if loadOrderStart <= 4:
+		logging.debug("Hyrule.esp will not be loaded, so removing Skyrim - Hyrule.bsa from newResourceArchiveList")
+		newResourceArchiveList = newResourceArchiveList.replace(", Skyrim - Hyrule.bsa", "")
+		print ("newResourceArchiveList is now:\n" + newResourceArchiveList)
 
 	iniPattern = r"^[; ]*([^=]*)=([^$]*)$"
 	def InsertIni(filename):

@@ -1,8 +1,7 @@
 #! python3
 
 import sys
-import os.path
-import inspect, os
+import os, os.path
 import shutil
 import subprocess
 import util
@@ -11,14 +10,12 @@ import logging
 import bitflag
 
 def PackMod(mod_name, target):
-	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+	script_path = util.GetScriptPath()
 	bsarch = os.path.join(script_path, "bsarch.exe")
 	targetData = target + r"\Data"
-	'''
 	logging.debug("This is the target: " + target)
 	logging.debug("This is the target Data: " + targetData)
 	logging.debug("This is the mod name " + mod_name)
-	'''
 	logging.info("Pack Mod")
 
 	data_list = os.listdir(targetData)
@@ -42,8 +39,9 @@ def PackMod(mod_name, target):
 		MakeBSAs[name].append(folder)
 		
 	def RemoveTree(tree):
+		logging.debug("Remove Tree <" + tree + ">")
 		try:
-			shutil.rmtree(tree)
+			shutil.rmtree(tree, ignore_errors=True)
 		except FileNotFoundError:
 			pass
 
@@ -110,12 +108,14 @@ def PackMod(mod_name, target):
 		return hexvalue
 
 	MakeBSAOrder = ["", "Meshes", "Textures"]
-
+	
+	bsaList = []
 	logging.debug("Make BSAs: \n" + str(MakeBSAs))
 	for bsa_subname in MakeBSAOrder:
 		logging.debug("Make BSA <" + bsa_subname + ">")
 		if bsa_subname in MakeBSAs:
 			logging.debug("<" + bsa_subname + "> in MakeBSAs")
+			logging.info("Making BSA <" + bsa_subname + ">")
 			folder_list = MakeBSAs[bsa_subname]
 			bsa_file_suffix = bsa_subname
 			if bsa_file_suffix != "":
@@ -134,13 +134,17 @@ def PackMod(mod_name, target):
 			archive_flags = GetArchiveFlags(folder_list, temp_data)
 			
 			flags_arg = "-sse -af:" + str(archive_flags)
-			commandLine = '"' + bsarch + '" pack "' + temp_data + '" "' + target_bsa + '" ' + flags_arg
+			commandLine = [bsarch, "pack", temp_data, target_bsa, "-sse", "-af:"+archive_flags]
+			#commandLine = '"' + bsarch + '" pack "' + temp_data + '" "' + target_bsa + '" ' + flags_arg
 			util.RunCommandLine(commandLine)
 
-			checkCommandLine = '"' + bsarch + '" "' + target_bsa + '"'
+			checkCommandLine = [bsarch, target_bsa]
+			#checkCommandLine = '"' + bsarch + '" "' + target_bsa + '"'
 			util.RunCommandLine(checkCommandLine)
 			
 			RemoveTree(temp_data)
+			bsaList.append(target_bsa)
+	return bsaList
 
 if __name__ == '__main__':
 	mod_name = sys.argv[1]

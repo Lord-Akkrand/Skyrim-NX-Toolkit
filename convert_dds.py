@@ -54,9 +54,10 @@ import logging
 
 import subprocess
 
-def ConvertDDS(script_path, basePath, ddsFileName, has_sdk):
+def ConvertDDS(script_path, basePath, ddsFileName):
 	relativeFilename = ddsFileName.replace(basePath, '')
 
+	hasSDK = util.HasSDK()
 	'''
 	logging.debug("This is texconv: " + " " +  texconv)
 	logging.debug("This is the base path: " + " " +  basePath)
@@ -64,11 +65,10 @@ def ConvertDDS(script_path, basePath, ddsFileName, has_sdk):
 	logging.debug("This is the relative dds file: " + " " +  relativeFilename)
 	logging.debug("This is ddsinfo text file: " + " " +  ddsInfo)
 	logging.debug("This is texdiag text file: " + " " +  texdiag)
-	logging.debug("HAS_SDK: " + " " +  has_sdk)
+	logging.debug("HAS_SDK: " + " " +  hasSDK)
 	'''
 	
 	logging.debug("convert_dds.py 2.0")
-	hasSDK = has_sdk == 'true'
 
 	relativePathList = relativeFilename[1:].split('\\')
 	logging.debug('PATH')
@@ -227,5 +227,4 @@ if __name__ == '__main__':
 	script_path = sys.argv[1]
 	basePath = sys.argv[2]
 	ddsFileName = sys.argv[3]
-	has_sdk = sys.argv[4]
-	ConvertDDS(script_path, basePath, ddsFileName, has_sdk)
+	ConvertDDS(script_path, basePath, ddsFileName)

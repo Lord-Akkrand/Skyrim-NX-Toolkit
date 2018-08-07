@@ -1,7 +1,5 @@
 #! python3
 
-import inspect, os
-
 import sys
 import os.path
 import shutil
@@ -13,17 +11,15 @@ import convert_dds
 import bitflag
 
 def UnpackMod(origin, target):
-	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+	script_path = util.GetScriptPath()
 	bsarch = os.path.join(script_path, "bsarch.exe")
 	targetData = target + r"\Data"
 	mod_name = os.path.basename(origin)
-	'''
 	logging.debug("This is the origin: " + origin)
 	logging.debug("This is the target: " + target)
 	logging.debug("This is the target Data: " + targetData)
 	logging.debug("This is the mod name " + mod_name)
-	'''
-	logging.info("Unpack Mod")
+	logging.info("Unpacking " + mod_name)
 
 	def CopyFile(file, filename):
 		newFileName = targetData + "\\" + file
@@ -31,36 +27,25 @@ def UnpackMod(origin, target):
 		shutil.copy2(filename, newFileName)
 
 	def UnpackBSA(file, filename):
+		logging.info("Unpack BSA " + file)
 		commandLine = [bsarch, "unpack", filename, targetData]
 		util.RunCommandLine(commandLine)
-		'''
-		commandLine = '"' + bsarch + '" unpack "' + filename + '" "' + targetData + '"'
-		logging.debug("Command Line:\n" + str(commandLine))
-		p = subprocess.Popen(commandLine, shell=True)
-		(output, err) = p.communicate()
-		p_status = p.wait()
-		'''
 
 	BSAsToUnpack = []
 	FilesToRename = []
 		
-	for file in os.listdir(targetData):
-		logging.debug("   Found " + file)
-		filename = os.path.join(targetData, file)
+	for file in os.listdir(origin):
+		logging.debug("   Found <" + file + ">")
+		filename = os.path.join(origin, file)
 		if file.endswith(".bsa"):
 			BSAsToUnpack.append( (file, filename) )
 		elif file.endswith(".esp") or file.endswith(".ini"):
 			newFileName = os.path.join(targetData, mod_name + file[-4:])
-			FilesToRename.append( (filename, newFileName) )
+			shutil.copy2(filename, newFileName)
 			
 	for bsaToUnpack in BSAsToUnpack:
 		(file, filename) = bsaToUnpack
-		UnpackBSA(file, filename)
-		os.remove(filename)
-		
-	for fileToRename in FilesToRename:
-		(filename, newFileName) = fileToRename
-		os.rename(filename, newFileName)
+		UnpackBSA(file, filename)		
 
 if __name__ == '__main__':
 	origin = sys.argv[1]

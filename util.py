@@ -1,7 +1,6 @@
 #! python3
 
-import os, subprocess, logging
-
+import inspect, logging, os, pathlib, subprocess
 
 def RunCommandLine(commandLine):
 	logging.debug("Running commandLine " + str(commandLine))
@@ -38,4 +37,21 @@ def InitialiseLog(newFileName):
 		logging.getLogger('').addHandler(console)
 		
 		logging.info("Logger Initialised")
-
+		
+def GetScriptPath():
+	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+	return script_path
+	
+def HasSDK():
+	try:
+		# NvnTools\NvnTexpkg.exe
+		script_path = GetScriptPath()
+		sdk_path = os.path.join(script_path, "NvnTools", "NvnTexpkg.exe")
+		my_file = pathlib.Path(sdk_path)
+		my_abs_path = my_file.resolve()
+	except FileNotFoundError:
+		# doesn't exist
+		return False
+	else:
+		# exists
+		return True

@@ -1,22 +1,25 @@
 @ECHO OFF
 
+SETLOCAL
+
 SET LOG=%~d1%~p1%~n1_Log.TXT
 SET SCRIPTS_PATH=%~d0%~p0
 SET LOAD_ORDER_PY="%SCRIPTS_PATH%packed_load_order.py"
-SET BSARCH="%SCRIPTS_PATH%bsarch.exe"
+SET PRISTINE=%SCRIPTS_PATH%PristineIni
 
 SET ORIGINAL=%~f1
-SET DUPLICATE=%~f1_Converted
+SET DUPLICATE=%~f2
+SET LOAD_ORDER=%3
 
 SET PATH=%PATH%;%SCRIPTS_PATH%
 
 >CON ECHO Starting up...
 >CON ECHO SCRIPTS_PATH is %SCRIPTS_PATH%
->CON ECHO bsarch.exe is set at %BSARCH%
 
->CON ECHO packed_load_order.py is set at %LOAD_ORDER_PY%
 
->CON ECHO Akkrand's Load Order Script v1.0.0
+>CON ECHO load_order.py is set at %LOAD_ORDER_PY%
+
+>CON ECHO Akkrand's Packed Load Order Script v2.0.0
 PAUSE
 
 >CON ECHO Finding Python 3.x path
@@ -25,7 +28,9 @@ IF ERRORLEVEL 1 GOTO pythonError
 
 >CON ECHO Found Python 3.x path
 
->"%LOG%" %PYTHON3% %LOAD_ORDER_PY% "%ORIGINAL%" "%DUPLICATE%" %BSARCH%
+ROBOCOPY "%PRISTINE%" "%DUPLICATE%" /MIR
+
+>"%LOG%" %PYTHON3% %LOAD_ORDER_PY% "%ORIGINAL%" "%DUPLICATE%" %LOAD_ORDER% 1
 PAUSE
 
 GOTO :EOF

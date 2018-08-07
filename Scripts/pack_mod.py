@@ -12,7 +12,8 @@ import bitflag
 
 def PackMod(mod_name, target):
 	script_path = util.GetScriptPath()
-	bsarch = os.path.join(script_path, "bsarch.exe")
+	utilities_path = util.GetUtilitiesPath()
+	bsarch = os.path.join(utilities_path, "bsarch.exe")
 	targetData = target + r"\Data"
 	logging.debug("This is the target: " + target)
 	logging.debug("This is the target Data: " + targetData)
@@ -39,14 +40,6 @@ def PackMod(mod_name, target):
 			MakeBSAs[name] = []
 		MakeBSAs[name].append(folder)
 		
-	def RemoveTree(tree):
-		logging.debug("Remove Tree <" + tree + ">")
-		try:
-			shutil.rmtree(tree, ignore_errors=True)
-			os.rmdir(tree)
-		except FileNotFoundError:
-			pass
-
 	def DetectBSAType(full_path):
 		for root, subdirs, files in os.walk(full_path):
 			for file in files:
@@ -61,7 +54,7 @@ def PackMod(mod_name, target):
 		full_path = os.path.join(targetData, path)
 		if os.path.isdir(full_path):
 			if path == "sound":
-				RemoveTree(full_path)
+				util.RemoveTree(full_path)
 			else:
 				bsa_type = None
 				if path not in ReverseBSAGroups:
@@ -125,7 +118,7 @@ def PackMod(mod_name, target):
 			temp = os.path.join(targetData, "Temp" + bsa_file_suffix)
 			temp_data = os.path.join(temp, "Data")
 			
-			RemoveTree(temp)
+			util.RemoveTree(temp)
 			
 			for folder in folder_list:
 				from_folder = os.path.join(targetData, folder)
@@ -149,7 +142,7 @@ def PackMod(mod_name, target):
 				#checkCommandLine = '"' + bsarch + '" "' + target_bsa + '"'
 				util.RunCommandLine(checkCommandLine)
 			
-			RemoveTree(temp)
+			util.RemoveTree(temp)
 			bsaList.append(target_bsa)
 	return bsaList
 

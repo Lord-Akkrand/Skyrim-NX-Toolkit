@@ -28,7 +28,7 @@ def ConvertPath(mod_name, target):
 				if filename.lower().endswith(".dds"):
 					file_path = os.path.join(root, filename)
 					logging.debug("ModConverting " + file_path)
-					convert_dds.ConvertDDS(script_path, targetData, filename)
+					convert_dds.ConvertDDS(targetData, filename)
 
 
 if __name__ == '__main__':

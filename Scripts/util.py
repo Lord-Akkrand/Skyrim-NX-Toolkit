@@ -38,9 +38,29 @@ def InitialiseLog(newFileName):
 		
 		logging.info("Logger Initialised")
 		
+def RemoveTree(tree):
+	logging.debug("Remove Tree <" + tree + ">")
+	for i in range(0,3):
+		try:
+			shutil.rmtree(tree, ignore_errors=True)
+			os.rmdir(tree)
+			break
+		except Exception:
+			pass
+		
 def GetScriptPath():
 	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 	return script_path
+	
+def GetToolKitPath():
+	script_path = GetScriptPath()
+	toolkit_path = os.path.dirname(script_path)
+	return toolkit_path
+
+def GetUtilitiesPath():
+	toolkit_path = GetToolKitPath()
+	utilities_path = os.path.join(toolkit_path, "Utilities")
+	return utilities_path
 	
 def HasSDK():
 	try:

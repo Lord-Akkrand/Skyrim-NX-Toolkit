@@ -11,7 +11,8 @@ import subprocess
 
 def ArchiveBSA(target_folder, bsa_filename):
 	script_path = util.GetScriptPath()
-	archive_original = os.path.join(script_path, "Archive.exe") 
+	utilities_path = util.GetUtilitiesPath()
+	archive_original = os.path.join(utilities_path, "Archive.exe") 
 	
 	logging.debug("Copy Archive.exe to target folder")
 	archive = os.path.join(target_folder, "Archive.exe")

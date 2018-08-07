@@ -12,7 +12,8 @@ import bitflag
 
 def UnpackMod(origin, target):
 	script_path = util.GetScriptPath()
-	bsarch = os.path.join(script_path, "bsarch.exe")
+	utilities_path = util.GetUtilitiesPath()
+	bsarch = os.path.join(utilities_path, "bsarch.exe")
 	targetData = target + r"\Data"
 	mod_name = os.path.basename(origin)
 	logging.debug("This is the origin: " + origin)

@@ -54,7 +54,7 @@ import logging
 
 import subprocess
 
-def ConvertDDS(script_path, basePath, ddsFileName):
+def ConvertDDS(basePath, ddsFileName):
 	relativeFilename = ddsFileName.replace(basePath, '')
 
 	hasSDK = util.HasSDK()
@@ -76,7 +76,8 @@ def ConvertDDS(script_path, basePath, ddsFileName):
 		logging.debug(path)
 	logging.debug('END PATH')
 	
-	nvddsinfo = os.path.join(script_path, "nvddsinfo.exe")
+	utilities_path = util.GetUtilitiesPath()
+	nvddsinfo = os.path.join(utilities_path, "nvddsinfo.exe")
 	logging.debug(nvddsinfo + " " +  ddsFileName)
 	dds_buffer, dds_err = util.RunCommandLine([nvddsinfo, ddsFileName])
 	
@@ -84,7 +85,7 @@ def ConvertDDS(script_path, basePath, ddsFileName):
 	logging.debug(dds_buffer)
 	logging.debug('DDSINFO END')
 
-	texdiag = os.path.join(script_path, "texdiag.exe")
+	texdiag = os.path.join(utilities_path, "texdiag.exe")
 	logging.debug(texdiag + " " + ddsFileName)
 	td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])
 	logging.debug('TEXDIAG START')
@@ -203,7 +204,7 @@ def ConvertDDS(script_path, basePath, ddsFileName):
 			newLinearSize = newWidth * newHeight
 			newMipmaps -= 1
 			logging.debug('Resizing ' + str(resizePercentage) + ' results in ' + str(newWidth) + 'x' + str(newHeight))
-		texconv = os.path.join(script_path, "texconv.exe")
+		texconv = os.path.join(utilities_path, "texconv.exe")
 		commandLine = [texconv, "-pow2", "-fl", "9.3", "-y"]
 		if newWidth < width:
 			commandLine += ["-w", str(newWidth)]
@@ -224,7 +225,6 @@ def ConvertDDS(script_path, basePath, ddsFileName):
 
 
 if __name__ == '__main__':
-	script_path = sys.argv[1]
-	basePath = sys.argv[2]
-	ddsFileName = sys.argv[3]
-	ConvertDDS(script_path, basePath, ddsFileName)
+	basePath = sys.argv[1]
+	ddsFileName = sys.argv[2]
+	ConvertDDS(basePath, ddsFileName)

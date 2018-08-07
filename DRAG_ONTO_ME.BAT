@@ -1,7 +1,8 @@
 @ECHO OFF
 
 >CON ECHO Starting up...
-SET SCRIPTS_PATH=%~d0%~p0
+SET TOOLKIT_PATH=%~d0%~p0
+SET SCRIPTS_PATH=%TOOLKIT_PATH%Scripts\
 
 SET CONVERT_PATH_PY="%SCRIPTS_PATH%convert_path.py"
 >CON ECHO convert_path.py is set at %CONVERT_PATH_PY%

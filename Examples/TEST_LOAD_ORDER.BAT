@@ -1,4 +1,4 @@
 @ECHO OFF
 CD ..
-LOAD_ORDER.BAT "Examples\TestLoadOrder" "Examples\BuiltLoadOrder" Test
+LOAD_ORDER.BAT "Examples\WorkingMods" "Examples\BuiltLoadOrder" Test
 CD Examples

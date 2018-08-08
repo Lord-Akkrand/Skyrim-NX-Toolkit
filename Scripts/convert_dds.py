@@ -58,16 +58,11 @@ def ConvertDDS(basePath, ddsFileName):
 	relativeFilename = ddsFileName.replace(basePath, '')
 
 	hasSDK = util.HasSDK()
-	'''
-	logging.debug("This is texconv: " + " " +  texconv)
+	
 	logging.debug("This is the base path: " + " " +  basePath)
 	logging.debug("This is dds file: " + " " +  ddsFileName)
-	logging.debug("This is the relative dds file: " + " " +  relativeFilename)
-	logging.debug("This is ddsinfo text file: " + " " +  ddsInfo)
-	logging.debug("This is texdiag text file: " + " " +  texdiag)
-	logging.debug("HAS_SDK: " + " " +  hasSDK)
-	'''
-	
+	logging.debug("HAS_SDK: " +  str(hasSDK))
+		
 	logging.debug("convert_dds.py 2.0")
 
 	relativePathList = relativeFilename[1:].split('\\')

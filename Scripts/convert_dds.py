@@ -228,8 +228,11 @@ def ConvertDDS(basePath, ddsFileName):
 		
 		util.ForceMove(out_file, ddsFileName)
 	else:
-		pass
-
+		xtx_extract = util.GetXTXExtract()
+		commandLine = ["py", "-3", xtx_extract, ddsFileName]
+		util.RunCommandLine(commandLine)
+		out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
+		util.ForceMove(out_file, ddsFileName)
 
 if __name__ == '__main__':
 	basePath = sys.argv[1]

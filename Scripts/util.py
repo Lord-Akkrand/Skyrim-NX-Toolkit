@@ -90,23 +90,20 @@ def GetUtilitiesPath():
 	return utilities_path
 	
 def HasSDK():
-	try:
-		# NvnTools\NvnTexpkg.exe
-		toolkit_path = GetToolKitPath()
-		sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
-		my_file = pathlib.Path(sdk_path)
-		my_abs_path = my_file.resolve()
-	except FileNotFoundError:
-		# doesn't exist
-		return False
-	else:
-		# exists
-		return True
+	# NvnTools\NvnTexpkg.exe
+	toolkit_path = GetToolKitPath()
+	sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
+	return os.path.exists(sdk_path)		
 		
 def GetNvnTexpkg():
 	toolkit_path = GetToolKitPath()
 	sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
 	return sdk_path
 
+def GetXTXExtract():
+	toolkit_path = GetToolKitPath()
+	xtx_extract = os.path.join(toolkit_path, "XTX-Extractor-master", "xtx_extract.py")
+	return xtx_extract
+	
 def ForceMove(fromFile, toFile):
 	shutil.move(fromFile, toFile)

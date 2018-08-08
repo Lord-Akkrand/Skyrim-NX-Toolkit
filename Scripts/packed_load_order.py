@@ -163,9 +163,13 @@ def LoadOrder(origin, target, loadOrderName):
 			logging.debug("Passing on " + plugin)
 		else:
 			unpack_mod.UnpackMod(pluginFolder, target)
+			for file in os.listdir(targetData):
+				if file.endswith(".ini"):
+					filename = os.path.join(targetData, file)
+					os.remove(filename)
 			for file in os.listdir(pluginFolder):
 				logging.debug("   Found " + file)
-				filename = pluginFolder + "\\" + file
+				filename = os.path.join(pluginFolder, file)
 				if file.endswith(".esm") or file.endswith(".esp"):
 					InsertTestFile(file, filename)
 				elif file.endswith(".ini"):

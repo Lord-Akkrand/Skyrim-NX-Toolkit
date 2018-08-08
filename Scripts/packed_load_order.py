@@ -19,11 +19,6 @@ def LoadOrder(origin, target, loadOrderName):
 	logging.debug("This is the load order name: " + loadOrderName)
 
 	logging.info("Packed Load Order " + loadOrderName)
-	logging.debug("Create empty target Data")
-	os.mkdir(targetData)
-	if not os.access(targetData, os.F_OK):
-		logging.debug("Error creating targetData")
-		sys.exit(1)
 	
 	loadOrderTxt = os.path.join(origin, loadOrderName + ".txt")
 	loadOrder = open(loadOrderTxt, 'r').read()
@@ -175,6 +170,13 @@ def LoadOrder(origin, target, loadOrderName):
 					InsertTestFile(file, filename)
 				elif file.endswith(".ini"):
 					InsertIni(filename)
+				elif file.endswith(".bsa"):
+					pass # we unpacked already
+				else:
+					if os.path.isdir(filename):
+						shutil.copytree(filename, os.path.join(targetData, file))
+					else:
+						shutil.copy2(filename, os.path.join(targetData, file))
 					
 	bsaList = pack_mod.PackMod(loadOrderName, target)
 	for filename in bsaList:

@@ -38,20 +38,47 @@ def InitialiseLog(newFileName):
 		
 		logging.info("Logger Initialised")
 		
-def RemoveTree(tree):
-	logging.debug("Remove Tree <" + tree + ">")
+def OldRemoveTree(tree):
+	success = False
 	for i in range(0,3):
+		logging.debug("Remove Tree <" + tree + ">")
 		try:
 			shutil.rmtree(tree, ignore_errors=True)
 			os.rmdir(tree)
+			success = True
 			break
 		except Exception:
 			pass
+	if not success:
+		RemoveTree(tree)
+	return success
+
+def RemoveTree(tree):
+	success = False
+	empty_path = GetEmptyPath()
+	commandLine = ["ROBOCOPY", empty_path, tree, "/PURGE", "/XF", ".gitignore"]
+	for i in range(0,3):
+		try:
+			logging.debug("RemoveTree({})".format(tree))
+			RunCommandLine(commandLine)
+			os.rmdir(tree)
+			success = True
+			break
+		except Exception:
+			pass
+	if not success:
+		logging.warning("RemoveTree({}) not successful".format(tree))
+	return success
 		
 def GetScriptPath():
 	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 	return script_path
-	
+
+def GetEmptyPath():
+	toolkit_path = GetToolKitPath()
+	empty_path = os.path.join(toolkit_path, "Empty")
+	return empty_path
+
 def GetToolKitPath():
 	script_path = GetScriptPath()
 	toolkit_path = os.path.dirname(script_path)

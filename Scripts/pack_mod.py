@@ -128,8 +128,14 @@ def PackMod(mod_name, target):
 			target_bsa = os.path.join(targetData, bsa_filename)
 			useArchive = True
 			if useArchive:
-				bsa_filename = archive_bsa.ArchiveBSA(temp, bsa_filename)
-				shutil.move(bsa_filename, target_bsa)
+				bsa_list = archive_bsa.ArchiveBSA(temp, bsa_filename)
+				for bsa_info in bsa_list:
+					bsa_filename = bsa_info["FileName"]
+					bsa_filepath = bsa_info["Folder"]
+					bsa_fullpath = os.path.join(bsa_filepath, bsa_filename)
+					newTargetBSA = os.path.join(targetData, bsa_filename)
+					shutil.move(bsa_fullpath, newTargetBSA)
+					bsaList.append(newTargetBSA)
 			else:
 				archive_flags = GetArchiveFlags(folder_list, temp_data)
 				
@@ -141,9 +147,10 @@ def PackMod(mod_name, target):
 				checkCommandLine = [bsarch, target_bsa]
 				#checkCommandLine = '"' + bsarch + '" "' + target_bsa + '"'
 				util.RunCommandLine(checkCommandLine)
+				bsaList.append(target_bsa)
 			
 			util.RemoveTree(temp)
-			bsaList.append(target_bsa)
+			
 	return bsaList
 
 if __name__ == '__main__':

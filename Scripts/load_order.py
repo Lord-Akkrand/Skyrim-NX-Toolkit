@@ -17,11 +17,6 @@ def LoadOrder(origin, target, loadOrderName):
 	logging.debug("This is the load order name: " + loadOrderName)
 
 	logging.info("Load Order " + loadOrderName)
-	logging.debug("Create empty target Data")
-	os.mkdir(targetData)
-	if not os.access(targetData, os.F_OK):
-		logging.debug("Error creating targetData")
-		sys.exit(1)
 	
 	loadOrderTxt = os.path.join(origin, loadOrderName + ".txt")
 	loadOrder = open(loadOrderTxt, 'r').read()

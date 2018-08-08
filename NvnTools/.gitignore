@@ -1,0 +1,6 @@
+# Annoying Windows Files
+desktop.ini
+
+*.dll
+*.lib
+*.exe

@@ -12,11 +12,6 @@ bsarch.exe
 *.pyc
 __pycache__/
 
-# SDK Folders
-AdpcmTools/
-GraphicsTools/
-NvnTools/
-
 # Test Folders
 test me/
 test me_Archived/

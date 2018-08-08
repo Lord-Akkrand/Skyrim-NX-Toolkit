@@ -1,3 +1,5 @@
+![Skyrim NX Toolkit](Skyrim-NX-Toolkit.png)
+
 It is necessary that you have Python 3.x installed.
 - Python 3.x https://www.python.org/downloads/
 The batch scripts will attempt to find the path to your python.exe automatically.  If it fails, you will get an error and may need to modify the FIND_PYTHON.BAT file to compensate.

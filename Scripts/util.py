@@ -1,6 +1,6 @@
 #! python3
 
-import inspect, logging, os, pathlib, subprocess
+import inspect, logging, os, pathlib, subprocess, shutil
 
 def RunCommandLine(commandLine):
 	logging.debug("Running commandLine " + str(commandLine))
@@ -92,8 +92,8 @@ def GetUtilitiesPath():
 def HasSDK():
 	try:
 		# NvnTools\NvnTexpkg.exe
-		script_path = GetScriptPath()
-		sdk_path = os.path.join(script_path, "NvnTools", "NvnTexpkg.exe")
+		toolkit_path = GetToolKitPath()
+		sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
 		my_file = pathlib.Path(sdk_path)
 		my_abs_path = my_file.resolve()
 	except FileNotFoundError:
@@ -102,3 +102,11 @@ def HasSDK():
 	else:
 		# exists
 		return True
+		
+def GetNvnTexpkg():
+	toolkit_path = GetToolKitPath()
+	sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
+	return sdk_path
+
+def ForceMove(fromFile, toFile):
+	shutil.move(fromFile, toFile)

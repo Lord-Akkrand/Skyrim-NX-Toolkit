@@ -51,12 +51,13 @@ import os.path
 import sizes
 import util
 import logging
+import shutil
 
 import subprocess
 
 def ConvertDDS(basePath, ddsFileName):
 	relativeFilename = ddsFileName.replace(basePath, '')
-
+	ddsFilePath = os.path.dirname(ddsFileName)
 	hasSDK = util.HasSDK()
 	
 	logging.debug("This is the base path: " + " " +  basePath)
@@ -217,6 +218,17 @@ def ConvertDDS(basePath, ddsFileName):
 		output, err = util.RunCommandLine(commandLine)
 	else:
 		logging.debug("TexConv will not run")
+		
+	logging.debug("Now for NX texture conversion")
+	if hasSDK:
+		nvntexpkg = util.GetNvnTexpkg()
+		out_file = os.path.join(ddsFilePath, "out.xtx")
+		commandLine = [nvntexpkg, "-i", ddsFileName, "-v", "--printinfo", "-o", out_file]
+		util.RunCommandLine(commandLine)
+		
+		util.ForceMove(out_file, ddsFileName)
+	else:
+		pass
 
 
 if __name__ == '__main__':

@@ -1,0 +1,7 @@
+# Annoying Windows Files
+desktop.ini
+*.log
+
+# Test Folders
+BuiltLoadOrder/
+

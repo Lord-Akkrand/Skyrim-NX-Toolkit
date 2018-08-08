@@ -14,6 +14,12 @@ If you drag a folder onto the file DRAG_ONTO_ME.BAT, it should start the process
 
 The converted mod will need to be packed back into a BSA and loaded in your Skyrim.ini(edited)
 
+Alternatively, if you have all the files for a given mod in a folder (esp + bsas or loose files), you can convert the mod using CONVERT_MOD.BAT
+- It will unpack any bsas it finds, and copy across any other loose files it finds
+- it will then convert any textures it finds
+- It will then pack all the folders (textures/meshes/scripts/etc) into bsas, one for misc, one for meshes, and one for textures
+
+
 There are 2 folders in the toolkit folder, GraphicsTools & NvnTools, which require files that are not publicly available in order to work.  The Readme files in those folder list the files required for the SDK conversion to work.  I will not link to those files publicly.
 
 Note that you require some external tools to run my scripts, they should be placed in the 'Utilities' directory.

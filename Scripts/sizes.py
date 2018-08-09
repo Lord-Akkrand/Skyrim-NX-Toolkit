@@ -38,19 +38,21 @@ All others are color-map, alpha is opacity or parallax
 DXT1 = ('DXT1','BC1_UNORM')
 DXT5 = ('DXT5','BC3_UNORM')
 BC4U = ('BC4U','BC4_UNORM')
-DX10 = ('DX10','BC7_UNORM')
 RGBA = ('RGBA', 'R8G8B8A8_UNORM')
 BGRA = ('BGRA', 'B8G8R8A8_UNORM')
 R8UN = ('R8UN', 'R8_UNORM')
+DX10 = ('DX10','BC7_UNORM')
+DX10_SRGB = ('BC3_UNORM_SRGB', 'BC3_UNORM_SRGB')
 
 Formats = []
 Formats.append(DXT1)
 Formats.append(DXT5)
 Formats.append(BC4U)
-Formats.append(DX10)
 Formats.append(RGBA)
 Formats.append(BGRA)
 Formats.append(R8UN)
+Formats.append(DX10)
+Formats.append(DX10_SRGB)
 
 Rules = []
 
@@ -84,9 +86,11 @@ ConvertFromTo = []
 ConvertFromTo.append(('DX10',DXT5))
 ConvertFromTo.append(('BGRA',RGBA))
 ConvertFromTo.append(('DX10',DXT5))
+ConvertFromTo.append(('BC3_UNORM_SRGB',DXT5))
 
 ConvertFromToSDK = []
 ConvertFromToSDK.append(('R8UN',DXT1))
+ConvertFromToSDK.append(('BC3_UNORM_SRGB',DX10))
 
 
 # Fallback, if not found, use 1024*1024 as default

@@ -112,6 +112,8 @@ def ConvertDDS(basePath, ddsFileName):
 		fourCC = fourCC.group(1)
 	else:
 		fourCC = '----'
+		
+	if fourCC == '----' or fourCC == 'DX10':
 		diffPattern = r"format = \b(.*)\b"
 		tdFormat = ''
 		m = re.search(diffPattern, td_buffer)

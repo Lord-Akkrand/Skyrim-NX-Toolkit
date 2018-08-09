@@ -69,7 +69,25 @@ def RemoveTree(tree):
 	if not success:
 		logging.warning("RemoveTree({}) not successful".format(tree))
 	return success
-		
+	
+def CreateTargetData(target):
+	logging.info("CreateTargetData({})".format(target))
+	targetData = os.path.join(target, "Data")
+	empty_path = GetEmptyPath()
+	
+	commandLine = ["ROBOCOPY", empty_path, target, "/MIR", "/XF", ".gitignore"]
+	RunCommandLine(commandLine)
+	commandLine = ["ROBOCOPY", empty_path, targetData, "/MIR", "/XF", ".gitignore"]
+	RunCommandLine(commandLine)
+
+def CopyOriginToTargetData(origin, target):
+	targetData = os.path.join(target, "Data")
+	logging.info("CopyOriginToTargetData({}, {})".format(origin, targetData))
+
+	commandLine = ["ROBOCOPY", origin, targetData, "/MIR"]
+	RunCommandLine(commandLine)
+	
+	
 def GetScriptPath():
 	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 	return script_path

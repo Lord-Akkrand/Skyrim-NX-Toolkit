@@ -1,7 +1,7 @@
 #! python3
 
 # Import the modules needed to run the script.
-import sys, os
+import sys, os, util
 
 current_stack = []
 current_data = {}
@@ -88,17 +88,11 @@ def GoBack():
 	current_stack.pop()
 	EnterMenu()
 	
-# =======================
-#          MENUS FUNCTIONS
-# =======================
-	
-def ConvertMod():
-	print("Convert MOD NOW!")
-	exit()
-
-def UnpackMod():
-	print("Unpack MOD NOW!")
-	exit()
+def GetDataPath(key):
+	path = GetData(key)
+	if path[0] == '"' and path[-1] == '"':
+		path = path[1:-1]
+	return path
 	
 def GetData(key):
 	data = "Not Set"
@@ -115,13 +109,53 @@ def SetData(key):
 	choice = choice.rstrip()
 
 	if choice != "":
-		current_data[key] = choice
+		SetDataTo(key, choice)
 
 	EnterMenu()
+
+def SetDataTo(key, value):
+	current_data[key] = value
 	
 # Exit program
-def exit():
+def Exit():
 	sys.exit()
+
+	
+# =======================
+#          MENUS FUNCTIONS
+# =======================
+import convert_mod, unpack_mod
+
+def ConvertMod():
+	origin = GetDataPath("Origin")
+	target = GetDataPath("Target")
+	
+	util.InitialiseLog(origin + ".log")
+	convert_mod.ConvertMod(origin, target)
+	Exit()
+
+def UnpackMod():
+	origin = GetDataPath("Origin")
+	target = GetDataPath("Target")
+	
+	util.InitialiseLog(origin + ".log")
+	util.CreateTargetData(target)
+	unpack_mod.UnpackMod(origin, target)
+	Exit()
+	
+def ConvertPath():
+	origin = GetDataPath("Origin")
+	target = GetDataPath("Target")
+	
+	util.InitialiseLog(origin + ".log")
+	util.CopyOriginToTargetData(origin, target)
+	convert_path.ConvertPath(origin, target)
+	Exit()
+	
+def PackMod():
+	print("Pack MOD NOW!")
+	Exit()
+		
 
 # =======================
 #    MENUS DEFINITIONS
@@ -130,9 +164,10 @@ def exit():
 Data = {
 	"Origin":"Origin Folder",
 	"Target":"Target Folder",
+	"File":"Config File"
 }
  
-convert_mod = {
+convertMod = {
 	"Title":"Convert Mod",
 	"Show":["Origin", "Target"],
 	"Options": {
@@ -143,7 +178,7 @@ convert_mod = {
 		},
 }
 
-unpack_mod = {
+unpackMod = {
 	"Title":"Unpack Mod",
 	"Show":["Origin", "Target"],
 	"Options": {
@@ -154,12 +189,36 @@ unpack_mod = {
 		},
 }
 
+convertPath = {
+	"Title":"Convert Path",
+	"Show":["Origin", "Target"],
+	"Options": {
+		'1': {'Title':"Set Origin Folder", 'FunctionParam':(SetData, "Origin")},
+		'2': {'Title':"Set Target Folder", 'FunctionParam':(SetData, "Target")},
+		'3': {'Title':"Convert Now", 'Function':ConvertPath, "DataRestriction":["Origin", "Target"]},
+		'9': {'Title':"Back", 'Function':GoBack},
+		},
+}
+
+packMod = {
+	"Title":"Pack Mod",
+	"Show":["Origin", "Target"],
+	"Options": {
+		'1': {'Title':"Set Origin Folder", 'FunctionParam':(SetData, "Origin")},
+		'2': {'Title':"Set Target Folder", 'FunctionParam':(SetData, "Target")},
+		'3': {'Title':"Pack Now", 'Function':PackMod, "DataRestriction":["Origin", "Target"]},
+		'9': {'Title':"Back", 'Function':GoBack},
+		},
+}
+
 main_menu = {
 	"Title":"Main Menu",
 	"Options": {
-		'1': {'Transition':convert_mod},
-		'2': {'Transition':unpack_mod},
-		'9': {'Title':"Exit", 'Function':exit},
+		'1': {'Transition':convertMod},
+		'2': {'Transition':unpackMod},
+		'3': {'Transition':convertPath},
+		'4': {'Transition':packMod},
+		'9': {'Title':"Exit", 'Function':Exit},
 		}
 }
  
@@ -170,4 +229,14 @@ main_menu = {
 # Main Program
 if __name__ == "__main__":
 	# Launch main menu
+	if len(sys.argv) > 1:
+		arg = sys.argv[1]
+		if os.path.isfile(arg):
+			SetDataTo("File", arg)
+		elif os.path.isdir(arg):
+			origin = arg
+			target = origin + "_Output"
+			SetDataTo("Origin", origin)
+			SetDataTo("Target", target)
+		
 	TransitionToMenu(main_menu)

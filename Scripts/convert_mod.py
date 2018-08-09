@@ -11,7 +11,6 @@ import inspect, os
 import bitflag
 
 def ConvertMod(origin, target):
-	targetData = target + r"\Data"
 	mod_name = os.path.basename(origin)
 	'''
 	logging.debug("This is the origin: " + origin)
@@ -21,7 +20,9 @@ def ConvertMod(origin, target):
 	'''
 	logging.debug("convert_mod.py 2.0")
 	
-	logging.info("Convert Mod")
+	logging.info("Convert Mod, create empty folder at target")
+	
+	util.CreateTargetData(target)
 	
 	unpack_mod.UnpackMod(origin, target)
 		

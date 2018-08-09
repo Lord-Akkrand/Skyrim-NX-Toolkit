@@ -15,10 +15,23 @@ def EnterMenu():
 	choice = input(" >> ")
 	ExecuteMenuChoice(choice)
 
+def IsRestricted(optionInfo):
+	restricted = False
+	if "DataRestriction" in optionInfo:
+			for data in optionInfo["DataRestriction"]:
+				restricted = restricted or GetData(data) == "Not Set"
+	return restricted
+	
 def PrintMenu():
 	current = current_stack[-1]
 	os.system('CLS')
 	print(current['Title'])
+	if "Show" in current:
+		for show in current["Show"]:
+			data = GetData(show)
+			name = Data[show]
+			print("Current {} is <{}>".format(name, data))
+			
 	options = []
 	optionHash = current['Options']
 	for key in optionHash:
@@ -27,10 +40,19 @@ def PrintMenu():
 	
 	for optionId in options:
 		optionInfo = optionHash[optionId]
+		optionString = "{}:".format(optionId)
+
+		if IsRestricted(optionInfo):
+			optionString += "[X] "
+		else:
+			optionString += "    "
+			
+		
 		if "Title" in optionInfo:
-			print("{}: {}".format(optionId, optionInfo['Title']))
+			optionString += "{}".format(optionInfo['Title'])
 		elif 'Transition' in optionInfo:
-			print("{}: {}".format(optionId, optionInfo['Transition']['Title']))
+			optionString += "{}".format(optionInfo['Transition']['Title'])
+		print(optionString)
 		
 # Execute menu
 def ExecuteMenuChoice(choice):
@@ -44,14 +66,17 @@ def ExecuteMenuChoice(choice):
 		optionHash = current['Options']
 		try:
 			option = optionHash[ch]
+			if IsRestricted(option):
+				EnterMenu()
+				return
 			if "Function" in option:
 				option["Function"]()
 				return
 			if "FunctionParam" in option:
 				funcData = option["FunctionParam"]
 				func = funcData[0]
-				params = funcData[1]
-				func(*params)
+				param = funcData[1]
+				func(param)
 				return
 			if "Transition" in option:
 				TransitionToMenu(option["Transition"])
@@ -75,45 +100,56 @@ def UnpackMod():
 	print("Unpack MOD NOW!")
 	exit()
 	
-def SetData(key, name):
-	os.system("CLS")
+def GetData(key):
 	data = "Not Set"
 	if key in current_data:
 		data = current_data[key]
+	return data
+	
+def SetData(key):
+	name = Data[key]
+	os.system("CLS")
+	data = GetData(key)
 	print("Current {} is <{}>".format(name, data))
 	choice = input("Press ENTER if this is correct, or enter new value:")
 	choice = choice.rstrip()
-	current_data[key] = choice
+
 	if choice != "":
-		SetData(key, name)
+		current_data[key] = choice
+
 	EnterMenu()
 	
 # Exit program
 def exit():
 	sys.exit()
- 
+
 # =======================
 #    MENUS DEFINITIONS
 # =======================
+
+Data = {
+	"Origin":"Origin Folder",
+	"Target":"Target Folder",
+}
  
 convert_mod = {
 	"Title":"Convert Mod",
-	"Show":["OriginFolder"],
+	"Show":["Origin", "Target"],
 	"Options": {
-		'1': {'Title':"Set Origin Folder", 'FunctionParam':(SetData, ["Origin", "Origin Folder"])},
-		'2': {'Title':"Set Origin Folder", 'FunctionParam':(SetData, ["Target", "Target Folder"])},
-		'3': {'Title':"Convert Now", 'Function':ConvertMod},
+		'1': {'Title':"Set Origin Folder", 'FunctionParam':(SetData, "Origin")},
+		'2': {'Title':"Set Target Folder", 'FunctionParam':(SetData, "Target")},
+		'3': {'Title':"Convert Now", 'Function':ConvertMod, "DataRestriction":["Origin", "Target"]},
 		'9': {'Title':"Back", 'Function':GoBack},
 		},
 }
 
 unpack_mod = {
 	"Title":"Unpack Mod",
-	"Show":["OriginFolder"],
+	"Show":["Origin", "Target"],
 	"Options": {
-		'1': {'Title':"Set Origin Folder", 'FunctionParam':(SetData, ["Origin", "Origin Folder"])},
-		'2': {'Title':"Set Origin Folder", 'FunctionParam':(SetData, ["Target", "Target Folder"])},
-		'3': {'Title':"Unpack Now", 'Function':UnpackMod},
+		'1': {'Title':"Set Origin Folder", 'FunctionParam':(SetData, "Origin")},
+		'2': {'Title':"Set Target Folder", 'FunctionParam':(SetData, "Target")},
+		'3': {'Title':"Unpack Now", 'Function':UnpackMod, "DataRestriction":["Origin", "Target"]},
 		'9': {'Title':"Back", 'Function':GoBack},
 		},
 }

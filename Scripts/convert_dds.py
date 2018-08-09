@@ -184,7 +184,7 @@ def ConvertDDS(basePath, ddsFileName):
 			forceFormat = conv[1][1]
 			logging.debug('Match.  Force convert to ' + forceFormat)
 			break
-
+	
 	shouldRun = shouldRun or linearSize > maxSize
 	shouldRun = shouldRun or (forceFormat != None)
 	if shouldRun:
@@ -215,6 +215,7 @@ def ConvertDDS(basePath, ddsFileName):
 			commandLine += ["-f", BC3_UNORM]
 		
 		commandLine += [ddsFileName]
+		commandLine += ["-o", ddsFilePath]
 		output, err = util.RunCommandLine(commandLine)
 	else:
 		logging.debug("TexConv will not run")

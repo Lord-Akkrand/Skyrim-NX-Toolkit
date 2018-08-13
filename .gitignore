@@ -13,11 +13,7 @@ bsarch.exe
 __pycache__/
 
 # Test Folders
-test me/
-test me_Archived/
-test me_Converted/
-TestLoadOrder/
-TestLoadOrder_Converted/
+test me*/
 
 # Log files
 *.log

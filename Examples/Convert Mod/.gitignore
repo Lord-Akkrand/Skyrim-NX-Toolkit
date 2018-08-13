@@ -1,0 +1,8 @@
+# Annoying Windows Files
+desktop.ini
+
+# Test Folders
+LAL_ConvertedAndPacked/
+
+# Logs
+*.log

@@ -24,7 +24,8 @@ As an examle, I use 4, because I do not use the Hyrule.esp.  The script will exp
 After the StartingESP number is set, then list the name of each mod in the order you want them loaded, with the name matching the name of the folder containing that mod.
 
 ### Output
-The output folder will end up containing ```
+The output folder will end up containing 
+```
 Skyrim.ini
 Skyrim_de.ini
 Skyrim_en.ini
@@ -32,7 +33,8 @@ Skyrim_es.ini
 Skyrim_fr.ini
 Skyrim_it.ini
 Skyrim_ja.ini
-Skyrim_ru.ini```
+Skyrim_ru.ini
+```
 
 They will all be modified to correctly load the esps and main, mesh, and texture bsas of every mod in your list.  If a mod contained an INI file, then the contents of that file should be included in the ini files as well.
 The Data folder will then contain all the esps and bsas that are required.

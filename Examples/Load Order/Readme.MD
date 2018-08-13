@@ -2,28 +2,28 @@
 
 The Load Order scripts (LOAD_ORDER.BAT & PACKED_LOAD_ORDER.BAT) are scripts that take a list of mod folders and puts together a package that can be copied across to the SD card ready for playing.
 
-### Usage
+## Usage
 Both scripts take 3 parameters:
 - The origin folder
 - The target folder
 - the name of the load order to use
 
-## Origin Folder
+### Origin Folder
 The Origin folder should contain a list of folders, one per mod.  Each mod folder should contain everything from that mod that you would put in your Data folder on the SD card, so ESP, BSAs, and INI files.
 
 It should also contain all of your load order files, named <YourLoadOrderName>.txt
 
-## Target Folder
+### Target Folder
 The target folder is where the script will put your package.  Everything in that folder (if it already exists) will be erased before the packing occurs.
 
-## Load Order Name
+### Load Order Name
 The script will look for your load order text file in the Origin folder, and use it to make your package.  
 The text file should start with a number on the first line, this is the number of the first sTestFile that is availble for the script to put ESPs in.  
 As an examle, I use 4, because I do not use the Hyrule.esp.  The script will explicitly remove the Hyrule.bsa if you select 4 or less.  I have no idea what would happen if you used 3 or less, since you'd then be not loading the original ESMs, and I'm sure there's data in the BSAs that might not work if the corresponding ESM is not present.
 
 After the StartingESP number is set, then list the name of each mod in the order you want them loaded, with the name matching the name of the folder containing that mod.
 
-### Output
+## Output
 The output folder will end up containing 
 ```
 Skyrim.ini

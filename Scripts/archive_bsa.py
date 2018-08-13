@@ -146,12 +146,12 @@ def ArchiveBSA(target_folder, bsa_filename):
 		newTally = currentFileSizeTally + file_size
 		totalWrittenTally = totalWrittenTally + file_size
 		logging.debug("Adding " + fileInfo['FileName'] + " currentFileSizeTally is " + str(currentFileSizeTally) + " file_size is " + str(file_size) + " totalWrittenTally is " + str(totalWrittenTally))
+		buffer += fileInfo['PathNoData'] + "\n"
+		currentFileSizeTally += file_size
 		if (newTally >= SizeLimitBSA) or (totalWrittenTally >= totalFileSizeTally):
 			WrtiteBSA()
 			currentFileSizeTally = 0
-		else:
-			buffer += fileInfo['PathNoData'] + "\n"
-			currentFileSizeTally += file_size
+		
 	if buffer != '':
 		logging.warning("BUFFER NOT EMPTY!")
 		

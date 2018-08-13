@@ -1,3 +1,4 @@
+![Convert Mod](CONVERT_MOD.gif)
 # Convert Mod
 
 Convert Mod will make a copy of a mod folder and unpack all the bsas from the mod into that folder, and copy across everything else.  

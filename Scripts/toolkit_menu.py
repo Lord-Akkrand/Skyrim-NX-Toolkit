@@ -139,7 +139,7 @@ def UnpackMod():
 	target = GetDataPath("Target")
 	
 	util.InitialiseLog(origin + ".log")
-	util.CreateTargetData(target)
+	util.CreateTarget(target)
 	unpack_mod.UnpackMod(origin, target)
 	Exit()
 	
@@ -148,7 +148,7 @@ def ConvertPath():
 	target = GetDataPath("Target")
 	
 	util.InitialiseLog(origin + ".log")
-	util.CopyOriginToTargetData(origin, target)
+	util.CopyOriginToTarget(origin, target)
 	convert_path.ConvertPath(origin, target)
 	Exit()
 	

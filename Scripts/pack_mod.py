@@ -14,13 +14,11 @@ def PackMod(mod_name, target):
 	script_path = util.GetScriptPath()
 	utilities_path = util.GetUtilitiesPath()
 	bsarch = os.path.join(utilities_path, "bsarch.exe")
-	targetData = target + r"\Data"
 	logging.debug("This is the target: " + target)
-	logging.debug("This is the target Data: " + targetData)
 	logging.debug("This is the mod name " + mod_name)
 	logging.info("Pack Mod")
 
-	data_list = os.listdir(targetData)
+	data_list = os.listdir(target)
 	logging.debug(str(data_list))
 
 	BSAGroups = {
@@ -51,7 +49,7 @@ def PackMod(mod_name, target):
 		
 	for path in data_list:
 		logging.debug('Checking path ' + path)
-		full_path = os.path.join(targetData, path)
+		full_path = os.path.join(target, path)
 		if os.path.isdir(full_path):
 			if path == "sound":
 				util.RemoveTree(full_path)
@@ -115,17 +113,17 @@ def PackMod(mod_name, target):
 			bsa_file_suffix = bsa_subname
 			if bsa_file_suffix != "":
 				bsa_file_suffix = " - " + bsa_file_suffix
-			temp = os.path.join(targetData, "Temp" + bsa_file_suffix)
+			temp = os.path.join(target, "Temp" + bsa_file_suffix)
 			temp_data = os.path.join(temp, "Data")
 			
 			util.RemoveTree(temp)
 			
 			for folder in folder_list:
-				from_folder = os.path.join(targetData, folder)
+				from_folder = os.path.join(target, folder)
 				to_folder = os.path.join(temp_data, folder)
 				shutil.move(from_folder, to_folder)
 			bsa_filename = mod_name + bsa_file_suffix + ".bsa"
-			target_bsa = os.path.join(targetData, bsa_filename)
+			target_bsa = os.path.join(target, bsa_filename)
 			useArchive = True
 			if useArchive:
 				bsa_list = archive_bsa.ArchiveBSA(temp, bsa_filename)
@@ -133,7 +131,7 @@ def PackMod(mod_name, target):
 					bsa_filename = bsa_info["FileName"]
 					bsa_filepath = bsa_info["Folder"]
 					bsa_fullpath = os.path.join(bsa_filepath, bsa_filename)
-					newTargetBSA = os.path.join(targetData, bsa_filename)
+					newTargetBSA = os.path.join(target, bsa_filename)
 					shutil.move(bsa_fullpath, newTargetBSA)
 					bsaList.append(newTargetBSA)
 			else:
@@ -157,4 +155,4 @@ if __name__ == '__main__':
 	mod_name = sys.argv[1]
 	target = sys.argv[2]
 	util.InitialiseLog(target + ".log")
-	ConvertMod(mod_name, target)
+	PackMod(mod_name, target)

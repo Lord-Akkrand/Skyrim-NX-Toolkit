@@ -14,7 +14,7 @@ def RunCommandLine(commandLine):
 		#err = err.decode('ascii')
 		logging.debug("Errors:" + err)#str(err.splitlines()))
 	return (output, err)
-
+	
 g_loggingInitialised = False
 def InitialiseLog(newFileName):
 	global g_loggingInitialised
@@ -70,21 +70,18 @@ def RemoveTree(tree):
 		logging.warning("RemoveTree({}) not successful".format(tree))
 	return success
 	
-def CreateTargetData(target):
-	logging.info("CreateTargetData({})".format(target))
-	targetData = os.path.join(target, "Data")
+def CreateTarget(target):
+	logging.info("CreateTarget({})".format(target))
 	empty_path = GetEmptyPath()
 	
 	commandLine = ["ROBOCOPY", empty_path, target, "/MIR", "/XF", ".gitignore"]
 	RunCommandLine(commandLine)
-	commandLine = ["ROBOCOPY", empty_path, targetData, "/MIR", "/XF", ".gitignore"]
-	RunCommandLine(commandLine)
 
-def CopyOriginToTargetData(origin, target):
-	targetData = os.path.join(target, "Data")
-	logging.info("CopyOriginToTargetData({}, {})".format(origin, targetData))
 
-	commandLine = ["ROBOCOPY", origin, targetData, "/MIR"]
+def CopyOriginToTarget(origin, target):
+	logging.info("CopyOriginToTarget({}, {})".format(origin, target))
+
+	commandLine = ["ROBOCOPY", origin, target, "/MIR"]
 	RunCommandLine(commandLine)
 	
 	

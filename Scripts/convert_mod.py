@@ -15,15 +15,13 @@ def ConvertMod(origin, target):
 	'''
 	logging.debug("This is the origin: " + origin)
 	logging.debug("This is the target: " + target)
-	logging.debug("This is the target Data: " + targetData)
 	logging.debug("This is the mod name " + mod_name)
 	'''
 	logging.debug("convert_mod.py 2.0")
 	
 	logging.info("Convert Mod, create empty folder at target")
 	
-	util.CreateTargetData(target)
-	
+	util.CreateTarget(target)
 	unpack_mod.UnpackMod(origin, target)
 		
 	convert_path.ConvertPath(mod_name, target)

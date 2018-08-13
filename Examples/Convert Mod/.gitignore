@@ -2,7 +2,7 @@
 desktop.ini
 
 # Test Folders
-LAL_ConvertedAndPacked/
+*_ConvertedAndPacked/
 
 # Logs
 *.log

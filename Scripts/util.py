@@ -2,9 +2,10 @@
 
 import inspect, logging, os, pathlib, subprocess, shutil
 
-def RunCommandLine(commandLine):
-	logging.debug("Running commandLine " + str(commandLine))
-	p = subprocess.Popen(commandLine, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+def RunCommandLine(commandLine, useShell=False):
+	logging.debug("RunCommandLine({}, shell={})".format(str(commandLine), str(useShell)))
+	
+	p = subprocess.Popen(commandLine, shell=useShell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
 	output, err = p.communicate()
 	p_status = p.wait()
 	if output != None:
@@ -60,7 +61,7 @@ def RemoveTree(tree):
 	for i in range(0,3):
 		try:
 			logging.debug("RemoveTree({})".format(tree))
-			RunCommandLine(commandLine)
+			RunCommandLine(commandLine, True)
 			os.rmdir(tree)
 			success = True
 			break
@@ -75,14 +76,14 @@ def CreateTarget(target):
 	empty_path = GetEmptyPath()
 	
 	commandLine = ["ROBOCOPY", empty_path, target, "/MIR", "/XF", ".gitignore"]
-	RunCommandLine(commandLine)
+	RunCommandLine(commandLine, True)
 
 
 def CopyOriginToTarget(origin, target):
 	logging.info("CopyOriginToTarget({}, {})".format(origin, target))
 
 	commandLine = ["ROBOCOPY", origin, target, "/MIR"]
-	RunCommandLine(commandLine)
+	RunCommandLine(commandLine, True)
 	
 	
 def GetScriptPath():

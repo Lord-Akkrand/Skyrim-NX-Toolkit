@@ -19,6 +19,13 @@ IF ERRORLEVEL 1 GOTO pythonError
 
 >CON ECHO Found Python 3.x path
 
+>CON CALL "%SCRIPTS_PATH%CHECK_TEXCONV"
+IF ERRORLEVEL 1 GOTO utilityError
+>CON CALL "%SCRIPTS_PATH%CHECK_TEXDIAG"
+IF ERRORLEVEL 1 GOTO utilityError
+>CON CALL "%SCRIPTS_PATH%CHECK_NVDDSINFO"
+IF ERRORLEVEL 1 GOTO utilityError
+
 SET ORIGINAL=%~f1
 SET MOD_NAME=%~n1
 SET TARGET=%~f1_Converted
@@ -35,3 +42,8 @@ GOTO :EOF
 
 :pythonError
 >CON ECHO Error finding Python path
+GOTO :EOF
+
+:utilityError
+>CON ECHO There was an error finding a 3rd-party tool.  Aborting.
+GOTO :EOF

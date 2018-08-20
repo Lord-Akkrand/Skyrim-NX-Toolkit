@@ -28,6 +28,10 @@ IF ERRORLEVEL 1 GOTO pythonError
 
 >CON ECHO Found Python 3.x path
 
+>CON CALL "%SCRIPTS_PATH%CHECK_BSARCH"
+IF ERRORLEVEL 1 GOTO utilityError
+
+
 >CON ECHO Making "%TARGET%"
 ROBOCOPY "%EMPTY%" "%TARGET%" /MIR /PURGE /XF .gitignore
 
@@ -38,3 +42,8 @@ GOTO :EOF
 
 :pythonError
 >CON ECHO Error finding Python path
+GOTO :EOF
+
+:utilityError
+>CON ECHO There was an error finding a 3rd-party tool.  Aborting.
+GOTO :EOF

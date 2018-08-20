@@ -6,7 +6,6 @@ Archive.exe
 texconv.exe
 nvddsinfo.exe
 texdiag.exe
-bsarch.exe
 
 # Compiled Python
 *.pyc

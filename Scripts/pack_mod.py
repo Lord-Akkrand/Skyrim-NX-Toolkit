@@ -7,6 +7,7 @@ import subprocess
 import util
 import logging
 import archive_bsa
+import bsarch_bsa
 
 import bitflag
 
@@ -61,45 +62,6 @@ def PackMod(mod_name, target):
 					bsa_type = ReverseBSAGroups[path]
 				AddBSA(bsa_type, path, MakeBSAs)
 
-	def GetArchiveFlags(data_list, target_data_folder):
-		Flag_NamedDir = 1
-		Flag_NamedFiles = 2
-		Flag_Compressed = 4
-		Flag_RetainDir = 8
-		Flag_RetainName = 16
-		Flag_RetainFOff = 32
-		Flag_XBox360 = 64
-		Flag_StartupStr = 128
-		Flag_EmbedName = 256
-		Flag_XMem = 512
-		Flag_Bit = 1024
-
-		flags = bitflag.BitFlag()
-
-		flags.SetFlag(Flag_NamedDir)
-		flags.SetFlag(Flag_NamedFiles)
-		lower_case_data_list = map(str.lower, data_list)
-		
-		if "meshes" in lower_case_data_list:
-			#flags.SetFlag(Flag_Compressed)
-			flags.SetFlag(Flag_StartupStr)
-		if "seq" in lower_case_data_list:
-			flags.SetFlag(Flag_RetainName)
-		if "grass" in lower_case_data_list:
-			flags.SetFlag(Flag_RetainName)
-		if "scripts" in lower_case_data_list:
-			flags.SetFlag(Flag_RetainName)
-		if "music" in lower_case_data_list:
-			flags.SetFlag(Flag_RetainName)
-		if "sound" in lower_case_data_list:
-			sound_list = os.listdir(os.path.join(target_data_folder, "sound"))
-			if "fx" in lower_case_data_list:
-				flags.SetFlag(Flag_RetainName)
-
-		value = flags.GetValue()
-		hexvalue = hex(value)
-		return hexvalue
-
 	MakeBSAOrder = ["", "Meshes", "Textures"]
 	
 	bsaList = []
@@ -124,7 +86,7 @@ def PackMod(mod_name, target):
 				shutil.move(from_folder, to_folder)
 			bsa_filename = mod_name + bsa_file_suffix + ".bsa"
 			target_bsa = os.path.join(target, bsa_filename)
-			useArchive = True
+			useArchive = False
 			if useArchive:
 				bsa_list = archive_bsa.ArchiveBSA(temp, bsa_filename)
 				for bsa_info in bsa_list:
@@ -135,17 +97,14 @@ def PackMod(mod_name, target):
 					shutil.move(bsa_fullpath, newTargetBSA)
 					bsaList.append(newTargetBSA)
 			else:
-				archive_flags = GetArchiveFlags(folder_list, temp_data)
-				
-				flags_arg = "-sse -af:" + str(archive_flags)
-				commandLine = [bsarch, "pack", temp_data, target_bsa, "-sse", "-af:"+archive_flags]
-				#commandLine = '"' + bsarch + '" pack "' + temp_data + '" "' + target_bsa + '" ' + flags_arg
-				util.RunCommandLine(commandLine)
-
-				checkCommandLine = [bsarch, target_bsa]
-				#checkCommandLine = '"' + bsarch + '" "' + target_bsa + '"'
-				util.RunCommandLine(checkCommandLine)
-				bsaList.append(target_bsa)
+				bsa_list = bsarch_bsa.BsarchBSA(temp, target_bsa)
+				for bsa_info in bsa_list:
+					bsa_filename = bsa_info["FileName"]
+					bsa_filepath = bsa_info["Folder"]
+					bsa_fullpath = os.path.join(bsa_filepath, bsa_filename)
+					newTargetBSA = os.path.join(target, bsa_filename)
+					shutil.move(bsa_fullpath, newTargetBSA)
+					bsaList.append(newTargetBSA)
 			
 			util.RemoveTree(temp)
 			

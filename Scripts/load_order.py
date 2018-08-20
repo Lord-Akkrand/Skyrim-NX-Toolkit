@@ -110,7 +110,7 @@ def LoadOrder(origin, target, loadOrderName):
 	if loadOrderStart <= 4:
 		logging.debug("Hyrule.esp will not be loaded, so removing Skyrim - Hyrule.bsa from newResourceArchiveList")
 		newResourceArchiveList = newResourceArchiveList.replace(", Skyrim - Hyrule.bsa", "")
-		print ("newResourceArchiveList is now:\n" + newResourceArchiveList)
+		logging.debug("newResourceArchiveList is now:\n" + newResourceArchiveList)
 
 	iniPattern = r"^[; ]*([^=]*)=([^$]*)$"
 	def InsertIni(filename):

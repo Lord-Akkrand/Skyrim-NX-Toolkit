@@ -70,7 +70,19 @@ def RemoveTree(tree):
 	if not success:
 		logging.warning("RemoveTree({}) not successful".format(tree))
 	return success
-	
+
+def RemoveFile(filename):
+	success = False
+	for i in range(0,3):
+		logging.debug("Remove File <" + filename + ">")
+		try:
+			os.remove(filename)
+			success = True
+			break
+		except Exception:
+			pass
+	return success
+
 def CreateTarget(target):
 	logging.info("CreateTarget({})".format(target))
 	empty_path = GetEmptyPath()

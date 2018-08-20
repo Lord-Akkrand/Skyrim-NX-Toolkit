@@ -159,7 +159,8 @@ def ArchiveBSA(target_folder, bsa_filename):
 	
 	logging.info("Clean Up")
 
-	os.remove(archive)
+	util.RemoveFile(archive)
+
 	os.chdir(script_path)
 	return bsaFileWritten
 

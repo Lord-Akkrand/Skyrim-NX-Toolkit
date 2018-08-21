@@ -8,11 +8,11 @@ There are 2 folders in the toolkit folder, GraphicsTools & NvnTools, which requi
 
 Note that you require some external tools to run my scripts, they should be placed in the 'Utilities' directory.
 The external tools are:
-- Archive.exe (from the Bethesda CK for SSE)
-- bsarch.exe <https://www.nexusmods.com/newvegas/mods/64745>
 - nvddsinfo.exe <https://github.com/castano/nvidia-texture-tools/releases>
 - textconv.exe <https://github.com/Microsoft/DirectXTex/releases>
 - texdiag.exe <https://github.com/Microsoft/DirectXTex/releases>
+
+If there's an external tool that you don't have, the scripts will attempt to download it.
 
 There are Examples listed in the "Examples" folder.  They are filled with dummy mod files, but you should be able to run them and they should produce the appropriate output.  
 Most of the scripts can be used by dragging a folder onto them, but I prefer to run them from the command line in case there's an error whilst in the batch file, so you can see it before the window disappears.  

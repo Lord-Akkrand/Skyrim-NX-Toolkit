@@ -122,6 +122,12 @@ def HasSDK():
 	toolkit_path = GetToolKitPath()
 	sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
 	return os.path.exists(sdk_path)		
+	
+def HasArchive():
+	# Utilities\Archive.exe
+	utilities_path = GetUtilitiesPath()
+	archive_path = os.path.join(utilities_path, "Archive.exe")
+	return os.path.exists(archive_path)		
 		
 def GetNvnTexpkg():
 	toolkit_path = GetToolKitPath()

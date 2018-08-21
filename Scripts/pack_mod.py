@@ -18,7 +18,10 @@ def PackMod(mod_name, target):
 	logging.debug("This is the target: " + target)
 	logging.debug("This is the mod name " + mod_name)
 	logging.info("Pack Mod")
-
+	
+	has_archive = util.HasArchive()
+	logging.debug("HasArchive is {}".format(has_archive))
+	
 	data_list = os.listdir(target)
 	logging.debug(str(data_list))
 
@@ -86,7 +89,7 @@ def PackMod(mod_name, target):
 				shutil.move(from_folder, to_folder)
 			bsa_filename = mod_name + bsa_file_suffix + ".bsa"
 			target_bsa = os.path.join(target, bsa_filename)
-			useArchive = False
+			useArchive = has_archive
 			if useArchive:
 				bsa_list = archive_bsa.ArchiveBSA(temp, bsa_filename)
 				for bsa_info in bsa_list:

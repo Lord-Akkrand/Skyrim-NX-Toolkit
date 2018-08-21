@@ -1,6 +1,18 @@
 #! python3
 
-import inspect, logging, os, pathlib, subprocess, shutil
+import datetime, inspect, logging, os, pathlib, subprocess, shutil
+
+gStartTime = 0
+def StartTimer():
+	global gStartTime
+	gStartTime = datetime.datetime.now()
+	logging.info("Timer Started {}".format(gStartTime.strftime('%Y-%m-%d %H:%M:%S')))
+	
+def EndTimer():
+	ts = datetime.datetime.now()
+	delta = ts - gStartTime
+
+	logging.info("Total Time Taken {}".format(str(delta)))
 
 def RunCommandLine(commandLine, useShell=False):
 	logging.debug("RunCommandLine({}, shell={})".format(str(commandLine), str(useShell)))

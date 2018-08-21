@@ -171,4 +171,6 @@ if __name__ == '__main__':
 	bsa_basename = bsa_basename.replace(" ", "")
 	bsa_filename = os.path.join(target_folder, bsa_basename)
 	util.InitialiseLog(bsa_filename + ".log")
+	util.StartTimer()
 	BsarchBSA(target_folder, bsa_basename)
+	util.EndTimer()

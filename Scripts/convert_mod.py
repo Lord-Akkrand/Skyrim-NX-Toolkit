@@ -32,4 +32,6 @@ if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
 	util.InitialiseLog(origin + ".log")
+	util.StartTimer()
 	ConvertMod(origin, target)
+	util.EndTimer()

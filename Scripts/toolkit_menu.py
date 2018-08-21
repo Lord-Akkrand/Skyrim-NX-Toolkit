@@ -129,27 +129,30 @@ import convert_mod, unpack_mod
 def ConvertMod():
 	origin = GetDataPath("Origin")
 	target = GetDataPath("Target")
-	
 	util.InitialiseLog(origin + ".log")
+	util.StartTimer()
 	convert_mod.ConvertMod(origin, target)
+	util.EndTimer()
 	Exit()
 
 def UnpackMod():
 	origin = GetDataPath("Origin")
 	target = GetDataPath("Target")
-	
 	util.InitialiseLog(origin + ".log")
+	util.StartTimer()
 	util.CreateTarget(target)
 	unpack_mod.UnpackMod(origin, target)
+	util.EndTimer()
 	Exit()
 	
 def ConvertPath():
 	origin = GetDataPath("Origin")
 	target = GetDataPath("Target")
-	
 	util.InitialiseLog(origin + ".log")
+	util.StartTimer()
 	util.CopyOriginToTarget(origin, target)
 	convert_path.ConvertPath(origin, target)
+	util.EndTimer()
 	Exit()
 	
 def PackMod():

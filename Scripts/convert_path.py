@@ -39,4 +39,6 @@ if __name__ == '__main__':
 	mod_name = sys.argv[1]
 	target = sys.argv[2]
 	util.InitialiseLog(target + ".log")
+	util.StartTimer()
 	ConvertPath(mod_name, target)
+	util.EndTimer()

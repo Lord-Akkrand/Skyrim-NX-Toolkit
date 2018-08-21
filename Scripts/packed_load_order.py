@@ -214,5 +214,7 @@ if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
 	loadOrderName = sys.argv[3]
+	util.StartTimer()
 	util.InitialiseLog(os.path.join(origin, loadOrderName) + ".log")
 	LoadOrder(origin, target, loadOrderName)
+	util.EndTimer()

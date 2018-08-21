@@ -116,5 +116,7 @@ def PackMod(mod_name, target):
 if __name__ == '__main__':
 	mod_name = sys.argv[1]
 	target = sys.argv[2]
+	util.StartTimer()
 	util.InitialiseLog(target + ".log")
 	PackMod(mod_name, target)
+	util.EndTimer()

@@ -32,20 +32,28 @@ def UnpackMod(origin, target):
 
 	BSAsToUnpack = []
 	FilesToRename = []
-		
-	for file in os.listdir(origin):
-		logging.debug("   Found <" + file + ">")
-		filename = os.path.join(origin, file)
-		if file.endswith(".bsa"):
-			BSAsToUnpack.append( (file, filename) )
-		elif file.endswith(".esp") or file.endswith(".ini"):
-			newFileName = os.path.join(target, mod_name + file[-4:])
-			shutil.copy2(filename, newFileName)
-		else:
-			if os.path.isdir(filename):
-				shutil.copytree(filename, os.path.join(target, file))
+	
+	FilesToCopy = []
+	for root, subdirs, files in os.walk(origin):
+		for file in files:
+			logging.debug("   Found <" + file + ">")
+			filename = os.path.join(root, file)
+			if file.endswith(".bsa"):
+				BSAsToUnpack.append( (file, filename) )
+			elif file.endswith(".esp") or file.endswith(".ini"):
+				newFileName = os.path.join(target, mod_name + file[-4:])
+				FilesToCopy.append( (filename, newFileName) )
 			else:
-				shutil.copy2(filename, os.path.join(target, file))
+				FilesToCopy.append( (filename, os.path.join(target, file)) )
+				
+	logging.info("Found {} BSAs & {} loose files".format(len(BSAsToUnpack), len(FilesToCopy)))
+	for i in range(len(FilesToCopy)):
+		fileToCopy = FilesToCopy[i]
+		(filename, newFileName) = fileToCopy
+		shutil.copy2(filename, newFileName)
+		sys.stdout.write("Copied {}/{} \r".format(i+1, len(FilesToCopy)))
+		sys.stdout.flush()
+	sys.stdout.write("\n")
 			
 	for bsaToUnpack in BSAsToUnpack:
 		(file, filename) = bsaToUnpack
@@ -55,4 +63,6 @@ if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
 	util.InitialiseLog(origin + ".log")
+	util.StartTimer()
 	UnpackMod(origin, target)
+	util.EndTimer()

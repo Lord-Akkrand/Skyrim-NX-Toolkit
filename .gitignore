@@ -6,6 +6,7 @@ Archive.exe
 texconv.exe
 nvddsinfo.exe
 texdiag.exe
+HavokBehaviorPostProcess.exe
 
 # Compiled Python
 *.pyc

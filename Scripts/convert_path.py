@@ -7,6 +7,7 @@ import subprocess
 import util
 import logging
 import convert_dds
+import convert_hkx
 
 import bitflag
 
@@ -18,20 +19,35 @@ def ConvertPath(mod_name, target):
 	logging.debug("This is the target: " + target)
 	logging.debug("This is the mod name " + mod_name)
 	
-	FilesToConvert = []
+	has_havoc = util.HasHavokBPP()
+	
+	ConvertListDDS = []
+	ConvertListHKX = []
 	for root, subdirs, files in os.walk(target):
 		if root != target:
 			logging.debug("Walking folder " + root)
 			for filename in files:
 				if filename.lower().endswith(".dds"):
 					file_path = os.path.join(root, filename)
-					FilesToConvert.append(file_path)
-	logging.info("Found {} dds files to convert".format(len(FilesToConvert)))
+					ConvertListDDS.append(file_path)
+				elif filename.lower().endswith(".hkx"):
+					file_path = os.path.join(root, filename)
+					ConvertListHKX.append(file_path)
+					
+	logging.info("Found {} dds files to convert".format(len(ConvertListDDS)))
+	if has_havoc: logging.info("Found {} hkx files to convert".format(len(ConvertListHKX)))
 	
-	for i in range(len(FilesToConvert)):
-		file_path = FilesToConvert[i]
+	for i in range(len(ConvertListDDS)):
+		file_path = ConvertListDDS[i]
 		convert_dds.ConvertDDS(target, file_path)
-		sys.stdout.write("Converted {}/{} \r".format(i+1, len(FilesToConvert)))
+		sys.stdout.write("Converted {}/{} \r".format(i+1, len(ConvertListDDS)))
+		sys.stdout.flush()
+	sys.stdout.write("\n")
+	
+	for i in range(len(ConvertListHKX)):
+		file_path = ConvertListHKX[i]
+		convert_hkx.ConvertHKX(file_path)
+		sys.stdout.write("Converted {}/{} \r".format(i+1, len(ConvertListHKX)))
 		sys.stdout.flush()
 	sys.stdout.write("\n")
 	

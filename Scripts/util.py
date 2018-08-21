@@ -145,6 +145,17 @@ def GetNvnTexpkg():
 	toolkit_path = GetToolKitPath()
 	sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
 	return sdk_path
+	
+def HasHavokBPP():
+	# Utilities\HavokBehaviorPostProcess.exe
+	utilities_path = GetUtilitiesPath()
+	havok_path = os.path.join(utilities_path, "HavokBehaviorPostProcess.exe")
+	return os.path.exists(havok_path)
+	
+def GetHavokBPP():
+	utilities_path = GetUtilitiesPath()
+	havok_path = os.path.join(utilities_path, "HavokBehaviorPostProcess.exe")
+	return havok_path	
 
 def GetXTXExtract():
 	toolkit_path = GetToolKitPath()

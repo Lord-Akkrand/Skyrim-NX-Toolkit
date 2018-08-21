@@ -44,12 +44,17 @@ def UnpackMod(origin, target):
 				newFileName = os.path.join(target, mod_name + file[-4:])
 				FilesToCopy.append( (filename, newFileName) )
 			else:
-				FilesToCopy.append( (filename, os.path.join(target, file)) )
+				relativePath = root.replace(origin, target)
+				newFileName = os.path.join(relativePath, file)
+				FilesToCopy.append( (filename, newFileName) )
 				
 	logging.info("Found {} BSAs & {} loose files".format(len(BSAsToUnpack), len(FilesToCopy)))
 	for i in range(len(FilesToCopy)):
 		fileToCopy = FilesToCopy[i]
 		(filename, newFileName) = fileToCopy
+		folderName = os.path.dirname(newFileName)
+		logging.debug("Copying {}->{}, makedirs {}".format(filename, newFileName, folderName))
+		os.makedirs(folderName, exist_ok=True)
 		shutil.copy2(filename, newFileName)
 		sys.stdout.write("Copied {}/{} \r".format(i+1, len(FilesToCopy)))
 		sys.stdout.flush()

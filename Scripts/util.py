@@ -49,7 +49,7 @@ def InitialiseLog(newFileName):
 		# add the handler to the root logger
 		logging.getLogger('').addHandler(console)
 		
-		logging.info("Logger Initialised")
+		logging.info("Logger Initialised {}".format(newFileName))
 		
 def OldRemoveTree(tree):
 	success = False

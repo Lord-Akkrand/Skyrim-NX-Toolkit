@@ -6,11 +6,11 @@ import shutil
 import subprocess
 import util
 import logging
-import unpack_mod, convert_path, pack_mod
+import unpack_mod, reconcile_hkx, convert_path, pack_mod
 import inspect, os
 import bitflag
 
-def ConvertMod(origin, target):
+def ConvertMod(origin, target, oldrim):
 	mod_name = os.path.basename(origin)
 	'''
 	logging.debug("This is the origin: " + origin)
@@ -23,6 +23,8 @@ def ConvertMod(origin, target):
 	
 	util.CreateTarget(target)
 	unpack_mod.UnpackMod(origin, target)
+	if oldrim:
+		reconcile_hkx.ReconcileHKX(target, oldrim)
 		
 	convert_path.ConvertPath(mod_name, target)
 
@@ -31,7 +33,10 @@ def ConvertMod(origin, target):
 if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
+	oldrim = None
+	if len(sys.argv) > 2:
+		oldrim = sys.argv[3]
 	util.InitialiseLog(origin + ".log")
 	util.StartTimer()
-	ConvertMod(origin, target)
+	ConvertMod(origin, target, oldrim)
 	util.EndTimer()

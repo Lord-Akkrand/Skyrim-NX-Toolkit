@@ -40,14 +40,14 @@ def ConvertPath(mod_name, target):
 	for i in range(len(ConvertListDDS)):
 		file_path = ConvertListDDS[i]
 		convert_dds.ConvertDDS(target, file_path)
-		sys.stdout.write("Converted {}/{} \r".format(i+1, len(ConvertListDDS)))
+		sys.stdout.write("Converted {}/{} DDS \r".format(i+1, len(ConvertListDDS)))
 		sys.stdout.flush()
 	sys.stdout.write("\n")
 	
 	for i in range(len(ConvertListHKX)):
 		file_path = ConvertListHKX[i]
 		convert_hkx.ConvertHKX(file_path)
-		sys.stdout.write("Converted {}/{} \r".format(i+1, len(ConvertListHKX)))
+		sys.stdout.write("Converted {}/{} HKX \r".format(i+1, len(ConvertListHKX)))
 		sys.stdout.flush()
 	sys.stdout.write("\n")
 	

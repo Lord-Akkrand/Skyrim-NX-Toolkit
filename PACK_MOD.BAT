@@ -13,7 +13,7 @@ SET EMPTY=%TOOLKIT_PATH%Empty
 SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
->CON ECHO archive_bsa.py is set at %ARCHIVE_BSA_PY%
+>CON ECHO pack_mod.py is set at %PACK_MOD_PY%
 
 >CON ECHO Akkrand's Mod Packing Utility v1.0.0
 PAUSE
@@ -21,8 +21,10 @@ PAUSE
 >CON ECHO Finding Python 3.x path
 >CON CALL "%SCRIPTS_PATH%FIND_PYTHON_PATH"
 IF ERRORLEVEL 1 GOTO pythonError
-
 >CON ECHO Found Python 3.x path
+
+>CON CALL "%SCRIPTS_PATH%CHECK_BSARCH"
+IF ERRORLEVEL 1 GOTO utilityError
 
 >CON ECHO Making "%TARGET%"
 ROBOCOPY "%ORIGINAL%" "%TARGET%" /MIR

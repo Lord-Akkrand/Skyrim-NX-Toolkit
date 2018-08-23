@@ -61,10 +61,6 @@ Rules = []
 # But all elements must be in the order specified
 Rules.append({"Name":"ExampleDragon", 'Path':[r'\bactors\b', r'\bdragon\b', 'dragonskeleton.dds'], 'Size':2048*2048})
 
-# no tintmasks or facetint from SkyrimNX are bigger than this
-Rules.append({"Name":"TintMasks", 'Path':[r'\btintmasks\b'], 'Size':512*512})
-Rules.append({"Name":"FaceTint", 'Path':[r'\bfacetint\b'], 'Size':512*512, 'Format':DXT5})
-
 Rules.append({"Name":"WeaponDiffuse", 'Path':[r'\bweapons\b'], 'Size':1024*1024})
 Rules.append({"Name":"WeaponNormalMap", 'Path':[r'\bweapons\b', r'[.]*_n\.dds'], 'Size':1024*1024})
 Rules.append({"Name":"WeaponSpecularMap", 'Path':[r'\bweapons\b', r'[.]*_m\.dds'], 'Size':512*512})
@@ -78,6 +74,11 @@ Rules.append({"Name":"ArmorGlowMap", 'Path':[r'\barmor\b', r'[.]*_g\.dds'], 'Siz
 # CBBE requires quite hi-res textures in order to look good.  The body textures are all in actors/character/*
 Rules.append({"Name":"ActorCharacter", 'Path':[r'\bactors\b', r'\bcharacter\b'], 'Size':2048*2048})
 Rules.append({"Name":"ActorModelSpaceNormal", 'Path':[r'\bactors\b', r'\bcharacter\b', r'[.]*_msn\.dds'], 'Size':1024*1024})
+
+# no tintmasks or facetint from SkyrimNX are bigger than this
+Rules.append({"Name":"TintMasks", 'Path':[r'\btintmasks\b'], 'Size':512*512})
+Rules.append({"Name":"FaceTint", 'Path':[r'\bfacetint\b'], 'Size':512*512})
+
 #Rules.append({"Name":"ActorToneMap", 'Path':[r'\bactors\b', r'\bcharacter\b', r'[.]*_sk\.dds'], 'Size':2048*2048})
 
 # If you come across a texture that is the following type, convert it to the other type

@@ -60,33 +60,33 @@ def ConvertDDS(basePath, ddsFileName):
 	ddsFilePath = os.path.dirname(ddsFileName)
 	hasSDK = util.HasSDK()
 	
-	logging.debug("This is the base path: " + " " +  basePath)
-	logging.debug("This is dds file: " + " " +  ddsFileName)
-	logging.debug("HAS_SDK: " +  str(hasSDK))
+	util.LogDebug("This is the base path: " + " " +  basePath)
+	util.LogDebug("This is dds file: " + " " +  ddsFileName)
+	util.LogDebug("HAS_SDK: " +  str(hasSDK))
 		
-	logging.debug("convert_dds.py 2.0")
+	util.LogDebug("convert_dds.py 2.0")
 
 	relativePathList = relativeFilename[1:].split('\\')
-	logging.debug('PATH')
+	util.LogDebug('PATH')
 	for path in relativePathList:
-		logging.debug(path)
-	logging.debug('END PATH')
+		util.LogDebug(path)
+	util.LogDebug('END PATH')
 	
 	utilities_path = util.GetUtilitiesPath()
 	nvddsinfo = os.path.join(utilities_path, "nvddsinfo.exe")
-	logging.debug(nvddsinfo + " " +  ddsFileName)
+	util.LogDebug(nvddsinfo + " " +  ddsFileName)
 	dds_buffer, dds_err = util.RunCommandLine([nvddsinfo, ddsFileName])
 	
-	logging.debug('DDSINFO START')
-	logging.debug(dds_buffer)
-	logging.debug('DDSINFO END')
+	util.LogDebug('DDSINFO START')
+	util.LogDebug(dds_buffer)
+	util.LogDebug('DDSINFO END')
 
 	texdiag = os.path.join(utilities_path, "texdiag.exe")
-	logging.debug(texdiag + " " + ddsFileName)
+	util.LogDebug(texdiag + " " + ddsFileName)
 	td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])
-	logging.debug('TEXDIAG START')
-	logging.debug(td_buffer)
-	logging.debug('TEXDIAG END')
+	util.LogDebug('TEXDIAG START')
+	util.LogDebug(td_buffer)
+	util.LogDebug('TEXDIAG END')
 
 	def getIntPattern(name):
 		namePattern = name + r": ([\d]+)"
@@ -95,7 +95,7 @@ def ConvertDDS(basePath, ddsFileName):
 			nameReturn = nameReturn.group(1)
 		else:
 			nameReturn = -1
-		logging.debug(name + " is :" + str(nameReturn))
+		util.LogDebug(name + " is :" + str(nameReturn))
 		return int(nameReturn)
 
 	def lerp(x, a, b):
@@ -119,28 +119,28 @@ def ConvertDDS(basePath, ddsFileName):
 		m = re.search(diffPattern, td_buffer)
 		if m != None:
 			tdFormat = m.group(1)
-			logging.debug("Format is <" + tdFormat + ">")
+			util.LogDebug("Format is <" + tdFormat + ">")
 		for formatInfo in sizes.Formats:
 			if formatInfo[1] == tdFormat:
 				fourCC = formatInfo[0]
 
-	logging.debug("FourCC is " + str(fourCC))
+	util.LogDebug("FourCC is " + str(fourCC))
 
 	maxSize = sizes.DefaultSizeLimit
 	forceFormat = None
 	shouldRun = False
-	logging.debug('File is ' + relativeFilename)
+	util.LogDebug('File is ' + relativeFilename)
 	for rule in sizes.Rules:
 		rulePath = rule['Path']
 		pathStart = rulePath[0]
 		match = False
-		logging.debug('Checking rule: ' + str(rule))
+		util.LogDebug('Checking rule: ' + str(rule))
 		for iP in range(len(relativePathList)):
 			path = relativePathList[iP]
 			m = re.search(pathStart, path)
 			if m != None:
 				# we have the start of a match.  See if it bears out.
-				logging.debug('on the trail of ' + pathStart)
+				util.LogDebug('on the trail of ' + pathStart)
 				match = True
 				for iL in range(1, len(rulePath)):
 					pathOngoing = rulePath[iL]
@@ -155,20 +155,20 @@ def ConvertDDS(basePath, ddsFileName):
 						internalIdx += 1
 						m = re.search(pathOngoing, nextPath)
 						match = m != None
-						logging.debug('ongoing into ' + nextPath + ' == ' + pathOngoing)
+						util.LogDebug('ongoing into ' + nextPath + ' == ' + pathOngoing)
 						if match == True:
 							break
 					if match == False:
 						break
 			if match:
-				logging.debug('APPLYING RULE [' + rule['Name'] + ']')
+				util.LogDebug('APPLYING RULE [' + rule['Name'] + ']')
 				if 'Size' in rule:
 					maxSize = rule['Size']
 				if 'Format' in rule:
 					formatRule = rule['Format']
 					if formatRule[0] != fourCC:
 						forceFormat = formatRule[1]
-						logging.debug('Forcing Format from ' + fourCC + ' to ' + forceFormat)
+						util.LogDebug('Forcing Format from ' + fourCC + ' to ' + forceFormat)
 						
 				break
 
@@ -179,12 +179,12 @@ def ConvertDDS(basePath, ddsFileName):
 	else:
 		convertTable = sizes.ConvertFromTo
 
-	logging.debug("Check force conversion for fourCC " + fourCC)
+	util.LogDebug("Check force conversion for fourCC " + fourCC)
 	for conv in convertTable:
-		logging.debug('Checking ' + conv[0])
+		util.LogDebug('Checking ' + conv[0])
 		if fourCC == conv[0]:
 			forceFormat = conv[1][1]
-			logging.debug('Match.  Force convert to ' + forceFormat)
+			util.LogDebug('Match.  Force convert to ' + forceFormat)
 			break
 	
 	shouldRun = shouldRun or linearSize > maxSize
@@ -201,7 +201,7 @@ def ConvertDDS(basePath, ddsFileName):
 			newHeight = int(height * resizePercentage)
 			newLinearSize = newWidth * newHeight
 			newMipmaps -= 1
-			logging.debug('Resizing ' + str(resizePercentage) + ' results in ' + str(newWidth) + 'x' + str(newHeight))
+			util.LogDebug('Resizing ' + str(resizePercentage) + ' results in ' + str(newWidth) + 'x' + str(newHeight))
 		texconv = os.path.join(utilities_path, "texconv.exe")
 		commandLine = [texconv, "-pow2", "-fl", "9.3", "-y"]
 		if newWidth < width:
@@ -220,9 +220,9 @@ def ConvertDDS(basePath, ddsFileName):
 		commandLine += ["-o", ddsFilePath]
 		output, err = util.RunCommandLine(commandLine)
 	else:
-		logging.debug("TexConv will not run")
+		util.LogDebug("TexConv will not run")
 		
-	logging.debug("Now for NX texture conversion")
+	util.LogDebug("Now for NX texture conversion")
 	if hasSDK:
 		nvntexpkg = util.GetNvnTexpkg()
 		out_file = os.path.join(ddsFilePath, "out.xtx")

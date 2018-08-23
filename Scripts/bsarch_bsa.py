@@ -39,16 +39,16 @@ def BsarchBSA(target_folder, bsa_filename):
 	flags.SetFlag(Flag_NamedDir)
 	flags.SetFlag(Flag_NamedFiles)
 	
-	logging.info("Build File List")
+	util.LogInfo("Build File List")
 	totalFileSizeTally = 0
 	target_data = os.path.join(target_folder, "Data")
-	logging.debug("Walking the target directory " + target_data)
+	util.LogDebug("Walking the target directory " + target_data)
 	bsaFolders = []
 	
 	SizeLimitBSA = bsa_rules.BSASizeLimit
 	
 	for root, subdirs, files in os.walk(target_data):
-		logging.debug('--\nroot = ' + root)
+		util.LogDebug('--\nroot = ' + root)
 		if root != target_data:
 			for filename in files:
 				if filename != "desktop.ini" and filename != 'thumbs.db':
@@ -70,13 +70,13 @@ def BsarchBSA(target_folder, bsa_filename):
 	temp_data = os.path.join(os.path.dirname(target_data), "Ready")
 	def WriteBSA():
 		nonlocal currentFileIndex, bsa_filename
-		logging.debug("Writing BSA")
+		util.LogDebug("Writing BSA")
 		
 		if currentFileIndex != None:
 			bsa_filename = bsa_original_filename[:-4] + str(currentFileIndex) + ".bsa"
 			currentFileIndex += 1
 			
-		logging.info("Run bsarch.exe")
+		util.LogInfo("Run bsarch.exe")
 		
 		flags_value = flags.GetValue()
 		flags_hexvalue = hex(flags_value)
@@ -88,41 +88,41 @@ def BsarchBSA(target_folder, bsa_filename):
 		util.RemoveTree(temp_data)
 	
 	for root, subdirs, files in os.walk(target_data):
-		logging.debug('--\nroot = ' + root)
+		util.LogDebug('--\nroot = ' + root)
 		if root == target_data:
-			logging.debug("subdirs: " + str(subdirs))
+			util.LogDebug("subdirs: " + str(subdirs))
 			lower_case_data_list = [x.lower() for x in subdirs]
-			logging.debug("lcds: " + str(lower_case_data_list))
+			util.LogDebug("lcds: " + str(lower_case_data_list))
 			if "meshes" in lower_case_data_list:
-				logging.debug("found meshes")
+				util.LogDebug("found meshes")
 				flags.SetFlag(Flag_StartupStr)
 			if "textures" in lower_case_data_list:
-				logging.debug("found texttures")
+				util.LogDebug("found texttures")
 			if "interface" in lower_case_data_list:
-				logging.debug("found interface")
+				util.LogDebug("found interface")
 			if "music" in lower_case_data_list:
-				logging.debug("found music")
+				util.LogDebug("found music")
 				flags.SetFlag(Flag_RetainName)
 			if "sound" in lower_case_data_list:
-				logging.debug("found sound")
+				util.LogDebug("found sound")
 				sound_list = os.listdir(os.path.join(target_data, "sound"))
 				sound_list_lower = [x.lower() for x in sound_list]
 				
 				if "fx" in sound_list_lower:
-					logging.debug("found sound//fx")
+					util.LogDebug("found sound//fx")
 					flags.SetFlag(Flag_RetainName)
 				if "voice" in sound_list_lower:
-					logging.debug("found sound//voice")
+					util.LogDebug("found sound//voice")
 			if "shadersfx" in lower_case_data_list:
-				logging.debug("found shaders")
+				util.LogDebug("found shaders")
 			if "seq" in lower_case_data_list:
-				logging.debug("found seq")
+				util.LogDebug("found seq")
 				flags.SetFlag(Flag_RetainName)
 			if "grass" in lower_case_data_list:
-				logging.debug("found grass")
+				util.LogDebug("found grass")
 				flags.SetFlag(Flag_RetainName)
 			if "scripts" in lower_case_data_list:
-				logging.debug("found scripts")
+				util.LogDebug("found scripts")
 				flags.SetFlag(Flag_RetainName)
 		else:
 			for filename in files:
@@ -131,9 +131,9 @@ def BsarchBSA(target_folder, bsa_filename):
 					
 					file_size = os.path.getsize(file_path)
 					newTally = currentFileSizeTally + file_size
-					logging.debug("Attempting to add " + file_path + " currentFileSizeTally is " + str(currentFileSizeTally) + " file_size is " + str(file_size))
+					util.LogDebug("Attempting to add " + file_path + " currentFileSizeTally is " + str(currentFileSizeTally) + " file_size is " + str(file_size))
 					if (newTally >= SizeLimitBSA):
-						logging.debug("New BSA would be too big, writing current BSA")
+						util.LogDebug("New BSA would be too big, writing current BSA")
 						WriteBSA()
 						currentFileSizeTally = 0
 						
@@ -141,25 +141,25 @@ def BsarchBSA(target_folder, bsa_filename):
 					
 					path_no_data = relative_path[6:]
 					temp_path = os.path.join(temp_data, path_no_data)
-					logging.debug("Moving <{}> to <{}>".format(file_path, temp_path))
+					util.LogDebug("Moving <{}> to <{}>".format(file_path, temp_path))
 					paths_to_create = []
 					check_path = os.path.dirname(temp_path)
 					
-					logging.debug("Checking path {}".format(check_path))
+					util.LogDebug("Checking path {}".format(check_path))
 					while not os.path.isdir(check_path):
-						logging.debug("{} does not exist.".format(check_path))
+						util.LogDebug("{} does not exist.".format(check_path))
 						paths_to_create.insert(0, check_path)
 						check_path = os.path.dirname(check_path)
-						logging.debug("Checking path {}".format(check_path))
+						util.LogDebug("Checking path {}".format(check_path))
 					for path_to_create in paths_to_create:
-						logging.debug("{} does not exist.".format(check_path))
+						util.LogDebug("{} does not exist.".format(check_path))
 						os.mkdir(path_to_create)
 					shutil.move(file_path, temp_path)
 					currentFileSizeTally += file_size
 	if currentFileSizeTally > 0:
 		WriteBSA()
 	
-	logging.info("Clean Up")
+	util.LogInfo("Clean Up")
 
 	os.chdir(script_path)
 	return bsaFileWritten

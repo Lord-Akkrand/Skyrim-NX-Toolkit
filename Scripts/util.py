@@ -6,26 +6,26 @@ gStartTime = 0
 def StartTimer():
 	global gStartTime
 	gStartTime = datetime.datetime.now()
-	logging.info("Timer Started {}".format(gStartTime.strftime('%Y-%m-%d %H:%M:%S')))
+	LogInfo("Timer Started {}".format(gStartTime.strftime('%Y-%m-%d %H:%M:%S')))
 	
 def EndTimer():
 	ts = datetime.datetime.now()
 	delta = ts - gStartTime
 
-	logging.info("Total Time Taken {}".format(str(delta)))
+	LogInfo("Total Time Taken {}".format(str(delta)))
 
 def RunCommandLine(commandLine, useShell=False):
-	logging.debug("RunCommandLine({}, shell={})".format(str(commandLine), str(useShell)))
+	LogDebug("RunCommandLine({}, shell={})".format(str(commandLine), str(useShell)))
 	
 	p = subprocess.Popen(commandLine, shell=useShell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
 	output, err = p.communicate()
 	p_status = p.wait()
 	if output != None:
 		#output = output.decode('ascii')
-		logging.debug("Output:" + output)#str(output.splitlines()))
+		LogDebug("Output:" + output)#str(output.splitlines()))
 	if err != None:
 		#err = err.decode('ascii')
-		logging.debug("Errors:" + err)#str(err.splitlines()))
+		LogDebug("Errors:" + err)#str(err.splitlines()))
 	return (output, err)
 	
 g_loggingInitialised = False
@@ -49,12 +49,21 @@ def InitialiseLog(newFileName):
 		# add the handler to the root logger
 		logging.getLogger('').addHandler(console)
 		
-		logging.info("Logger Initialised {}".format(newFileName))
-		
+		LogInfo("Logger Initialised {}".format(newFileName))
+
+def LogDebug(msg):
+	logging.debug(msg)
+	
+def LogInfo(msg):
+	logging.info(msg)
+	
+def LogWarn(msg):
+	logging.warning(msg)
+	
 def OldRemoveTree(tree):
 	success = False
 	for i in range(0,3):
-		logging.debug("Remove Tree <" + tree + ">")
+		LogDebug("Remove Tree <" + tree + ">")
 		try:
 			shutil.rmtree(tree, ignore_errors=True)
 			os.rmdir(tree)
@@ -74,24 +83,24 @@ def RemoveTree(tree):
 	for i in range(0,3):
 		try:
 			if os.path.isdir(tree):
-				logging.debug("RemoveTree({})".format(tree))
+				LogDebug("RemoveTree({})".format(tree))
 				RunCommandLine(commandLine, True)
-				logging.debug("RD")
+				LogDebug("RD")
 				RunCommandLine(commandLine2, True)
-				logging.debug("rmdir")
+				LogDebug("rmdir")
 				os.rmdir(tree)
 			success = True
 			break
 		except Exception:
 			pass
 	if not success:
-		logging.warning("RemoveTree({}) not successful".format(tree))
+		LogWarn("RemoveTree({}) not successful".format(tree))
 	return success
 
 def RemoveFile(filename):
 	success = False
 	for i in range(0,3):
-		logging.debug("Remove File <" + filename + ">")
+		LogDebug("Remove File <" + filename + ">")
 		try:
 			os.remove(filename)
 			success = True
@@ -101,7 +110,7 @@ def RemoveFile(filename):
 	return success
 
 def CreateTarget(target):
-	logging.info("CreateTarget({})".format(target))
+	LogInfo("CreateTarget({})".format(target))
 	empty_path = GetEmptyPath()
 	
 	commandLine = ["ROBOCOPY", empty_path, target, "/MIR", "/XF", ".gitignore"]
@@ -109,7 +118,7 @@ def CreateTarget(target):
 
 
 def CopyOriginToTarget(origin, target):
-	logging.info("CopyOriginToTarget({}, {})".format(origin, target))
+	LogInfo("CopyOriginToTarget({}, {})".format(origin, target))
 
 	commandLine = ["ROBOCOPY", origin, target, "/MIR"]
 	RunCommandLine(commandLine, True)

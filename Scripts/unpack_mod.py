@@ -15,18 +15,18 @@ def UnpackMod(origin, target):
 	utilities_path = util.GetUtilitiesPath()
 	bsarch = os.path.join(utilities_path, "bsarch.exe")
 	mod_name = os.path.basename(origin)
-	logging.debug("This is the origin: " + origin)
-	logging.debug("This is the target: " + target)
-	logging.debug("This is the mod name " + mod_name)
-	logging.info("Unpacking " + mod_name)
+	util.LogDebug("This is the origin: " + origin)
+	util.LogDebug("This is the target: " + target)
+	util.LogDebug("This is the mod name " + mod_name)
+	util.LogInfo("Unpacking " + mod_name)
 
 	def CopyFile(file, filename):
 		newFileName = os.path.join(target, file)
-		logging.debug(filename + "->" + newFileName)
+		util.LogDebug(filename + "->" + newFileName)
 		shutil.copy2(filename, newFileName)
 
 	def UnpackBSA(file, filename):
-		logging.info("Unpack BSA " + file)
+		util.LogInfo("Unpack BSA " + file)
 		commandLine = [bsarch, "unpack", filename, target]
 		util.RunCommandLine(commandLine)
 
@@ -36,7 +36,7 @@ def UnpackMod(origin, target):
 	FilesToCopy = []
 	for root, subdirs, files in os.walk(origin):
 		for file in files:
-			logging.debug("   Found <" + file + ">")
+			util.LogDebug("   Found <" + file + ">")
 			filename = os.path.join(root, file)
 			if file.endswith(".bsa"):
 				BSAsToUnpack.append( (file, filename) )
@@ -48,12 +48,12 @@ def UnpackMod(origin, target):
 				newFileName = os.path.join(relativePath, file)
 				FilesToCopy.append( (filename, newFileName) )
 				
-	logging.info("Found {} BSAs & {} loose files".format(len(BSAsToUnpack), len(FilesToCopy)))
+	util.LogInfo("Found {} BSAs & {} loose files".format(len(BSAsToUnpack), len(FilesToCopy)))
 	for i in range(len(FilesToCopy)):
 		fileToCopy = FilesToCopy[i]
 		(filename, newFileName) = fileToCopy
 		folderName = os.path.dirname(newFileName)
-		logging.debug("Copying {}->{}, makedirs {}".format(filename, newFileName, folderName))
+		util.LogDebug("Copying {}->{}, makedirs {}".format(filename, newFileName, folderName))
 		os.makedirs(folderName, exist_ok=True)
 		shutil.copy2(filename, newFileName)
 		sys.stdout.write("Copied {}/{} \r".format(i+1, len(FilesToCopy)))

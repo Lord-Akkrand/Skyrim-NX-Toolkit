@@ -11,7 +11,7 @@ import shutil
 import subprocess
 
 def ConvertHKX(filename):
-	logging.debug("ConvertHKX : " + filename)
+	util.LogDebug("ConvertHKX : " + filename)
 		
 	havocBPP = util.GetHavokBPP()
 	

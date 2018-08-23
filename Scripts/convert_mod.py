@@ -13,13 +13,13 @@ import bitflag
 def ConvertMod(origin, target, oldrim):
 	mod_name = os.path.basename(origin)
 	'''
-	logging.debug("This is the origin: " + origin)
-	logging.debug("This is the target: " + target)
-	logging.debug("This is the mod name " + mod_name)
+	util.LogDebug("This is the origin: " + origin)
+	util.LogDebug("This is the target: " + target)
+	util.LogDebug("This is the mod name " + mod_name)
 	'''
-	logging.debug("convert_mod.py 2.0")
+	util.LogDebug("convert_mod.py 2.0")
 	
-	logging.info("Convert Mod, create empty folder at target")
+	util.LogInfo("Convert Mod, create empty folder at target")
 	
 	util.CreateTarget(target)
 	unpack_mod.UnpackMod(origin, target)

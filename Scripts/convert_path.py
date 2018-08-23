@@ -15,9 +15,9 @@ def ConvertPath(mod_name, target):
 
 	script_path = util.GetScriptPath()
 	
-	logging.info("Convert Path")
-	logging.debug("This is the target: " + target)
-	logging.debug("This is the mod name " + mod_name)
+	util.LogInfo("Convert Path")
+	util.LogDebug("This is the target: " + target)
+	util.LogDebug("This is the mod name " + mod_name)
 	
 	has_havoc = util.HasHavokBPP()
 	
@@ -25,7 +25,7 @@ def ConvertPath(mod_name, target):
 	ConvertListHKX = []
 	for root, subdirs, files in os.walk(target):
 		if root != target:
-			logging.debug("Walking folder " + root)
+			util.LogDebug("Walking folder " + root)
 			for filename in files:
 				if filename.lower().endswith(".dds"):
 					file_path = os.path.join(root, filename)
@@ -34,8 +34,8 @@ def ConvertPath(mod_name, target):
 					file_path = os.path.join(root, filename)
 					ConvertListHKX.append(file_path)
 					
-	logging.info("Found {} dds files to convert".format(len(ConvertListDDS)))
-	if has_havoc: logging.info("Found {} hkx files to convert".format(len(ConvertListHKX)))
+	util.LogInfo("Found {} dds files to convert".format(len(ConvertListDDS)))
+	if has_havoc: util.LogInfo("Found {} hkx files to convert".format(len(ConvertListHKX)))
 	
 	for i in range(len(ConvertListDDS)):
 		file_path = ConvertListDDS[i]

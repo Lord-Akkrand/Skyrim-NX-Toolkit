@@ -16,15 +16,15 @@ def PackMod(mod_name, target):
 	script_path = util.GetScriptPath()
 	utilities_path = util.GetUtilitiesPath()
 	bsarch = os.path.join(utilities_path, "bsarch.exe")
-	logging.debug("This is the target: " + target)
-	logging.debug("This is the mod name " + mod_name)
-	logging.info("Pack Mod")
+	util.LogDebug("This is the target: " + target)
+	util.LogDebug("This is the mod name " + mod_name)
+	util.LogInfo("Pack Mod")
 	
 	has_archive = util.HasArchive()
-	logging.debug("HasArchive is {}".format(has_archive))
+	util.LogDebug("HasArchive is {}".format(has_archive))
 	
 	data_list = os.listdir(target)
-	logging.debug(str(data_list))
+	util.LogDebug(str(data_list))
 	
 	BSARules = bsa_rules.BSARules
 	
@@ -52,13 +52,13 @@ def PackMod(mod_name, target):
 		child = os.path.basename(folder)
 		parent = os.path.dirname(folder)
 		if parent != target:
-			logging.debug("parent is not target")
+			util.LogDebug("parent is not target")
 			rel_parent = os.path.relpath(parent, target)
-			logging.debug("rel_parent is {}".format(rel_parent))
+			util.LogDebug("rel_parent is {}".format(rel_parent))
 			move_to_folder = os.path.join(move_to_folder, rel_parent, child)
-			logging.debug("move_to_folder is {}".format(move_to_folder))
+			util.LogDebug("move_to_folder is {}".format(move_to_folder))
 		shutil.move(folder, move_to_folder)
-		logging.debug("moving {} to {}".format(folder, move_to_folder))
+		util.LogDebug("moving {} to {}".format(folder, move_to_folder))
 		numFoldersMoved += 1
 		sys.stdout.write("Moved Files {}/{} Folders {}/{} \r".format(numFilesMoved, numFilesToMove, numFoldersMoved, numFoldersToMove))
 		sys.stdout.flush()
@@ -73,7 +73,7 @@ def PackMod(mod_name, target):
 		target_folder = os.path.dirname(target_path)
 		
 		os.makedirs(target_folder, exist_ok=True)
-		logging.debug("moving {} to {}".format(file_path, target_path))
+		util.LogDebug("moving {} to {}".format(file_path, target_path))
 		shutil.move(file_path, target_path)
 		numFilesMoved += 1
 		sys.stdout.write("Moved Files {}/{} Folders {}/{} \r".format(numFilesMoved, numFilesToMove, numFoldersMoved, numFoldersToMove))
@@ -101,17 +101,17 @@ def PackMod(mod_name, target):
 					ignoreMovedFolders.append(relative_folder)
 				else:
 					for filename in files:
-						logging.debug(os.path.join(relative_folder, filename))
+						util.LogDebug(os.path.join(relative_folder, filename))
 						numFilesToMove += 1
-	logging.info("Files ({}) / Folders ({}) to move".format(numFilesToMove, numFoldersToMove))
+	util.LogInfo("Files ({}) / Folders ({}) to move".format(numFilesToMove, numFoldersToMove))
 	
 	RemoveFolders = []
 	for root, subdirs, files in os.walk(target):
 		relative_folder = os.path.relpath(root, target)
-		#logging.debug("Walking relative folder " + relative_folder)
+		#util.LogDebug("Walking relative folder " + relative_folder)
 		if root == target:
 			for child in subdirs:
-				logging.debug("Children {}".format(child))
+				util.LogDebug("Children {}".format(child))
 				RemoveFolders.append(os.path.join(target, child))
 		else:
 			# First check if there is an unqualified path rule for this folder (like "scripts" are only placed in Misc)
@@ -122,10 +122,10 @@ def PackMod(mod_name, target):
 					folderCount += 1
 					lastRuleMatch = rule
 			if folderCount == 1:
-				logging.debug("ApplyRuleToFolder({}) -> {}".format(lastRuleMatch["BSA"], relative_folder))
+				util.LogDebug("ApplyRuleToFolder({}) -> {}".format(lastRuleMatch["BSA"], relative_folder))
 				ApplyRuleToFolder(lastRuleMatch, root)
 			else:
-				#logging.debug("No folder match, check files")
+				#util.LogDebug("No folder match, check files")
 				for filename in files:
 					file_path = os.path.join(root, filename)
 					relative_path = os.path.relpath(file_path, target)
@@ -133,32 +133,32 @@ def PackMod(mod_name, target):
 					for rule in BSARules:
 						should_apply = True
 						if should_apply and "Folder" in rule:
-							#logging.debug("checking folder rule {} vs relative_folder {}".format(rule["Folder"], relative_folder))
+							#util.LogDebug("checking folder rule {} vs relative_folder {}".format(rule["Folder"], relative_folder))
 							should_apply = should_apply and relative_folder.startswith(rule["Folder"])
 						if should_apply and "Extension" in rule:
-							#logging.debug("checking extension rule {} vs filename {}".format(rule["Extension"], filename))
+							#util.LogDebug("checking extension rule {} vs filename {}".format(rule["Extension"], filename))
 							should_apply = should_apply and filename.endswith(rule["Extension"])
 						if should_apply:
-							logging.debug("Applying BSA {} for {}".format(rule["BSA"], file_path))
+							util.LogDebug("Applying BSA {} for {}".format(rule["BSA"], file_path))
 							ApplyRuleToFile(rule, file_path)
 							break
 					if not should_apply:
-						logging.warning("Could not apply rule for <{}>".format(relative_path))
+						util.LogWarn("Could not apply rule for <{}>".format(relative_path))
 						for rule in BSARules:
 							should_apply = True
 							if should_apply and "Folder" in rule:
-								logging.debug("checking folder rule {} vs relative_folder {}".format(rule["Folder"], relative_folder))
+								util.LogDebug("checking folder rule {} vs relative_folder {}".format(rule["Folder"], relative_folder))
 								should_apply = should_apply and relative_folder.startswith(rule["Folder"])
 							if should_apply and "Extension" in rule:
-								logging.debug("checking extension rule {} vs filename {}".format(rule["Extension"], filename))
+								util.LogDebug("checking extension rule {} vs filename {}".format(rule["Extension"], filename))
 								should_apply = should_apply and filename.endswith(rule["Extension"])
 	sys.stdout.write("\n")
-	logging.info("Cleanup old folders")
+	util.LogInfo("Cleanup old folders")
 	for folder in RemoveFolders:
-		logging.debug("Cleanup {}".format(folder))
+		util.LogDebug("Cleanup {}".format(folder))
 		util.RemoveTree(folder)
 	
-	logging.debug("Build BSAs")
+	util.LogDebug("Build BSAs")
 	bsaList = []
 	for bsa_name in BSAs:
 		temp_data = BSAs[bsa_name]
@@ -190,7 +190,7 @@ def PackMod(mod_name, target):
 				bsaList.append(newTargetBSA)
 		util.RemoveTree(temp)
 	
-	logging.debug("PackMod Done")
+	util.LogDebug("PackMod Done")
 	return bsaList
 
 if __name__ == '__main__':

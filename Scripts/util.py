@@ -73,12 +73,13 @@ def RemoveTree(tree):
 	commandLine2 = ["RD", "/s", "/q", tree]
 	for i in range(0,3):
 		try:
-			logging.debug("RemoveTree({})".format(tree))
-			RunCommandLine(commandLine, True)
-			logging.debug("RD")
-			RunCommandLine(commandLine2, True)
-			logging.debug("rmdir")
-			os.rmdir(tree)
+			if os.path.isdir(tree):
+				logging.debug("RemoveTree({})".format(tree))
+				RunCommandLine(commandLine, True)
+				logging.debug("RD")
+				RunCommandLine(commandLine2, True)
+				logging.debug("rmdir")
+				os.rmdir(tree)
 			success = True
 			break
 		except Exception:

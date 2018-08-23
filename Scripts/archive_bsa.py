@@ -6,7 +6,7 @@ import os.path
 import shutil
 import logging
 import util
-import sizes
+import bsa_rules
 
 import subprocess
 
@@ -91,7 +91,7 @@ def ArchiveBSA(target_folder, bsa_filename):
 					allFilesList.append( {'FileName': filename, 'FilePath': file_path, 'RelativePath': relative_path, 'PathNoData': path_no_data, 'FileSize':file_size} )
 	
 	
-	SizeLimitBSA = sizes.BSASizeLimit
+	SizeLimitBSA = bsa_rules.BSASizeLimit
 	
 	currentFileIndex = None
 	currentFileSizeTally = 0

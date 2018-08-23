@@ -6,8 +6,8 @@ import os.path
 import shutil
 import logging
 import util
-import sizes
 import bitflag
+import bsa_rules
 
 import subprocess
 
@@ -45,7 +45,7 @@ def BsarchBSA(target_folder, bsa_filename):
 	logging.debug("Walking the target directory " + target_data)
 	bsaFolders = []
 	
-	SizeLimitBSA = sizes.BSASizeLimit
+	SizeLimitBSA = bsa_rules.BSASizeLimit
 	
 	for root, subdirs, files in os.walk(target_data):
 		logging.debug('--\nroot = ' + root)

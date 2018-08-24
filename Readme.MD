@@ -17,3 +17,4 @@ If there's an external tool that you don't have, the scripts will attempt to dow
 There are Examples listed in the "Examples" folder.  They are filled with dummy mod files, but you should be able to run them and they should produce the appropriate output.  
 Most of the scripts can be used by dragging a folder onto them, but I prefer to run them from the command line in case there's an error whilst in the batch file, so you can see it before the window disappears.  
 The examples all show proper command line usage.
+

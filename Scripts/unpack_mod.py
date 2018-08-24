@@ -40,7 +40,7 @@ def UnpackMod(origin, target):
 			filename = os.path.join(root, file)
 			if file.endswith(".bsa"):
 				BSAsToUnpack.append( (file, filename) )
-			elif file.endswith(".esp") or file.endswith(".ini"):
+			elif file.endswith(".esp") or file.endswith(".ini") or file.endswith(".esm"):
 				newFileName = os.path.join(target, mod_name + file[-4:])
 				FilesToCopy.append( (filename, newFileName) )
 			else:

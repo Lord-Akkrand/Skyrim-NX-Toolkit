@@ -30,6 +30,14 @@ def PackMod(mod_name, target):
 	
 	BSAs = {}
 	
+	mod_pathname = mod_name + ".esp"
+	for root, subdirs, files in os.walk(target):
+		for file in files:
+			filename = os.path.join(root, file)
+			if file.endswith(".esp") or file.endswith(".esm"):
+				logging.debug("mod_pathname is now set to <{}>".format(mod_pathname))
+				mod_pathname = file
+	
 	def DefineBSA(bsa_name):
 		nonlocal BSAs
 		temp = os.path.join(target, "Temp - " + bsa_name)
@@ -165,7 +173,7 @@ def PackMod(mod_name, target):
 			directory = root.lower()
 			dir_name = os.path.basename(directory)
 			if (dir_name.endswith("esm") or dir_name.endswith("esp")) and dir_name not in SafePlugins:
-				new_path = os.path.join(os.path.dirname(directory), "skyrim.esm")
+				new_path = os.path.join(os.path.dirname(directory), mod_pathname)
 				
 				if not os.path.isdir(new_path):
 					logging.debug("Rename plugin directory {} to {}".format(directory, new_path))
@@ -173,18 +181,7 @@ def PackMod(mod_name, target):
 				else:
 					logging.debug("Move plugin files from directory {} to {}".format(directory, new_path))
 					MoveFromTo.append( (directory, new_path) )
-					'''
-					for file in files:
-						file_path = os.path.join(directory, file)
-						new_file_path = os.path.join(new_path, file)
-						logging.debug("Move {} to {}".format(file_path, new_file_path))
-						shutil.move(file_path, new_file_path)
-					for subdir in subdirs:
-						sub_path = os.path.join(directory, subdir)
-						#new_sub_path = os.path.join(new_path, subdir)
-						logging.debug("Move {} to {}".format(sub_path, new_path))
-						shutil.move(sub_path, new_path)
-					'''
+
 		for moveFromTo in MoveFromTo:
 			(move_from, move_to) = moveFromTo
 			logging.debug("Need to move from {} to {}".format(move_from, move_to))

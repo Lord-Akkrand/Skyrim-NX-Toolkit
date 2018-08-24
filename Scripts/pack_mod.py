@@ -158,6 +158,47 @@ def PackMod(mod_name, target):
 		util.LogDebug("Cleanup {}".format(folder))
 		util.RemoveTree(folder)
 	
+	SafePlugins = ["skyrim.esm", "dawnguard.esm", "hearthfires.esm", "dragonborn.esm"]
+	MoveFromTo = []
+	def CleanPluginSpecificPaths(cleanup_directory):
+		for root, subdirs, files in os.walk(cleanup_directory):
+			directory = root.lower()
+			dir_name = os.path.basename(directory)
+			if (dir_name.endswith("esm") or dir_name.endswith("esp")) and dir_name not in SafePlugins:
+				new_path = os.path.join(os.path.dirname(directory), "skyrim.esm")
+				
+				if not os.path.isdir(new_path):
+					logging.debug("Rename plugin directory {} to {}".format(directory, new_path))
+					os.rename(directory, new_path)
+				else:
+					logging.debug("Move plugin files from directory {} to {}".format(directory, new_path))
+					MoveFromTo.append( (directory, new_path) )
+					'''
+					for file in files:
+						file_path = os.path.join(directory, file)
+						new_file_path = os.path.join(new_path, file)
+						logging.debug("Move {} to {}".format(file_path, new_file_path))
+						shutil.move(file_path, new_file_path)
+					for subdir in subdirs:
+						sub_path = os.path.join(directory, subdir)
+						#new_sub_path = os.path.join(new_path, subdir)
+						logging.debug("Move {} to {}".format(sub_path, new_path))
+						shutil.move(sub_path, new_path)
+					'''
+		for moveFromTo in MoveFromTo:
+			(move_from, move_to) = moveFromTo
+			logging.debug("Need to move from {} to {}".format(move_from, move_to))
+			for root, subdirs, files in os.walk(move_from):
+				for file in files:
+					file_path = os.path.join(root, file)
+					relative_path = os.path.relpath(root, move_from)
+					new_path = os.path.join(move_to, relative_path)
+					
+					logging.debug("Moving file from {} to {}".format(file_path, new_path))
+					new_directory = os.path.dirname(new_path)
+					os.makedirs(new_directory, exist_ok=True)
+					shutil.move(file_path, new_path)
+					
 	util.LogDebug("Build BSAs")
 	bsaList = []
 	for bsa_name in BSAs:
@@ -166,7 +207,8 @@ def PackMod(mod_name, target):
 		bsa_file_suffix = ""
 		if bsa_name != "":
 			bsa_file_suffix = " - " + bsa_name
-			
+		
+		CleanPluginSpecificPaths(temp_data)
 		bsa_filename = mod_name + bsa_file_suffix + ".bsa"
 		target_bsa = os.path.join(target, bsa_filename)
 		useArchive = has_archive

@@ -47,6 +47,7 @@ def BsarchBSA(target_folder, bsa_filename):
 	
 	SizeLimitBSA = bsa_rules.BSASizeLimit
 	
+	totalFileCount = 0
 	for root, subdirs, files in os.walk(target_data):
 		util.LogDebug('--\nroot = ' + root)
 		if root != target_data:
@@ -56,12 +57,13 @@ def BsarchBSA(target_folder, bsa_filename):
 					
 					file_size = os.path.getsize(file_path)
 					totalFileSizeTally += file_size
+					totalFileCount += 1
+					
 	currentFileIndex = None
 	if totalFileSizeTally > SizeLimitBSA:
 		currentFileIndex = 0
 	
 	totalWrittenTally = 0
-	
 	
 	currentFileSizeTally = 0
 	buffer = ''
@@ -87,6 +89,7 @@ def BsarchBSA(target_folder, bsa_filename):
 		bsaFileWritten.append({"Folder":target_folder, "FileName":bsa_filename})
 		util.RemoveTree(temp_data)
 	
+	filesArchived = 0
 	for root, subdirs, files in os.walk(target_data):
 		util.LogDebug('--\nroot = ' + root)
 		if root == target_data:
@@ -134,7 +137,9 @@ def BsarchBSA(target_folder, bsa_filename):
 					util.LogDebug("Attempting to add " + file_path + " currentFileSizeTally is " + str(currentFileSizeTally) + " file_size is " + str(file_size))
 					if (newTally >= SizeLimitBSA):
 						util.LogDebug("New BSA would be too big, writing current BSA")
+						sys.stdout.write("\n")
 						WriteBSA()
+						
 						currentFileSizeTally = 0
 						
 					relative_path = file_path.replace(target_folder, '')
@@ -156,6 +161,10 @@ def BsarchBSA(target_folder, bsa_filename):
 						os.mkdir(path_to_create)
 					shutil.move(file_path, temp_path)
 					currentFileSizeTally += file_size
+					filesArchived += 1
+					sys.stdout.write("Prepared {}/{} \r".format(filesArchived, totalFileCount))
+					sys.stdout.flush()
+	sys.stdout.write("\n")
 	if currentFileSizeTally > 0:
 		WriteBSA()
 	

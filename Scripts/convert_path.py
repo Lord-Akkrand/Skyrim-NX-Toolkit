@@ -44,12 +44,13 @@ def ConvertPath(mod_name, target):
 		sys.stdout.flush()
 	sys.stdout.write("\n")
 	
-	for i in range(len(ConvertListHKX)):
-		file_path = ConvertListHKX[i]
-		convert_hkx.ConvertHKX(file_path)
-		sys.stdout.write("Converted {}/{} HKX \r".format(i+1, len(ConvertListHKX)))
-		sys.stdout.flush()
-	sys.stdout.write("\n")
+	if has_havoc:
+		for i in range(len(ConvertListHKX)):
+			file_path = ConvertListHKX[i]
+			convert_hkx.ConvertHKX(file_path)
+			sys.stdout.write("Converted {}/{} HKX \r".format(i+1, len(ConvertListHKX)))
+			sys.stdout.flush()
+		sys.stdout.write("\n")
 	
 if __name__ == '__main__':
 	mod_name = sys.argv[1]

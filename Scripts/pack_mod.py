@@ -89,7 +89,7 @@ def PackMod(mod_name, target):
 	
 	ignoreMovedFolders = []
 	for root, subdirs, files in os.walk(target):
-		relative_folder = os.path.relpath(root, target)
+		relative_folder = os.path.relpath(root, target).lower()
 		if root != target:
 			# Check if this folder is ignored already
 			ignoreThisFolder = False
@@ -115,7 +115,7 @@ def PackMod(mod_name, target):
 	
 	RemoveFolders = []
 	for root, subdirs, files in os.walk(target):
-		relative_folder = os.path.relpath(root, target)
+		relative_folder = os.path.relpath(root, target).lower()
 		#util.LogDebug("Walking relative folder " + relative_folder)
 		if root == target:
 			for child in subdirs:
@@ -167,6 +167,7 @@ def PackMod(mod_name, target):
 		util.RemoveTree(folder)
 	
 	SafePlugins = ["skyrim.esm", "dawnguard.esm", "hearthfires.esm", "dragonborn.esm"]
+	SafePlugins.append(mod_pathname.lower())
 	MoveFromTo = []
 	def CleanPluginSpecificPaths(cleanup_directory):
 		for root, subdirs, files in os.walk(cleanup_directory):

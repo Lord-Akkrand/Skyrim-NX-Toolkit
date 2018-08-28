@@ -4,21 +4,45 @@
 BSASizeLimit = 1024 * 1024 * 2000
 
 BSARules = []
-# In order to be placed in a BSA you must meet all the criteria.  First rule evaluated wins.
-BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"hkx"})
-BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"txt"})
 
-BSARules.append({"BSA":"Meshes", "Folder":"meshes"})
-BSARules.append({"BSA":"Meshes", "Folder":"lodsettings"})
+FullRules = False
 
-BSARules.append({"BSA":"Misc", "Folder":"grass"})
-BSARules.append({"BSA":"Misc", "Folder":"scripts"})
-BSARules.append({"BSA":"Misc", "Folder":"seq"})
-BSARules.append({"BSA":"Shaders", "Folder":"shadersfx"})
+if FullRules:
+	# In order to be placed in a BSA you must meet all the criteria.  First rule evaluated wins.
+	BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"hkx"})
+	BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"txt"})
 
-BSARules.append({"BSA":"Sounds", "Folder":"music"})
-BSARules.append({"BSA":"Sounds", "Folder":"sound\\fx"})
+	BSARules.append({"BSA":"Meshes", "Folder":"meshes"})
+	BSARules.append({"BSA":"Meshes", "Folder":"lodsettings"})
 
-BSARules.append({"BSA":"Textures", "Folder":"textures"})
+	BSARules.append({"BSA":"Misc", "Folder":"grass"})
+	BSARules.append({"BSA":"Misc", "Folder":"scripts"})
+	BSARules.append({"BSA":"Misc", "Folder":"seq"})
+	BSARules.append({"BSA":"Shaders", "Folder":"shadersfx"})
 
-BSARules.append({"BSA":"Voices", "Folder":"sound\\voice"})
+	BSARules.append({"BSA":"Sounds", "Folder":"music"})
+	BSARules.append({"BSA":"Sounds", "Folder":"sound\\fx"})
+
+	BSARules.append({"BSA":"Textures", "Folder":"textures"})
+
+	BSARules.append({"BSA":"Voices", "Folder":"sound\\voice"})
+else:
+
+	# Basic Rules, only make Textures/Meshes/''
+	# '' will just be PluginName.bsa
+	BSARules.append({"BSA":"Textures", "Folder":"textures"})
+	
+	BSARules.append({"BSA":"", "Folder":"meshes", "Extension":"hkx"})
+	BSARules.append({"BSA":"", "Folder":"meshes", "Extension":"txt"})
+
+	BSARules.append({"BSA":"Meshes", "Folder":"meshes"})
+	BSARules.append({"BSA":"Meshes", "Folder":"lodsettings"})
+
+	BSARules.append({"BSA":"", "Folder":"grass"})
+	BSARules.append({"BSA":"", "Folder":"scripts"})
+	BSARules.append({"BSA":"", "Folder":"seq"})
+	BSARules.append({"BSA":"", "Folder":"shadersfx"})
+
+	BSARules.append({"BSA":"", "Folder":"music"})
+	BSARules.append({"BSA":"", "Folder":"sound"})
+

@@ -40,7 +40,10 @@ def PackMod(mod_name, target):
 	
 	def DefineBSA(bsa_name):
 		nonlocal BSAs
-		temp = os.path.join(target, "Temp - " + bsa_name)
+		temp = os.path.join(target, "Temp")
+		if bsa_name != '':
+			temp = os.path.join(target, "Temp - " + bsa_name)
+		
 		temp_data = os.path.join(temp, "Data")
 		util.RemoveTree(temp)
 		os.makedirs(temp_data, exist_ok=True)

@@ -23,6 +23,9 @@ if FullRules:
 	BSARules.append({"BSA":"Sounds", "Folder":"music"})
 	BSARules.append({"BSA":"Sounds", "Folder":"sound\\fx"})
 
+	BSARules.append({"BSA":"Interface", "Folder":"strings"})
+	BSARules.append({"BSA":"Interface", "Folder":"interface"})
+	
 	BSARules.append({"BSA":"Textures", "Folder":"textures"})
 
 	BSARules.append({"BSA":"Voices", "Folder":"sound\\voice"})
@@ -42,6 +45,8 @@ else:
 	BSARules.append({"BSA":"", "Folder":"scripts"})
 	BSARules.append({"BSA":"", "Folder":"seq"})
 	BSARules.append({"BSA":"", "Folder":"shadersfx"})
+	BSARules.append({"BSA":"", "Folder":"strings"})
+	BSARules.append({"BSA":"", "Folder":"interface"})
 
 	BSARules.append({"BSA":"", "Folder":"music"})
 	BSARules.append({"BSA":"", "Folder":"sound"})

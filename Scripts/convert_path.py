@@ -37,10 +37,13 @@ def ConvertPath(mod_name, target):
 	util.LogInfo("Found {} dds files to convert".format(len(ConvertListDDS)))
 	if has_havoc: util.LogInfo("Found {} hkx files to convert".format(len(ConvertListHKX)))
 	
+	failedCount = 0
 	for i in range(len(ConvertListDDS)):
 		file_path = ConvertListDDS[i]
-		convert_dds.ConvertDDS(target, file_path)
-		sys.stdout.write("Converted {}/{} DDS \r".format(i+1, len(ConvertListDDS)))
+		success = convert_dds.ConvertDDS(target, file_path)
+		if not success:
+			failedCount += 1
+		sys.stdout.write("Converted {}/{} DDS ({}) failed. \r".format(i+1, len(ConvertListDDS), failedCount))
 		sys.stdout.flush()
 	sys.stdout.write("\n")
 	

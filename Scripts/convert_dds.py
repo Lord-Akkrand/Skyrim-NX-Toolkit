@@ -227,15 +227,21 @@ def ConvertDDS(basePath, ddsFileName):
 		nvntexpkg = util.GetNvnTexpkg()
 		out_file = os.path.join(ddsFilePath, "out.xtx")
 		commandLine = [nvntexpkg, "-i", ddsFileName, "-v", "--printinfo", "-o", out_file]
-		util.RunCommandLine(commandLine)
+		(convOutput, convErrors) = util.RunCommandLine(commandLine)
 		
-		util.ForceMove(out_file, ddsFileName)
+		if "Everything went OK" in convOutput:
+			util.ForceMove(out_file, ddsFileName)
+			return True
+		return False
 	else:
 		xtx_extract = util.GetXTXExtract()
 		commandLine = ["py", "-3", xtx_extract, ddsFileName]
 		util.RunCommandLine(commandLine)
 		out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
-		util.ForceMove(out_file, ddsFileName)
+		if os.path.exists(out_file):
+			util.ForceMove(out_file, ddsFileName)
+			return True
+		return False
 
 if __name__ == '__main__':
 	basePath = sys.argv[1]

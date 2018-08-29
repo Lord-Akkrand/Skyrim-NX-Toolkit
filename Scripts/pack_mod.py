@@ -193,7 +193,7 @@ def PackMod(mod_name, target):
 				for file in files:
 					file_path = os.path.join(root, file)
 					relative_path = os.path.relpath(root, move_from)
-					new_path = os.path.join(move_to, relative_path)
+					new_path = os.path.join(move_to, relative_path, file)
 					
 					logging.debug("Moving file from {} to {}".format(file_path, new_path))
 					new_directory = os.path.dirname(new_path)

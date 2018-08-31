@@ -66,7 +66,7 @@ def PackMod(mod_name, target):
 							espTest = re.findall(espPattern, value)
 							if espTest != None:
 								for espCandidate in espTest:
-									espCandidate = ''.join(espCandidate.split())
+									espCandidate = espCandidate.strip()#''.join(espCandidate.split())
 									if espCandidate != '':
 										logging.debug("Found <{}>".format(espCandidate))
 										pluginList.append(espCandidate)

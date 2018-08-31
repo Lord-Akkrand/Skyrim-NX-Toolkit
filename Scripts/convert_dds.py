@@ -229,7 +229,8 @@ def ConvertDDS(basePath, ddsFileName):
 		commandLine = [nvntexpkg, "-i", ddsFileName, "-v", "--printinfo", "-o", out_file]
 		(convOutput, convErrors) = util.RunCommandLine(commandLine)
 		
-		if "Everything went OK" in convOutput:
+		#if "Everything went OK" in convOutput:
+		if os.path.exists(out_file):
 			util.ForceMove(out_file, ddsFileName)
 			return True
 		return False

@@ -29,10 +29,11 @@ if FullRules:
 	BSARules.append({"BSA":"Textures", "Folder":"textures"})
 
 	BSARules.append({"BSA":"Voices", "Folder":"sound\\voice"})
+	
 else:
 
 	# Basic Rules, only make Textures/Meshes/''
-	# '' will just be PluginName.bsa
+	# "BSA":"" will just be PluginName.bsa
 	BSARules.append({"BSA":"Textures", "Folder":"textures"})
 	
 	BSARules.append({"BSA":"", "Folder":"meshes", "Extension":"hkx"})
@@ -50,4 +51,7 @@ else:
 
 	BSARules.append({"BSA":"", "Folder":"music"})
 	BSARules.append({"BSA":"", "Folder":"sound"})
+	
+# Not implemented yet
+#BSARules.append({"NotIncluded":True, "Folder":"source"})
 

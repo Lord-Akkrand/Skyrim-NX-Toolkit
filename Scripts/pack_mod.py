@@ -9,6 +9,7 @@ import logging
 import archive_bsa
 import bsarch_bsa
 import bsa_rules
+import re
 
 import bitflag
 
@@ -30,14 +31,79 @@ def PackMod(mod_name, target):
 	
 	BSAs = {}
 	
+	SafePlugins = ["skyrim.esm", "dawnguard.esm", "hearthfires.esm", "dragonborn.esm"]
+	PluginPaths = {}
+	for plugin in SafePlugins:
+		PluginPaths[plugin] = plugin
+	
+	# Arbitrary Limit to search for merged plugin list
+	LineLimit = 10
+	ChunkSize = 1024
+	ChunksLimit = 10
+	childPattern = re.compile(r"Merged Plugin:([^\0]*)[\0]", re.MULTILINE)
+	espPattern = re.compile(r"(.+?\.[^.]*$|$)", re.MULTILINE)
+	def ReadPlugin(filename):
+		logging.debug("Reading plugin{}".format(filename))
+		pluginList = []
+		with open(filename, "rb") as plugin:
+			lineNumber = 0
+			chunkNumber = 0
+			foundMerge = False
+			buffer = ''
+			while True:
+				chunk = plugin.read(ChunkSize)
+				chunkNumber += 1
+				buffer = buffer + "".join(map(chr, chunk))
+				if "Merged Plugin:" in buffer:
+					foundMerge = True
+				if foundMerge:
+					childPlugins = re.search(childPattern, buffer)
+					if childPlugins != None:
+						wholePattern = childPlugins.group(0)
+						value = childPlugins.group(1)
+						logging.debug("Found Plugins Block <{}>".format(value))
+						while True:
+							espTest = re.findall(espPattern, value)
+							if espTest != None:
+								for espCandidate in espTest:
+									espCandidate = ''.join(espCandidate.split())
+									if espCandidate != '':
+										logging.debug("Found <{}>".format(espCandidate))
+										pluginList.append(espCandidate)
+								#logging.info("Found <{}>".format(str(espTest)))
+								break
+						break
+					if chunkNumber  >= ChunksLimit:
+						break
+				if not foundMerge:
+					lineNumber += 1
+					if lineNumber >= LineLimit:
+						break
+		return pluginList
+	
 	mod_pathname = mod_name + ".esp"
 	for root, subdirs, files in os.walk(target):
 		for file in files:
-			filename = os.path.join(root, file)
 			if file.endswith(".esp") or file.endswith(".esm"):
-				logging.debug("mod_pathname is now set to <{}>".format(mod_pathname))
+				filename = os.path.join(root, file)
+				logging.debug("Found a plugin at {}, <{}>".format(filename, file))
+				
+				# look after yourself
+				PluginPaths[file] = file
+
+				childrenOfPlugin = ReadPlugin(filename)
+				if len(childrenOfPlugin) > 0:
+					logging.info("Detected that {} is merged from:".format(file))
+					for child in childrenOfPlugin:
+						logging.info(" - {}".format(child))
+						# look after your children
+						PluginPaths[child] = file
 				mod_pathname = file
-	
+		# only interested in files in the root folder
+		break
+
+	logging.debug("PluginPaths is <{}>".format(str(PluginPaths)))
+
 	def DefineBSA(bsa_name):
 		nonlocal BSAs
 		temp = os.path.join(target, "Temp")
@@ -169,22 +235,23 @@ def PackMod(mod_name, target):
 		util.LogDebug("Cleanup {}".format(folder))
 		util.RemoveTree(folder)
 	
-	SafePlugins = ["skyrim.esm", "dawnguard.esm", "hearthfires.esm", "dragonborn.esm"]
-	SafePlugins.append(mod_pathname.lower())
 	MoveFromTo = []
 	def CleanPluginSpecificPaths(cleanup_directory):
 		for root, subdirs, files in os.walk(cleanup_directory):
 			directory = root.lower()
 			dir_name = os.path.basename(directory)
 			if (dir_name.endswith("esm") or dir_name.endswith("esp")) and dir_name not in SafePlugins:
-				new_path = os.path.join(os.path.dirname(directory), mod_pathname)
-				
-				if not os.path.isdir(new_path):
-					logging.debug("Rename plugin directory {} to {}".format(directory, new_path))
-					os.rename(directory, new_path)
+				if dir_name in PluginPaths:
+					target_pathname = PluginPaths[dir_name]
+					new_path = os.path.join(os.path.dirname(directory), target_pathname)
+					if not os.path.isdir(new_path):
+						logging.info("Rename plugin directory {} to {}".format(directory, new_path))
+						os.rename(directory, new_path)
+					else:
+						logging.info("Move plugin files from directory {} to {}".format(directory, new_path))
+						MoveFromTo.append( (directory, new_path) )
 				else:
-					logging.debug("Move plugin files from directory {} to {}".format(directory, new_path))
-					MoveFromTo.append( (directory, new_path) )
+					logging.warning("There's a plugin-like path <{}> in your data, but no ESP matching it or listing it as a merge parent".format(dir_name))
 
 		for moveFromTo in MoveFromTo:
 			(move_from, move_to) = moveFromTo

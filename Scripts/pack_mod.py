@@ -69,7 +69,7 @@ def PackMod(mod_name, target):
 									espCandidate = espCandidate.strip()#''.join(espCandidate.split())
 									if espCandidate != '':
 										logging.debug("Found <{}>".format(espCandidate))
-										pluginList.append(espCandidate)
+										pluginList.append(espCandidate.lower())
 								#logging.info("Found <{}>".format(str(espTest)))
 								break
 						break
@@ -89,7 +89,7 @@ def PackMod(mod_name, target):
 				logging.debug("Found a plugin at {}, <{}>".format(filename, file))
 				
 				# look after yourself
-				PluginPaths[file] = file
+				PluginPaths[file.lower()] = file.lower()
 
 				childrenOfPlugin = ReadPlugin(filename)
 				if len(childrenOfPlugin) > 0:
@@ -97,7 +97,7 @@ def PackMod(mod_name, target):
 					for child in childrenOfPlugin:
 						logging.info(" - {}".format(child))
 						# look after your children
-						PluginPaths[child] = file
+						PluginPaths[child.lower()] = file.lower()
 				mod_pathname = file
 		# only interested in files in the root folder
 		break
@@ -242,13 +242,13 @@ def PackMod(mod_name, target):
 			dir_name = os.path.basename(directory)
 			if (dir_name.endswith("esm") or dir_name.endswith("esp")) and dir_name not in SafePlugins:
 				if dir_name in PluginPaths:
-					target_pathname = PluginPaths[dir_name]
+					target_pathname = PluginPaths[dir_name.lower()]
 					new_path = os.path.join(os.path.dirname(directory), target_pathname)
 					if not os.path.isdir(new_path):
-						logging.info("Rename plugin directory {} to {}".format(directory, new_path))
+						logging.debug("Rename plugin directory {} to {}".format(directory, new_path))
 						os.rename(directory, new_path)
 					else:
-						logging.info("Move plugin files from directory {} to {}".format(directory, new_path))
+						logging.debug("Move plugin files from directory {} to {}".format(directory, new_path))
 						MoveFromTo.append( (directory, new_path) )
 				else:
 					logging.warning("There's a plugin-like path <{}> in your data, but no ESP matching it or listing it as a merge parent".format(dir_name))

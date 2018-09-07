@@ -30,6 +30,7 @@ def ConvertPath(mod_name, target):
 		if root != target:
 			util.LogDebug("Walking folder " + root)
 			for filename in files:
+				#util.LogDebug("filename: {}".format(filename))
 				if filename.lower().endswith(".dds"):
 					file_path = os.path.join(root, filename)
 					ConvertListDDS.append(file_path)
@@ -39,7 +40,7 @@ def ConvertPath(mod_name, target):
 				elif filename.lower().startswith("translate_") and filename.lower().endswith(".txt"):
 					file_path = os.path.join(root, filename)
 					ConvertListTXT.append(file_path)
-				elif filename.lower().endswith(".xmw") or filename.lower().endswith(".fuz") or filename.lower().endswith(".wav"):
+				elif filename.lower().endswith(".xwm") or filename.lower().endswith(".fuz") or filename.lower().endswith(".wav"):
 					file_path = os.path.join(root, filename)
 					ConvertListSound.append(file_path)
 					

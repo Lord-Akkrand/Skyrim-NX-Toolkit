@@ -5,7 +5,6 @@ import os.path
 import shutil
 import subprocess
 import util
-import logging
 import convert_dds
 
 import bitflag

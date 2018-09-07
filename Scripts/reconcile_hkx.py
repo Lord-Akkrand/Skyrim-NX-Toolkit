@@ -5,7 +5,6 @@ import os.path
 import shutil
 import subprocess
 import util
-import logging
 
 def ReconcileHKX(mod_path, oldrim_path):
 

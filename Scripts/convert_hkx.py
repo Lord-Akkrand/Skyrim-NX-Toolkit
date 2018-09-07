@@ -5,7 +5,6 @@ import re
 import os.path
 import sizes
 import util
-import logging
 import shutil
 
 import subprocess

@@ -4,7 +4,6 @@ import sys
 import re
 import os.path
 import shutil
-import logging
 import util
 import bsa_rules
 

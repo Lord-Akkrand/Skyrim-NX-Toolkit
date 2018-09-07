@@ -59,6 +59,9 @@ def LogInfo(msg):
 	
 def LogWarn(msg):
 	logging.warning(msg)
+
+def LogError(msg):
+	logging.error(msg)
 	
 def OldRemoveTree(tree):
 	success = False

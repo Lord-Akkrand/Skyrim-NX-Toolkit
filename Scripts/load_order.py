@@ -4,7 +4,6 @@ import sys
 import re
 import os.path
 import shutil
-import logging
 import util
 
 import subprocess
@@ -52,8 +51,8 @@ def LoadOrder(origin, target, loadOrderName):
 			alPattern = re.compile(alPattern, flags)
 		al = re.search(alPattern, buffer)
 		if al == None:
-			logging.error("Cannot find " + aln + ", bailing")
-			logging.error("BUFFER" + buffer + "ENDBUFFER")
+			util.LogError("Cannot find " + aln + ", bailing")
+			util.LogError("BUFFER" + buffer + "ENDBUFFER")
 			sys.exit(1)
 		retVal = al.group(1)
 		util.LogDebug("<" + retVal + ">")
@@ -67,7 +66,7 @@ def LoadOrder(origin, target, loadOrderName):
 		tfPattern = "([;]*sTestFile" + tfn + r"=[^\n]*)\n"
 		tf = re.search(tfPattern, newSkyrimIni)
 		if tf == None:
-			logging.error("Cannot find " + tfn + ", bailing")
+			util.LogError("Cannot find " + tfn + ", bailing")
 			sys.exit(1)
 		retVal = tf.group(1)
 		util.LogDebug("<" + retVal + ">")

@@ -5,7 +5,6 @@ import os.path
 import shutil
 import subprocess
 import util
-import logging
 import unpack_mod, reconcile_hkx, convert_path, pack_mod
 import inspect, os
 import bitflag

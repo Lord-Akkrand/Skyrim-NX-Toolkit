@@ -5,7 +5,6 @@ import os, os.path
 import shutil
 import subprocess
 import util
-import logging
 import archive_bsa
 import bsarch_bsa
 import bsa_rules
@@ -43,7 +42,7 @@ def PackMod(mod_name, target):
 	childPattern = re.compile(r"Merged Plugin:([^\0]*)[\0]", re.MULTILINE)
 	espPattern = re.compile(r"(.+?\.[^.]*$|$)", re.MULTILINE)
 	def ReadPlugin(filename):
-		logging.debug("Reading plugin{}".format(filename))
+		util.LogDebug("Reading plugin{}".format(filename))
 		pluginList = []
 		with open(filename, "rb") as plugin:
 			lineNumber = 0
@@ -61,16 +60,16 @@ def PackMod(mod_name, target):
 					if childPlugins != None:
 						wholePattern = childPlugins.group(0)
 						value = childPlugins.group(1)
-						logging.debug("Found Plugins Block <{}>".format(value))
+						util.LogDebug("Found Plugins Block <{}>".format(value))
 						while True:
 							espTest = re.findall(espPattern, value)
 							if espTest != None:
 								for espCandidate in espTest:
 									espCandidate = espCandidate.strip()#''.join(espCandidate.split())
 									if espCandidate != '':
-										logging.debug("Found <{}>".format(espCandidate))
+										util.LogDebug("Found <{}>".format(espCandidate))
 										pluginList.append(espCandidate.lower())
-								#logging.info("Found <{}>".format(str(espTest)))
+								#util.LogInfo("Found <{}>".format(str(espTest)))
 								break
 						break
 					if chunkNumber  >= ChunksLimit:
@@ -86,23 +85,23 @@ def PackMod(mod_name, target):
 		for file in files:
 			if file.endswith(".esp") or file.endswith(".esm"):
 				filename = os.path.join(root, file)
-				logging.debug("Found a plugin at {}, <{}>".format(filename, file))
+				util.LogDebug("Found a plugin at {}, <{}>".format(filename, file))
 				
 				# look after yourself
 				PluginPaths[file.lower()] = file.lower()
 
 				childrenOfPlugin = ReadPlugin(filename)
 				if len(childrenOfPlugin) > 0:
-					logging.info("Detected that {} is merged from:".format(file))
+					util.LogInfo("Detected that {} is merged from:".format(file))
 					for child in childrenOfPlugin:
-						logging.info(" - {}".format(child))
+						util.LogInfo(" - {}".format(child))
 						# look after your children
 						PluginPaths[child.lower()] = file.lower()
 				mod_pathname = file
 		# only interested in files in the root folder
 		break
 
-	logging.debug("PluginPaths is <{}>".format(str(PluginPaths)))
+	util.LogDebug("PluginPaths is <{}>".format(str(PluginPaths)))
 
 	def DefineBSA(bsa_name):
 		nonlocal BSAs
@@ -245,24 +244,24 @@ def PackMod(mod_name, target):
 					target_pathname = PluginPaths[dir_name.lower()]
 					new_path = os.path.join(os.path.dirname(directory), target_pathname)
 					if not os.path.isdir(new_path):
-						logging.debug("Rename plugin directory {} to {}".format(directory, new_path))
+						util.LogDebug("Rename plugin directory {} to {}".format(directory, new_path))
 						os.rename(directory, new_path)
 					else:
-						logging.debug("Move plugin files from directory {} to {}".format(directory, new_path))
+						util.LogDebug("Move plugin files from directory {} to {}".format(directory, new_path))
 						MoveFromTo.append( (directory, new_path) )
 				else:
-					logging.warning("There's a plugin-like path <{}> in your data, but no ESP matching it or listing it as a merge parent".format(dir_name))
+					util.LogWarn("There's a plugin-like path <{}> in your data, but no ESP matching it or listing it as a merge parent".format(dir_name))
 
 		for moveFromTo in MoveFromTo:
 			(move_from, move_to) = moveFromTo
-			logging.debug("Need to move from {} to {}".format(move_from, move_to))
+			util.LogDebug("Need to move from {} to {}".format(move_from, move_to))
 			for root, subdirs, files in os.walk(move_from):
 				for file in files:
 					file_path = os.path.join(root, file)
 					relative_path = os.path.relpath(root, move_from)
 					new_path = os.path.join(move_to, relative_path, file)
 					
-					logging.debug("Moving file from {} to {}".format(file_path, new_path))
+					util.LogDebug("Moving file from {} to {}".format(file_path, new_path))
 					new_directory = os.path.dirname(new_path)
 					os.makedirs(new_directory, exist_ok=True)
 					shutil.move(file_path, new_path)
@@ -309,5 +308,4 @@ if __name__ == '__main__':
 	util.InitialiseLog(target + ".log")
 	util.StartTimer()
 	PackMod(mod_name, target)
-	logging.shutdown()
 	util.EndTimer()

@@ -27,7 +27,7 @@ def ConvertMod(origin, target, oldrim):
 		
 	convert_path.ConvertPath(mod_name, target)
 
-	#pack_mod.PackMod(mod_name, target)
+	pack_mod.PackMod(mod_name, target)
 
 if __name__ == '__main__':
 	origin = sys.argv[1]

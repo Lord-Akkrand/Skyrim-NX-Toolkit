@@ -1,14 +1,21 @@
 #! python3
 
 import sys
-import util
+import download_file, unzip_file
 import convert_mod, convert_path, load_order, pack_mod, packed_load_order, repack_mod, unpack_mod
-
 	
 if __name__ == '__main__':
 	py_script = sys.argv[1]
 	print(str(sys.argv))
-	if py_script == 'convert_mod':
+	if py_script == 'download_file':
+		url = sys.argv[2]
+		file_path = sys.argv[3]
+		download_file.DownloadFile(url, file_path)
+	elif py_script == 'unzip_file':
+		zip_file = sys.argv[2]
+		file_path = sys.argv[3]
+		unzip_file.UnzipFile(zip_file, file_path)
+	elif py_script == 'convert_mod':
 		origin = sys.argv[2]
 		target = sys.argv[3]
 		oldrim = None
@@ -36,5 +43,6 @@ if __name__ == '__main__':
 		origin = sys.argv[2]
 		target = sys.argv[3]
 		unpack_mod.UnpackMod_External(origin, target)
+	
 
 		

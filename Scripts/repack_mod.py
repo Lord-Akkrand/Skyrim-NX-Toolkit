@@ -9,7 +9,7 @@ import unpack_mod, reconcile_hkx, convert_path, pack_mod
 import inspect, os
 import bitflag
 
-def RepackMod(origin, target, oldrim):
+def RepackMod(origin, target):
 	mod_name = os.path.basename(origin)
 	'''
 	util.LogDebug("This is the origin: " + origin)
@@ -23,12 +23,17 @@ def RepackMod(origin, target, oldrim):
 	util.CreateTarget(target)
 	unpack_mod.UnpackMod(origin, target)
 	pack_mod.PackMod(mod_name, target)
+	
+def RepackMod_External(origin, target):
+	util.InitialiseLog(origin + ".log")
+	util.StartTimer()
+	RepackMod(origin, target)
+	util.EndTimer()
 
 if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
-	oldrim = None
 	util.InitialiseLog(origin + ".log")
 	util.StartTimer()
-	RepackMod(origin, target, oldrim)
+	RepackMod(origin, target)
 	util.EndTimer()

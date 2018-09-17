@@ -302,6 +302,12 @@ def PackMod(mod_name, target):
 	util.LogDebug("PackMod Done")
 	return bsaList
 
+def PackMod_External(mod_name, target):
+	util.InitialiseLog(target + ".log")
+	util.StartTimer()
+	PackMod(mod_name, target)
+	util.EndTimer()
+	
 if __name__ == '__main__':
 	mod_name = sys.argv[1]
 	target = sys.argv[2]

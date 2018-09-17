@@ -66,6 +66,13 @@ def ConvertPath(mod_name, target):
 		LogProgress(ConvertListHKX, convert_hkx.ConvertHKX, "HKX")
 	LogProgress(ConvertListTXT, convert_txt.ConvertTXT, "TXT")
 	LogProgress(ConvertListSound, convert_sound.ConvertSound, "Sounds")
+
+def ConvertPath_External(mod_name, target):
+	util.InitialiseLog(target + ".log")
+	util.StartTimer()
+	util.LogInfo("TOOLKIT call convert_path")
+	ConvertPath(mod_name, target)
+	util.EndTimer()
 	
 if __name__ == '__main__':
 	mod_name = sys.argv[1]

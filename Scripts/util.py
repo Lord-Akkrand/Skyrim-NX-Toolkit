@@ -1,6 +1,11 @@
 #! python3
 
-import datetime, inspect, logging, os, pathlib, subprocess, shutil
+import datetime, inspect, logging, os, subprocess, shutil
+
+g_ToolkitVersion = 'v3.0.0'
+
+def GetToolkitVersion():
+	return g_ToolkitVersion
 
 gStartTime = 0
 def StartTimer():
@@ -17,13 +22,15 @@ def EndTimer():
 def RunCommandLine(commandLine, useShell=False):
 	LogDebug("RunCommandLine({}, shell={})".format(str(commandLine), str(useShell)))
 	
-	p = subprocess.Popen(commandLine, shell=useShell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+	p = subprocess.Popen(commandLine, shell=useShell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	output, err = p.communicate()
 	p_status = p.wait()
 	if output != None:
+		output = output.decode('utf-8', errors='ignore')
 		#output = output.decode('ascii')
 		LogDebug("Output:" + output)#str(output.splitlines()))
 	if err != None:
+		err = err.decode('utf-8', errors='ignore')
 		#err = err.decode('ascii')
 		LogDebug("Errors:" + err)#str(err.splitlines()))
 	return (output, err)
@@ -51,8 +58,19 @@ def InitialiseLog(newFileName):
 		
 		LogInfo("Logger Initialised {}".format(newFileName))
 
+g_LogGUI_Initialised = False
+g_LogGUI = ''
+def InitialiseGUILog():
+	global g_LogGUI, g_LogGUI_Initialised
+	if not g_LogGUI_Initialised:
+		g_LogGUI_Initialised = True
+	g_LogGUI = ''
+		
 def LogDebug(msg):
-	logging.debug(msg)
+	if g_LogGUI_Initialised:
+		g_LogGUI
+	else:
+		logging.debug(msg)
 	
 def LogInfo(msg):
 	logging.info(msg)

@@ -1,5 +1,6 @@
 @ECHO OFF
-CD ..
-CD ..
-UNPACK_MOD.BAT "Examples\Unpack Mod\LAL"
-CD "Examples\Unpack Mod"
+PUSHD ..
+PUSHD ..
+CALL UNPACK_MOD.BAT "Examples\Unpack Mod\LAL"
+POPD
+POPD

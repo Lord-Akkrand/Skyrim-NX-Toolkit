@@ -17,6 +17,8 @@ def ConvertMod(origin, target, oldrim):
 	util.LogDebug("This is the mod name " + mod_name)
 	'''
 	util.LogDebug("convert_mod.py 2.0")
+	toolkit_path = util.GetToolKitPath()
+	util.LogInfo("Convert Mod, ToolkitPath is {}".format(toolkit_path))
 	
 	util.LogInfo("Convert Mod, create empty folder at target")
 	
@@ -29,13 +31,17 @@ def ConvertMod(origin, target, oldrim):
 
 	pack_mod.PackMod(mod_name, target)
 
+def ConvertMod_External(origin, target, oldrim):
+	util.InitialiseLog(origin + ".log")
+	util.StartTimer()
+	util.LogInfo("TOOLKIT call convert_mod")
+	ConvertMod(origin, target, oldrim)
+	util.EndTimer()
+	
 if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
 	oldrim = None
 	if len(sys.argv) > 2:
 		oldrim = sys.argv[3]
-	util.InitialiseLog(origin + ".log")
-	util.StartTimer()
-	ConvertMod(origin, target, oldrim)
-	util.EndTimer()
+	ConvertMod_External(origin, target, oldrim)

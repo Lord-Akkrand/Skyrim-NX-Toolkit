@@ -62,7 +62,14 @@ def UnpackMod(origin, target):
 	for bsaToUnpack in BSAsToUnpack:
 		(file, filename) = bsaToUnpack
 		UnpackBSA(file, filename)		
-
+		
+def UnpackMod_External(origin, target):
+	util.InitialiseLog(origin + ".log")
+	util.StartTimer()
+	util.LogInfo("TOOLKIT call unpack_mod ")
+	UnpackMod(origin, target)
+	util.EndTimer()
+	
 if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]

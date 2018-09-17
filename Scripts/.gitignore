@@ -1,0 +1,7 @@
+# Annoying Windows Files
+desktop.ini
+
+# Compiled Python
+build/
+
+*.spec

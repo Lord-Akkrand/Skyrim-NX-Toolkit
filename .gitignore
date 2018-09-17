@@ -8,6 +8,8 @@ nvddsinfo.exe
 texdiag.exe
 HavokBehaviorPostProcess.exe
 
+PY_*.BAT
+
 # Compiled Python
 *.pyc
 __pycache__/

@@ -217,7 +217,7 @@ def ConvertDDS(basePath, ddsFileName):
 		
 		commandLine += [ddsFileName]
 		commandLine += ["-o", ddsFilePath]
-		output, err = util.RunCommandLine(commandLine)
+		(output, err) = util.RunCommandLine(commandLine)
 	else:
 		util.LogDebug("TexConv will not run")
 		

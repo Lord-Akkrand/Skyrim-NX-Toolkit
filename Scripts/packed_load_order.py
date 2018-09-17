@@ -207,7 +207,13 @@ def LoadOrder(origin, target, loadOrderName):
 		liResourceArchiveList2 = GetArchiveList("sResourceArchiveList2", languageBuffer, re.MULTILINE)
 		languageBuffer = languageBuffer.replace(liResourceArchiveList2, newResourceArchiveList2)
 		WriteIniFile(languageIni, languageBuffer)
-	
+
+def PackedLoadOrder_External(origin, target, loadOrderName):
+	util.InitialiseLog(os.path.join(origin, loadOrderName) + ".log")
+	util.StartTimer()
+	util.LogInfo("TOOLKIT call packed_load_order")
+	LoadOrder(origin, target, loadOrderName)
+	util.EndTimer()
 
 if __name__ == '__main__':
 	origin = sys.argv[1]

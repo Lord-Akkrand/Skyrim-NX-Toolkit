@@ -194,8 +194,8 @@ def GetHavokBPP():
 
 def GetXTXExtract():
 	toolkit_path = GetToolKitPath()
-	xtx_extract = os.path.join(toolkit_path, "XTX-Extractor-master", "xtx_extract.py")
-	return xtx_extract
+	xtx_extract_path = os.path.join(toolkit_path, "XTX-Extractor-master", "xtx_extract.py")
+	return xtx_extract_path
 	
 def ForceMove(fromFile, toFile):
 	shutil.move(fromFile, toFile)

@@ -51,6 +51,7 @@ import os.path
 import sizes
 import util
 import shutil
+import xtx_extract
 
 import subprocess
 
@@ -234,9 +235,9 @@ def ConvertDDS(basePath, ddsFileName):
 			return True
 		return False
 	else:
-		xtx_extract = util.GetXTXExtract()
-		commandLine = ["py", "-3", xtx_extract, ddsFileName]
-		util.RunCommandLine(commandLine)
+		xtx_extract.main_external([ddsFileName])
+		#commandLine = ["py", "-3", xtx_extract, ddsFileName]
+		#util.RunCommandLine(commandLine)
 		out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
 		if os.path.exists(out_file):
 			util.ForceMove(out_file, ddsFileName)

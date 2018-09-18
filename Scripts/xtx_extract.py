@@ -30,6 +30,8 @@ import time
 import dds
 import swizzle
 
+import util
+
 formats = {0x00000025: 'NVN_FORMAT_RGBA8',
            0x00000038: 'NVN_FORMAT_RGBA8_SRGB',
            0x0000003d: 'NVN_FORMAT_RGB10A2',
@@ -162,9 +164,9 @@ def readNv(f):
             pos += texHead.size
 
             if texHead.numMips > 17:
-                print("Invalid number of mipmaps for image " + str(imgInfo - 1))
-                print("")
-                print("Exiting in 5 seconds...")
+                util.LogDebug("Invalid number of mipmaps for image " + str(imgInfo - 1))
+                util.LogDebug("")
+                util.LogDebug("Exiting in 5 seconds...")
                 time.sleep(5)
                 sys.exit(1)
 
@@ -218,34 +220,34 @@ def readNv(f):
             pos += block.dataSize
 
     if images != imgInfo:
-        print("")
-        print("Whoops, fail! XD")
-        print("")
-        print("Exiting in 5 seconds...")
+        util.LogDebug("")
+        util.LogDebug("Whoops, fail! XD")
+        util.LogDebug("")
+        util.LogDebug("Exiting in 5 seconds...")
         time.sleep(5)
         sys.exit(1)
 
     if block2:
         if not block3:
-            print("")
-            print("Image info was found but no Image data was found.")
-            print("")
-            print("Exiting in 5 seconds...")
+            util.LogDebug("")
+            util.LogDebug("Image info was found but no Image data was found.")
+            util.LogDebug("")
+            util.LogDebug("Exiting in 5 seconds...")
             time.sleep(5)
             sys.exit(1)
     if not block2:
         if not block3:
-            print("")
-            print("No Image was found in this file.")
-            print("")
-            print("Exiting in 5 seconds...")
+            util.LogDebug("")
+            util.LogDebug("No Image was found in this file.")
+            util.LogDebug("")
+            util.LogDebug("Exiting in 5 seconds...")
             time.sleep(5)
             sys.exit(1)
         elif block3:
-            print("")
-            print("Image data was found but no Image info was found.")
-            print("")
-            print("Exiting in 5 seconds...")
+            util.LogDebug("")
+            util.LogDebug("Image data was found but no Image info was found.")
+            util.LogDebug("")
+            util.LogDebug("Exiting in 5 seconds...")
             time.sleep(5)
             sys.exit(1)
 
@@ -297,21 +299,21 @@ def get_deswizzled_data(i, nv):
             format__ = "BC5S"
 
         if depth != 1:
-            print("")
-            print("Unsupported depth!")
-            print("")
+            util.LogDebug("")
+            util.LogDebug("Unsupported depth!")
+            util.LogDebug("")
             if i != (numImages - 1):
-                print("Continuing in 5 seconds...")
+                util.LogDebug("Continuing in 5 seconds...")
                 time.sleep(5)
                 return b'', b'', b''
             else:
-                print("Exiting in 5 seconds...")
+                util.LogDebug("Exiting in 5 seconds...")
                 time.sleep(5)
                 sys.exit(1)
 
         if numMips - 1:
-            print("")
-            print("Processing " + str(numMips - 1) + " mipmaps:")
+            util.LogDebug("")
+            util.LogDebug("Processing " + str(numMips - 1) + " mipmaps:")
 
         result = []
         for level in range(numMips):
@@ -323,9 +325,9 @@ def get_deswizzled_data(i, nv):
             mipOffset = mipOffsets[level]
 
             if level != 0:
-                print(str(level) + ": " + str(max(1, width >> level)) + "x" + str(max(1, height >> level)))
+                util.LogDebug(str(level) + ": " + str(max(1, width >> level)) + "x" + str(max(1, height >> level)))
 
-                print(hex(mipOffset))
+                util.LogDebug(hex(mipOffset))
 
             data = nv.data[i][mipOffset:mipOffset + size]
 
@@ -338,15 +340,15 @@ def get_deswizzled_data(i, nv):
         hdr = dds.generateHeader(numMips, width, height, format__, nv.compSel[i], realSize, format_ in BCn_formats)
 
     else:
-        print("")
-        print("Unsupported texture format_: " + hex(format_))
-        print("")
+        util.LogDebug("")
+        util.LogDebug("Unsupported texture format_: " + hex(format_))
+        util.LogDebug("")
         if i != (numImages - 1):
-            print("Continuing in 5 seconds...")
+            util.LogDebug("Continuing in 5 seconds...")
             time.sleep(5)
             hdr, result = b'', []
         else:
-            print("Exiting in 5 seconds...")
+            util.LogDebug("Exiting in 5 seconds...")
             time.sleep(5)
             sys.exit(1)
 
@@ -372,49 +374,49 @@ def get_curr_mip_off_size(width, height, bpp, curr_level, compressed):
 
 
 def warn_color():
-    print("")
-    print("Warning: colors might mess up!!")
+    util.LogDebug("")
+    util.LogDebug("Warning: colors might mess up!!")
 
 
 def writeNv(f, SRGB, n, numImages, numBlocks):
     width, height, format_, fourcc, dataSize, compSel, numMips, data = dds.readDDS(f, SRGB)
 
     if 0 in [width, dataSize] and data == []:
-        print("")
+        util.LogDebug("")
         if n != (numImages - 1):
-            print("Continuing in 5 seconds...")
+            util.LogDebug("Continuing in 5 seconds...")
             time.sleep(5)
             return b''
         else:
-            print("Exiting in 5 seconds...")
+            util.LogDebug("Exiting in 5 seconds...")
             time.sleep(5)
             sys.exit(1)
 
     if format_ not in formats:
-        print("")
-        print("Unsupported DDS format!")
-        print("")
+        util.LogDebug("")
+        util.LogDebug("Unsupported DDS format!")
+        util.LogDebug("")
         if n != (numImages - 1):
-            print("")
-            print("Continuing in 5 seconds...")
+            util.LogDebug("")
+            util.LogDebug("Continuing in 5 seconds...")
             time.sleep(5)
             return b''
         else:
-            print("Exiting in 5 seconds...")
+            util.LogDebug("Exiting in 5 seconds...")
             time.sleep(5)
             sys.exit(1)
 
     if numMips > 16:
-        print("")
-        print("Invalid number of mipmaps for " + f)
-        print("")
+        util.LogDebug("")
+        util.LogDebug("Invalid number of mipmaps for " + f)
+        util.LogDebug("")
         if n != (numImages - 1):
-            print("")
-            print("Continuing in 5 seconds...")
+            util.LogDebug("")
+            util.LogDebug("Continuing in 5 seconds...")
             time.sleep(5)
             return b''
         else:
-            print("Exiting in 5 seconds...")
+            util.LogDebug("Exiting in 5 seconds...")
             time.sleep(5)
             sys.exit(1)
 
@@ -427,8 +429,8 @@ def writeNv(f, SRGB, n, numImages, numBlocks):
     alignment = 512
 
     if numMips - 1:
-        print("")
-        print("Processing " + str(numMips - 1) + " mipmaps:")
+        util.LogDebug("")
+        util.LogDebug("Processing " + str(numMips - 1) + " mipmaps:")
 
     swizzled_data = bytearray()
     offset = 0
@@ -437,7 +439,7 @@ def writeNv(f, SRGB, n, numImages, numBlocks):
         if not i:
             data = imageData
         else:
-            print(str(i) + ": " + str(max(1, width >> i)) + "x" + str(max(1, height >> i)))
+            util.LogDebug(str(i) + ": " + str(max(1, width >> i)) + "x" + str(max(1, height >> i)))
 
             mipOffset, dataSize = get_curr_mip_off_size(width, height, bpp, i, format_ in BCn_formats)
 
@@ -449,20 +451,20 @@ def writeNv(f, SRGB, n, numImages, numBlocks):
 
         swizzled_data += swizzle.swizzle(max(1, width >> i), max(1, height >> i), format_, data)
 
-    print("")
-    print("// ----- NvTextureHeader Info ----- ")
-    print("  imageSize       = " + str(offset))
-    print("  alignment       = " + str(alignment))
-    print("  width           = " + str(width))
-    print("  height          = " + str(height))
-    print("  depth           = 1")
-    print("  target          = 1")
-    print("  format          = " + formats[format_])
-    print("  numMips         = " + str(numMips))
-    print("  sliceSize       = " + str(offset))
-    print("")
-    print("  bits per pixel  = " + str(bpp * 8))
-    print("  bytes per pixel = " + str(bpp))
+    util.LogDebug("")
+    util.LogDebug("// ----- NvTextureHeader Info ----- ")
+    util.LogDebug("  imageSize       = " + str(offset))
+    util.LogDebug("  alignment       = " + str(alignment))
+    util.LogDebug("  width           = " + str(width))
+    util.LogDebug("  height          = " + str(height))
+    util.LogDebug("  depth           = 1")
+    util.LogDebug("  target          = 1")
+    util.LogDebug("  format          = " + formats[format_])
+    util.LogDebug("  numMips         = " + str(numMips))
+    util.LogDebug("  sliceSize       = " + str(offset))
+    util.LogDebug("")
+    util.LogDebug("  bits per pixel  = " + str(bpp * 8))
+    util.LogDebug("  bytes per pixel = " + str(bpp))
 
     if format_ == 1:
         if compSel not in [[0, 0, 0, 5], [0, 5, 5, 5]]:
@@ -512,43 +514,43 @@ def writeNv(f, SRGB, n, numImages, numBlocks):
 
 
 def printInfo():
-    print("")
-    print("Usage:")
-    print("  xtx_extract [option...] input")
-    print("")
-    print("Options:")
-    print(" -o <output>           Output file, if not specified, the output file will have the same name as the intput file")
-    print("                       Will be ignored if the XTX has multiple images")
-    print("")
-    print("DDS to XTX options:")
-    print(" -SRGB <n>             1 if the desired destination format is SRGB, else 0 (0 is the default)")
-    print(" -multi <numImages>    number of images to pack into the XTX file (input file must be the first image, 1 is the default)")
-    print("")
-    print("Supported formats:")
-    print(" - NVN_FORMAT_RGBA8")
-    print(" - NVN_FORMAT_RGBA8_SRGB")
-    print(" - NVN_FORMAT_RGB10A2")
-    print(" - NVN_FORMAT_RGB565")
-    print(" - NVN_FORMAT_RGB5A1")
-    print(" - NVN_FORMAT_RGBA4")
-    print(" - NVN_FORMAT_R8")
-    print(" - NVN_FORMAT_RG8")
-    print(" - DXT1")
-    print(" - DXT3")
-    print(" - DXT5")
-    print(" - BC4U")
-    print(" - BC4S")
-    print(" - BC5U")
-    print(" - BC5S")
-    print("")
-    print("Exiting in 5 seconds...")
+    util.LogDebug("")
+    util.LogDebug("Usage:")
+    util.LogDebug("  xtx_extract [option...] input")
+    util.LogDebug("")
+    util.LogDebug("Options:")
+    util.LogDebug(" -o <output>           Output file, if not specified, the output file will have the same name as the intput file")
+    util.LogDebug("                       Will be ignored if the XTX has multiple images")
+    util.LogDebug("")
+    util.LogDebug("DDS to XTX options:")
+    util.LogDebug(" -SRGB <n>             1 if the desired destination format is SRGB, else 0 (0 is the default)")
+    util.LogDebug(" -multi <numImages>    number of images to pack into the XTX file (input file must be the first image, 1 is the default)")
+    util.LogDebug("")
+    util.LogDebug("Supported formats:")
+    util.LogDebug(" - NVN_FORMAT_RGBA8")
+    util.LogDebug(" - NVN_FORMAT_RGBA8_SRGB")
+    util.LogDebug(" - NVN_FORMAT_RGB10A2")
+    util.LogDebug(" - NVN_FORMAT_RGB565")
+    util.LogDebug(" - NVN_FORMAT_RGB5A1")
+    util.LogDebug(" - NVN_FORMAT_RGBA4")
+    util.LogDebug(" - NVN_FORMAT_R8")
+    util.LogDebug(" - NVN_FORMAT_RG8")
+    util.LogDebug(" - DXT1")
+    util.LogDebug(" - DXT3")
+    util.LogDebug(" - DXT5")
+    util.LogDebug(" - BC4U")
+    util.LogDebug(" - BC4S")
+    util.LogDebug(" - BC5U")
+    util.LogDebug(" - BC5S")
+    util.LogDebug("")
+    util.LogDebug("Exiting in 5 seconds...")
     time.sleep(5)
     sys.exit(1)
 
 
 def main():
-    print("XTX Extractor v0.1")
-    print("(C) 2017 Stella/AboodXD")
+    util.LogDebug("XTX Extractor v0.1")
+    util.LogDebug("(C) 2017 Stella/AboodXD")
 
     input_ = g_arguments[-1]
 
@@ -593,14 +595,14 @@ def main():
             if multi:
                 input_ = input_[:-5]
                 for i in range(numImages):
-                    print("")
-                    print('Converting: ' + input_ + str(i) + ".dds")
+                    util.LogDebug("")
+                    util.LogDebug('Converting: ' + input_ + str(i) + ".dds")
                     
                     data, numBlocks = writeNv(input_ + str(i) + ".dds", SRGB, i, numImages, numBlocks)
                     output.write(data)
             else:
-                print("")
-                print('Converting: ' + input_)
+                util.LogDebug("")
+                util.LogDebug('Converting: ' + input_)
 
                 data, numBlocks = writeNv(input_, SRGB, 0, 1, numBlocks)
                 output.write(data)
@@ -612,8 +614,8 @@ def main():
             output.write(b'\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
 
     else:
-        print("")
-        print('Converting: ' + input_)
+        util.LogDebug("")
+        util.LogDebug('Converting: ' + input_)
 
         with open(input_, "rb") as inf:
             inb = inf.read()
@@ -622,25 +624,25 @@ def main():
 
         for i in range(nv.numImages):
 
-            print("")
-            print("// ----- NvTextureHeader Info ----- ")
-            print("  imageSize       = " + str(nv.imageSize[i]))
-            print("  alignment       = " + str(nv.alignment[i]))
-            print("  width           = " + str(nv.width[i]))
-            print("  height          = " + str(nv.height[i]))
-            print("  depth           = " + str(nv.depth[i]))
-            print("  target          = " + str(nv.target[i]))
+            util.LogDebug("")
+            util.LogDebug("// ----- NvTextureHeader Info ----- ")
+            util.LogDebug("  imageSize       = " + str(nv.imageSize[i]))
+            util.LogDebug("  alignment       = " + str(nv.alignment[i]))
+            util.LogDebug("  width           = " + str(nv.width[i]))
+            util.LogDebug("  height          = " + str(nv.height[i]))
+            util.LogDebug("  depth           = " + str(nv.depth[i]))
+            util.LogDebug("  target          = " + str(nv.target[i]))
             if nv.format[i] in formats:
-                print("  format          = " + formats[nv.format[i]])
+                util.LogDebug("  format          = " + formats[nv.format[i]])
             else:
-                print("  format          = " + hex(nv.format[i]))
-            print("  numMips         = " + str(nv.numMips[i]))
-            print("  sliceSize       = " + str(nv.sliceSize[i]))
+                util.LogDebug("  format          = " + hex(nv.format[i]))
+            util.LogDebug("  numMips         = " + str(nv.numMips[i]))
+            util.LogDebug("  sliceSize       = " + str(nv.sliceSize[i]))
             if nv.format[i] in formats:
                 bpp = nv.bpp[i]
-                print("")
-                print("  bits per pixel  = " + str(bpp * 8))
-                print("  bytes per pixel = " + str(bpp))
+                util.LogDebug("")
+                util.LogDebug("  bits per pixel  = " + str(bpp * 8))
+                util.LogDebug("  bytes per pixel = " + str(bpp))
 
             if nv.numImages > 1:
                 output_  = os.path.splitext(input_)[0] + str(i) + ".dds"
@@ -655,8 +657,8 @@ def main():
                     for data in result:
                         output.write(data)
 
-    print('')
-    print('Finished converting: ' + input_)
+    util.LogDebug('')
+    util.LogDebug('Finished converting: ' + input_)
 
 def main_external(arguments):
 	global g_arguments

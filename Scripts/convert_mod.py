@@ -29,7 +29,7 @@ def ConvertMod(origin, target, oldrim):
 		
 	convert_path.ConvertPath(mod_name, target)
 
-	#pack_mod.PackMod(mod_name, target)
+	pack_mod.PackMod(mod_name, target)
 
 def ConvertMod_External(origin, target, oldrim):
 	print("<{}>".format(origin))

@@ -225,7 +225,8 @@ def ConvertDDS(basePath, ddsFileName):
 	util.LogDebug("Now for NX texture conversion")
 	if hasSDK:
 		nvntexpkg = util.GetNvnTexpkg()
-		out_file = os.path.join(ddsFilePath, "out.xtx")
+		out_filename = ddsFileName + "out.xtx"
+		out_file = os.path.join(ddsFilePath, out_filename)
 		commandLine = [nvntexpkg, "-i", ddsFileName, "-v", "--printinfo", "-o", out_file]
 		(convOutput, convErrors) = util.RunCommandLine(commandLine)
 		
@@ -235,13 +236,17 @@ def ConvertDDS(basePath, ddsFileName):
 			return True
 		return False
 	else:
-		xtx_extract.main_external([ddsFileName])
+		out_filename = ddsFileName + "out.xtx"
+		out_file = os.path.join(ddsFilePath, out_filename)
+		xtx_extract.main_external(["-o", out_file, ddsFileName])
 		#commandLine = ["py", "-3", xtx_extract, ddsFileName]
 		#util.RunCommandLine(commandLine)
-		out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
+		
+		#out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
 		if os.path.exists(out_file):
 			util.ForceMove(out_file, ddsFileName)
 			return True
+		util.LogDebug("Error During Conversion of {}".format(ddsFileName))
 		return False
 
 if __name__ == '__main__':

@@ -5,10 +5,12 @@ import os.path
 import shutil
 import subprocess
 import util
+import job_manager
 import convert_dds
 import convert_hkx
 import convert_txt
 import convert_sound
+
 
 import bitflag
 
@@ -48,7 +50,7 @@ def ConvertPath(mod_name, target):
 	if has_havoc: util.LogInfo("Found {} hkx files to convert".format(len(ConvertListHKX)))
 	util.LogInfo("Found {} txt files to convert".format(len(ConvertListTXT)))
 	util.LogInfo("Found {} sound files to convert".format(len(ConvertListSound)))
-	
+	'''
 	def LogProgress(convertList, convertFn, name):
 		if len(convertList) > 0:
 			failedCount = 0
@@ -59,6 +61,32 @@ def ConvertPath(mod_name, target):
 					failedCount += 1
 				sys.stdout.write("Converted {}/{} {} ({}) failed. \r".format(i+1, len(convertList), name, failedCount))
 				sys.stdout.flush()
+			sys.stdout.write("\n")
+	'''
+	
+	def LogProgress(convertList, convertFn, name):
+		if len(convertList) > 0:
+			failedCount = 0
+			jm = job_manager.JobManager()
+			convertedCount = 0
+			processedCount = 0
+			totalCount = len(convertList)
+			def cb(success):
+				nonlocal processedCount, convertedCount, failedCount
+				processedCount += 1
+				if success:
+					convertedCount += 1
+				else:
+					failedCount += 1
+				sys.stdout.write("{} Processed {}/{} ({}/{}) success/failure. \r".format(name, processedCount, totalCount, convertedCount, failedCount))
+				sys.stdout.flush()
+				
+			for i in range(len(convertList)):
+				file_path = convertList[i]
+				job = job_manager.Job(cb, convertFn, target, file_path)
+				jm.AddJob(job)
+			jm.ProcessBatch()
+			
 			sys.stdout.write("\n")
 	
 	LogProgress(ConvertListDDS, convert_dds.ConvertDDS, "DDS")

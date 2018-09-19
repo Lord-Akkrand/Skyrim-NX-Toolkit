@@ -55,8 +55,6 @@ bpps = {0x25: 4, 0x38: 4, 0x3d: 4, 0x3c: 2, 0x3b: 2, 0x39: 2, 1: 1, 0xd: 2,
         0x42: 8, 0x43: 16,0x44: 16, 0x49: 8, 0x4a: 8, 0x4b: 16, 0x4c: 16}
 
 
-g_arguments = None
-		
 class NvData:
     pass
 
@@ -548,11 +546,11 @@ def printInfo():
     sys.exit(1)
 
 
-def main():
+def main(arguments):
     util.LogDebug("XTX Extractor v0.1")
     util.LogDebug("(C) 2017 Stella/AboodXD")
 
-    input_ = g_arguments[-1]
+    input_ = arguments[-1]
 
     if not (input_.endswith('.xtx') or input_.endswith('.dds')):
         printInfo()
@@ -562,26 +560,26 @@ def main():
     if input_.endswith('.dds'):
         toXTX = True
 
-    if "-o" in g_arguments:
-        output_ = g_arguments[g_arguments.index("-o") + 1]
+    if "-o" in arguments:
+        output_ = arguments[arguments.index("-o") + 1]
     else:
         output_ = os.path.splitext(input_)[0] + (".xtx" if toXTX else ".dds")
 
     if toXTX:
-        if "-SRGB" in g_arguments:
-            SRGB = int(g_arguments[g_arguments.index("-SRGB") + 1], 0)
+        if "-SRGB" in arguments:
+            SRGB = int(arguments[arguments.index("-SRGB") + 1], 0)
         else:
             SRGB = 0
 
         multi = False
-        if "-multi" in g_arguments:
+        if "-multi" in arguments:
             multi = True
-            numImages = int(g_arguments[g_arguments.index("-multi") + 1], 0)
+            numImages = int(arguments[arguments.index("-multi") + 1], 0)
 
         if SRGB > 1:
             printInfo()
 
-        if "-o" not in g_arguments and "-multi" in g_arguments:
+        if "-o" not in arguments and "-multi" in arguments:
             output_ = output_[:-5] + ".xtx"
 
         with open(output_, "wb+") as output:
@@ -661,9 +659,7 @@ def main():
     util.LogDebug('Finished converting: ' + input_)
 
 def main_external(arguments):
-	global g_arguments
-	g_arguments = arguments
-	main()
+	main(arguments)
 
 if __name__ == '__main__':
 	main_external(sys.argv)

@@ -2,9 +2,7 @@
 
 import threading
 import util
-
-MaxThreads = 5
-
+import toolkit_config
 
 class Job():
 	def __init__(self, cb, func, *args):
@@ -37,7 +35,11 @@ class JobManager:
 		if maxThreads != None:
 			self.m_MaxThreads = maxThreads
 		else:
-			self.m_MaxThreads = MaxThreads
+			maxThreads = toolkit_config.get_int_setting("Performance", "MaxOtherThreads")
+			if maxThreads == None:
+				util.LogWarn("No default max threads parameter!")
+				maxThreads = 1
+			self.m_MaxThreads = maxThreads
 		self.m_UpdateCount = 0
 	def AddJob(self, newJob):
 		self.m_JobsBacklog.append(newJob)

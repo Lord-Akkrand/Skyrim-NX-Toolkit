@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import util
 import job_manager
+import toolkit_config
 import convert_dds
 import convert_hkx
 import convert_txt
@@ -64,10 +65,12 @@ def ConvertPath(mod_name, target):
 			sys.stdout.write("\n")
 	'''
 	
-	def LogProgress(convertList, convertFn, name):
+	def LogProgress(convertList, convertFn, name, threadSetting):
 		if len(convertList) > 0:
 			failedCount = 0
-			jm = job_manager.JobManager()
+			maxThreads = toolkit_config.get_int_setting("Performance", threadSetting)
+			
+			jm = job_manager.JobManager(maxThreads)
 			convertedCount = 0
 			processedCount = 0
 			totalCount = len(convertList)
@@ -88,12 +91,12 @@ def ConvertPath(mod_name, target):
 			jm.ProcessBatch()
 			
 			sys.stdout.write("\n")
-	
-	LogProgress(ConvertListDDS, convert_dds.ConvertDDS, "DDS")
+			
+	LogProgress(ConvertListDDS, convert_dds.ConvertDDS, "DDS", "MaxTextureThreads")
 	if has_havoc:
-		LogProgress(ConvertListHKX, convert_hkx.ConvertHKX, "HKX")
-	LogProgress(ConvertListTXT, convert_txt.ConvertTXT, "TXT")
-	LogProgress(ConvertListSound, convert_sound.ConvertSound, "Sounds")
+		LogProgress(ConvertListHKX, convert_hkx.ConvertHKX, "HKX", "MaxAnimationThreads")
+	LogProgress(ConvertListTXT, convert_txt.ConvertTXT, "TXT", "MaxOtherThreads")
+	LogProgress(ConvertListSound, convert_sound.ConvertSound, "Sounds", "MaxSoundThreads")
 
 def ConvertPath_External(mod_name, target):
 	util.InitialiseLog(target + ".log")

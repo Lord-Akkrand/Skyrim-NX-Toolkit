@@ -1,13 +1,16 @@
 #! python3
 
 import sys
+import gui
 import download_file, unzip_file
 import convert_mod, convert_path, load_order, pack_mod, packed_load_order, repack_mod, unpack_mod
 	
 if __name__ == '__main__':
 	py_script = sys.argv[1]
 	print(str(sys.argv))
-	if py_script == 'download_file':
+	if py_script == 'gui':
+		gui.main()
+	elif py_script == 'download_file':
 		url = sys.argv[2]
 		file_path = sys.argv[3]
 		download_file.DownloadFile(url, file_path)

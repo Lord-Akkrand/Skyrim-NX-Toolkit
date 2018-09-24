@@ -305,6 +305,7 @@ def PackMod(mod_name, target):
 def PackMod_External(mod_name, target):
 	util.InitialiseLog(target + ".log")
 	util.StartTimer()
+	util.LogInfo("Skyrim-NX-Toolkit {} - pack_mod".format(util.GetToolkitVersion()))
 	PackMod(mod_name, target)
 	util.EndTimer()
 	

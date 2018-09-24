@@ -13,8 +13,6 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO repack_mod.py is set at %REPACK_MOD_PY%
-
->CON ECHO Akkrand's Mod Re-Packing Utility v1.0.0
 PAUSE
 
 >CON ECHO Finding Python 3.x path

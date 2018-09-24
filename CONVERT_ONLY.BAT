@@ -7,8 +7,6 @@ SET DIST_PATH=%SCRIPTS_PATH%dist\
 SET TOOLKIT_EXE="%DIST_PATH%toolkit.exe"
 
 >CON ECHO toolkit.exe is set at %TOOLKIT_EXE%
-
->CON ECHO Akkrand's NX Texture Conversion Scripts v3.2.3
 pause
 
 SET PATH=%PATH%;%SCRIPTS_PATH%

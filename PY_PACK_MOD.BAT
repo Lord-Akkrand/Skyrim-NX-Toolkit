@@ -3,7 +3,7 @@ SETLOCAL
 
 SET TOOLKIT_PATH=%~d0%~p0
 SET SCRIPTS_PATH=%TOOLKIT_PATH%Scripts\
-SET PACK_MOD_PY="%SCRIPTS_PATH%pack_mod.py"
+SET TOOLKIT_PY="%SCRIPTS_PATH%toolkit.py"
 
 SET ORIGINAL=%~f1
 SET TARGET=%~f1_Packed
@@ -13,9 +13,7 @@ SET EMPTY=%TOOLKIT_PATH%Empty
 SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
->CON ECHO pack_mod.py is set at %PACK_MOD_PY%
-
->CON ECHO Akkrand's Mod Packing Utility v1.0.0
+>CON ECHO toolkit.py is set at %TOOLKIT_PY%
 PAUSE
 
 >CON ECHO Finding Python 3.x path
@@ -23,13 +21,10 @@ PAUSE
 IF ERRORLEVEL 1 GOTO pythonError
 >CON ECHO Found Python 3.x path
 
->CON CALL "%SCRIPTS_PATH%CHECK_BSARCH"
-IF ERRORLEVEL 1 GOTO utilityError
-
 >CON ECHO Making "%TARGET%"
 ROBOCOPY "%ORIGINAL%" "%TARGET%" /MIR
 
-"%PYTHON3%" %PACK_MOD_PY% "%MOD_NAME%" "%TARGET%"
+"%PYTHON3%" %TOOLKIT_PY% pack_mod "%MOD_NAME%" "%TARGET%"
 PAUSE
 
 GOTO :EOF

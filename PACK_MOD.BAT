@@ -15,8 +15,6 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO toolkit.exe is set at %TOOLKIT_EXE%
-
->CON ECHO Akkrand's Mod Packing Utility v1.0.0
 PAUSE
 
 >CON ECHO Making "%TARGET%"

@@ -14,13 +14,6 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO toolkit.exe is set at %TOOLKIT_EXE%
-
->CON ECHO Akkrand's Unpack Mod Script v1.0.0
->CON ECHO This script expects to be given a folder containing all the files for a mod:
->CON ECHO ESP Files
->CON ECHO BSA Files
->CON ECHO INI Files
->CON ECHO Skyrim Data Folders (grass/interface/lodsettings/meshes/music/scripts/seq/shadersfx/sound/strings/textures)
 PAUSE
 
 >CON ECHO Making "%TARGET%"

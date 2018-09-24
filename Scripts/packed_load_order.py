@@ -211,7 +211,7 @@ def LoadOrder(origin, target, loadOrderName):
 def PackedLoadOrder_External(origin, target, loadOrderName):
 	util.InitialiseLog(os.path.join(origin, loadOrderName) + ".log")
 	util.StartTimer()
-	util.LogInfo("TOOLKIT call packed_load_order")
+	util.LogInfo("Skyrim-NX-Toolkit {} - packed_load_order".format(util.GetToolkitVersion()))
 	LoadOrder(origin, target, loadOrderName)
 	util.EndTimer()
 

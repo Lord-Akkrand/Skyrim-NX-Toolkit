@@ -33,4 +33,8 @@ def ConvertSound(target, filepath):
 	
 if __name__ == '__main__':
 	filepath = sys.argv[1]
-	ConvertSound(filepath)
+	util.InitialiseLog(filepath + ".log")
+	util.StartTimer()
+	util.LogInfo("Skyrim-NX-Toolkit {} - convert_txt".format(util.GetToolkitVersion()))
+	ConvertSound_Internal(filepath)
+	util.EndTimer()

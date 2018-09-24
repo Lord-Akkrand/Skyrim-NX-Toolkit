@@ -16,7 +16,7 @@ def MainLoop():
 	xResolution = 1280
 	yResolution = 640
 	root.geometry('{}x{}'.format(xResolution, yResolution))
-	root.title("Skyrim-NX-Toolkit")
+	root.title("Skyrim-NX-Toolkit {}".format(util.GetToolkitVersion()))
 	root.tk.call('wm', 'iconphoto', root._w, PhotoImage(file=icon_filename))
 	
 	def NewFile():

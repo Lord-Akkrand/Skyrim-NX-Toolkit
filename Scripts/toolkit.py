@@ -2,12 +2,12 @@
 
 import sys
 import gui
-import download_file, unzip_file
+import util, download_file, unzip_file
 import convert_mod, convert_path, load_order, pack_mod, packed_load_order, repack_mod, unpack_mod
 	
 if __name__ == '__main__':
 	py_script = sys.argv[1]
-	print(str(sys.argv))
+	print("Skyrim-NX-Toolkit {}, sys.argv <{}>".format(util.GetToolkitVersion(), str(sys.argv)))
 	if py_script == 'gui':
 		gui.main()
 	elif py_script == 'download_file':

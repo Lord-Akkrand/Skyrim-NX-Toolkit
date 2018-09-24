@@ -101,7 +101,7 @@ def ConvertPath(mod_name, target):
 def ConvertPath_External(mod_name, target):
 	util.InitialiseLog(target + ".log")
 	util.StartTimer()
-	util.LogInfo("TOOLKIT call convert_path")
+	util.LogInfo("Skyrim-NX-Toolkit {} - convert_path".format(util.GetToolkitVersion()))
 	ConvertPath(mod_name, target)
 	util.EndTimer()
 	

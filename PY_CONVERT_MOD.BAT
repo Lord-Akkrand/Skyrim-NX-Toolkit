@@ -14,8 +14,6 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO toolkit.py is set at %TOOLKIT_PY%
-
->CON ECHO Akkrand's Mod Converter v1.0.3
 PAUSE
 
 >CON ECHO Finding Python 3.x path

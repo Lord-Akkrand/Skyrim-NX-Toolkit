@@ -1,0 +1,6 @@
+@ECHO OFF
+PUSHD ..
+PUSHD ..
+CALL PY_UNPACK_MOD.BAT "Examples\Unpack Mod\LAL"
+POPD
+POPD

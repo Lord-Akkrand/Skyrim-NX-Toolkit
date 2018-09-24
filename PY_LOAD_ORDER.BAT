@@ -4,7 +4,7 @@ SETLOCAL
 
 SET TOOLKIT_PATH=%~d0%~p0
 SET SCRIPTS_PATH=%TOOLKIT_PATH%Scripts\
-SET LOAD_ORDER_PY="%SCRIPTS_PATH%load_order.py"
+SET TOOLKIT_PY="%SCRIPTS_PATH%toolkit.py"
 SET PRISTINE=%TOOLKIT_PATH%DefaultIniFiles
 
 SET ORIGINAL=%~f1
@@ -15,9 +15,7 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 
 >CON ECHO Starting up...
 
->CON ECHO load_order.py is set at %LOAD_ORDER_PY%
-
->CON ECHO Akkrand's Load Order Script v1.0.2
+>CON ECHO toolkit.py is set at %TOOLKIT_PY%
 PAUSE
 
 >CON ECHO Finding Python 3.x path
@@ -28,7 +26,7 @@ IF ERRORLEVEL 1 GOTO pythonError
 
 ROBOCOPY "%PRISTINE%" "%TARGET%" /MIR /XF .gitignore
 
-"%PYTHON3%" %LOAD_ORDER_PY% "%ORIGINAL%" "%TARGET%" %LOAD_ORDER%
+"%PYTHON3%" %TOOLKIT_PY% load_order "%ORIGINAL%" "%TARGET%" %LOAD_ORDER%
 PAUSE
 
 GOTO :EOF

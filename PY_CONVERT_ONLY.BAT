@@ -6,9 +6,7 @@ SET SCRIPTS_PATH=%TOOLKIT_PATH%Scripts\
 
 SET CONVERT_PATH_PY="%SCRIPTS_PATH%convert_path.py"
 >CON ECHO convert_path.py is set at %CONVERT_PATH_PY%
-
->CON ECHO Akkrand's NX Texture Conversion Scripts v3.2.3
-pause
+PAUSE
 
 
 SET PATH=%PATH%;%SCRIPTS_PATH%

@@ -35,7 +35,7 @@ def ConvertMod_External(origin, target, oldrim):
 	print("<{}>".format(origin))
 	util.InitialiseLog(origin + ".log")
 	util.StartTimer()
-	util.LogInfo("TOOLKIT call convert_mod")
+	util.LogInfo("Skyrim-NX-Toolkit {} - convert_mod".format(util.GetToolkitVersion()))
 	ConvertMod(origin, target, oldrim)
 	util.EndTimer()
 	

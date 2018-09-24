@@ -27,6 +27,7 @@ def RepackMod(origin, target):
 def RepackMod_External(origin, target):
 	util.InitialiseLog(origin + ".log")
 	util.StartTimer()
+	util.LogInfo("Skyrim-NX-Toolkit {} - repack_mod".format(util.GetToolkitVersion()))
 	RepackMod(origin, target)
 	util.EndTimer()
 

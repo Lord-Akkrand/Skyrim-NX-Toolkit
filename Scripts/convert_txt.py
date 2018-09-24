@@ -31,6 +31,7 @@ if __name__ == '__main__':
 	filename = sys.argv[1]
 	util.InitialiseLog(filename + ".log")
 	util.StartTimer()
+	util.LogInfo("Skyrim-NX-Toolkit {} - convert_txt".format(util.GetToolkitVersion()))
 	ConvertTXT_Internal(filename)
 	util.EndTimer()
 	

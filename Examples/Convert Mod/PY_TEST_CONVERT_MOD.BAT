@@ -1,0 +1,6 @@
+@ECHO OFF
+PUSHD ..
+PUSHD ..
+CALL PY_CONVERT_MOD.BAT "Examples\Convert Mod\SimpleMod"
+POPD 
+POPD

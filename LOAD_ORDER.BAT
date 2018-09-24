@@ -17,8 +17,6 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO toolkit.exe is set at %TOOLKIT_EXE%
-
->CON ECHO Akkrand's Load Order Script v1.0.2
 PAUSE
 
 ROBOCOPY "%PRISTINE%" "%TARGET%" /MIR /XF .gitignore

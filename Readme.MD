@@ -24,9 +24,6 @@ These tools are:
 - `HavocBehaviourPostProcess.exe` is available from the Bethesda Creation Kit.  
   It is necessary to convert any mod that has animations in it, and you are also required to have a 32-bit version of those animation files in order to perform that conversion.  
 
-There are 2 folders in the toolkit folder, GraphicsTools & NvnTools, which require files that are not publicly available in order to work.  The Readme files in those folder list the files required for the SDK conversion to work.  I will not link to those files publicly.  
-They cover slightly more texture formats than `XTX-Extractor`, and do so a lot faster.
-
 #### Running in Python
 All my scripts were written in Python 3.x, then packaged into an exe using PyInstaller.
 If you have Python 3.x (and Python Launcher, or 'py') accessible from your command line, you may run the scripts directly if you like.

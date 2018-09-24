@@ -4,12 +4,14 @@ import gui_log
 import logging
 import toolkit_config
 
-from tkinter import filedialog, messagebox
+import gui_se
+
+from tkinter import filedialog, messagebox, ttk
 from tkinter import *
+
 
 def MainLoop():
 	toolkit_path = util.GetToolKitPath()
-	logo_filename = os.path.join(toolkit_path, "Skyrim-NX-Toolkit.25.png")
 	icon_filename = os.path.join(toolkit_path, "Skyrim-NX-Toolkit.Icon.png")
 	
 	root = Tk()
@@ -46,15 +48,9 @@ def MainLoop():
 
 	main_window = PanedWindow(orient=HORIZONTAL, relief=RAISED)
 	
-
-	convert_pane = PanedWindow(main_window, orient=VERTICAL, relief=RAISED)
-	convert_pane.add(Label(convert_pane, text="Convert 1"))
-	convert_pane.add(Label(convert_pane, text="Convert 2"))
-	convert_pane.add(Label(convert_pane, text="Convert 3"))
-	convert_pane.pack()
+	solution_explorer = gui_se.SolutionExplorer(main_window, toolkit_path)
 	
-	
-	main_window.add(convert_pane)
+	main_window.add(solution_explorer.getPane())
 
 	log_pane = PanedWindow(main_window, orient=VERTICAL, relief=RAISED)
 	log_pane.add(Label(log_pane, text="Log Window"))

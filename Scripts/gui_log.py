@@ -57,7 +57,7 @@ class myGUI(tk.Frame):
 
         # Logging configuration
         logging.basicConfig(filename='test.log',
-            level=logging.INFO, 
+            level=logging.DEBUG, 
             format='%(asctime)s - %(levelname)s - %(message)s')        
 
         # Add the handler to logger

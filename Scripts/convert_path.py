@@ -7,8 +7,8 @@ import subprocess
 import util
 import job_manager
 import toolkit_config
-import convert_dds
-import convert_hkx
+import check_dds, convert_dds
+import check_hkx, convert_hkx
 import convert_txt
 import convert_sound
 
@@ -25,6 +25,8 @@ def ConvertPath(mod_name, target):
 	
 	has_havoc = util.HasHavokBPP()
 	
+	NoConversion = {}
+	WarnConversion = {}
 	ConvertListDDS = []
 	ConvertListHKX = []
 	ConvertListTXT = []
@@ -36,21 +38,56 @@ def ConvertPath(mod_name, target):
 				#util.LogDebug("filename: {}".format(filename))
 				if filename.lower().endswith(".dds"):
 					file_path = os.path.join(root, filename)
-					ConvertListDDS.append(file_path)
+					ddsChecked = check_dds.CheckDDS(file_path, file_path)
+					if ddsChecked == check_dds.PC:
+						ConvertListDDS.append(file_path)
+					elif ddsChecked == check_dds.NX:
+						if 'DDS' not in NoConversion:
+							NoConversion['DDS'] = 0
+						NoConversion['DDS'] += 1
+					else:
+						if 'DDS' not in WarnConversion:
+							WarnConversion['DDS'] = []
+						WarnConversion['DDS'].append( (filename, "Unknown DDS format") )
 				elif filename.lower().endswith(".hkx"):
 					file_path = os.path.join(root, filename)
-					ConvertListHKX.append(file_path)
+					hkxChecked = check_hkx.CheckHKX(file_path, file_path)
+					if hkxChecked == check_hkx.PC_32:
+						ConvertListHKX.append(file_path)
+					elif hkxChecked == check_hkx.PC_64:
+						if 'HKX' not in WarnConversion:
+							WarnConversion['HKX'] = []
+						WarnConversion['HKX'].append( (filename, "SSE hkx animation") )
+					elif hkxChecked == check_hkx.NX_64:
+						if 'HKX' not in NoConversion:
+							NoConversion['HKX'] = 0
+						NoConversion['HKX'] += 1
+					else:
+						if 'HKX' not in WarnConversion:
+							WarnConversion['HKX'] = []
+						WarnConversion['HKX'].append( (filename, "Unknown hkx animation format") )
+						
 				elif filename.lower().startswith("translate_") and filename.lower().endswith(".txt"):
 					file_path = os.path.join(root, filename)
 					ConvertListTXT.append(file_path)
 				elif filename.lower().endswith(".xwm") or filename.lower().endswith(".fuz") or filename.lower().endswith(".wav"):
 					file_path = os.path.join(root, filename)
 					ConvertListSound.append(file_path)
-					
+
+	for fileType in NoConversion:
+		util.LogInfo("Found {} {} files that are already in NX format".format(NoConversion[fileType], fileType))
+	for fileType in WarnConversion:
+		fileTypeWarnings = WarnConversion[fileType]
+		for i in range(len(fileTypeWarnings)):
+			util.LogInfo("Warning, cannot convert {} because <{}>".format(fileTypeWarnings[i][0], fileTypeWarnings[i][1]))
+			
 	util.LogInfo("Found {} dds files to convert".format(len(ConvertListDDS)))
 	if has_havoc: util.LogInfo("Found {} hkx files to convert".format(len(ConvertListHKX)))
 	util.LogInfo("Found {} txt files to convert".format(len(ConvertListTXT)))
 	util.LogInfo("Found {} sound files to convert".format(len(ConvertListSound)))
+	
+	
+	
 	'''
 	def LogProgress(convertList, convertFn, name):
 		if len(convertList) > 0:

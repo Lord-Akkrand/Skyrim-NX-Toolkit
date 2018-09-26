@@ -23,6 +23,7 @@ def LoadOrder(origin, target, loadOrderName):
 	loadOrderList = loadOrder.splitlines()
 	loadOrderStart = int(loadOrderList[0])
 	loadOrderList = loadOrderList[1:]
+	loadOrderList = list(filter(None, loadOrderList))
 	util.LogDebug("ESP Start at " + str(loadOrderStart))
 	util.LogDebug("LOAD ORDER LIST <" + str(loadOrderList) + ">")
 

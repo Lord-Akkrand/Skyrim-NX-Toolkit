@@ -92,10 +92,12 @@ def LoadOrder(origin, target, loadOrderName):
 		util.LogDebug(newTestFile)
 		CopyFile(file, filename)
 	#util.LogDebug("TESTFILES<" + str(sTestFiles) + ">")
-
+	
+	resourceArchiveList2Additions = ''
 	newResourceArchiveList2 = sResourceArchiveList2
 	def InsertTextureBSA(name, filename):
-		nonlocal newResourceArchiveList2
+		nonlocal resourceArchiveList2Additions, newResourceArchiveList2
+		resourceArchiveList2Additions += ", " + name
 		newResourceArchiveList2 += ", " + name
 		util.LogDebug(newResourceArchiveList2)
 		CopyFile(file, filename)
@@ -196,7 +198,8 @@ def LoadOrder(origin, target, loadOrderName):
 		util.LogDebug("opening " + liFilename)
 		
 		liResourceArchiveList2 = GetArchiveList("sResourceArchiveList2", languageBuffer, re.MULTILINE)
-		languageBuffer = languageBuffer.replace(liResourceArchiveList2, newResourceArchiveList2)
+		newLiResourceArchiveList2 = liResourceArchiveList2 + resourceArchiveList2Additions
+		languageBuffer = languageBuffer.replace(liResourceArchiveList2, newLiResourceArchiveList2)
 		WriteIniFile(languageIni, languageBuffer)
 
 def LoadOrder_External(origin, target, loadOrderName):

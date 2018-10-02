@@ -54,6 +54,9 @@ def ConvertPath(mod_name, target):
 					hkxChecked = check_hkx.CheckHKX(file_path, file_path)
 					if hkxChecked == check_hkx.PC_32:
 						ConvertListHKX.append(file_path)
+					elif hkxChecked == check_hkx.PC_XML:
+						WarnConversion['HKX'].append( (filename, "XML hkx file") )
+						ConvertListHKX.append(file_path)
 					elif hkxChecked == check_hkx.PC_64:
 						if 'HKX' not in WarnConversion:
 							WarnConversion['HKX'] = []

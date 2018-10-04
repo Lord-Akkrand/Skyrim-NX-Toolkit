@@ -1,4 +1,4 @@
-![Skyrim NX Toolkit](Skyrim-NX-Toolkit.png)
+![Skyrim NX Toolkit](Way Of The Voice.png)
 
 #### External Tools and Credits
 There are several external tools that are used by my scripts to get things done.  
@@ -13,6 +13,7 @@ There are several external tools that are used by my scripts to get things done.
 - `XTX-Extractor` was created by AboodXD  
   <https://github.com/aboood40091> and is available here  
   <https://github.com/aboood40091/XTX-Extractor>
+- nx_fuz.py was written by Zappastuff
 
 There are further external tools that the toolkit will attempt to download if you don't have them in the `Utilities` directory, or that you must source yourself.
 These tools are:

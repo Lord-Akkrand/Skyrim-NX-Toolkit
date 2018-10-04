@@ -7,7 +7,6 @@ SET DIST_PATH=%SCRIPTS_PATH%dist\
 SET TOOLKIT_EXE="%DIST_PATH%toolkit.exe"
 
 >CON ECHO toolkit.exe is set at %TOOLKIT_EXE%
-pause
 
 SET PATH=%PATH%;%SCRIPTS_PATH%
 
@@ -30,7 +29,6 @@ PUSHD "%SCRIPTS_PATH%"
 %TOOLKIT_EXE% convert_path "%MOD_NAME%" "%TARGET%"
 POPD
 >CON ECHO Done
-PAUSE
 
 GOTO :EOF
 

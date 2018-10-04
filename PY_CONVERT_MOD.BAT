@@ -14,7 +14,6 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO toolkit.py is set at %TOOLKIT_PY%
-PAUSE
 
 >CON ECHO Finding Python 3.x path
 >CON CALL "%SCRIPTS_PATH%FIND_PYTHON_PATH"
@@ -28,7 +27,6 @@ IF ERRORLEVEL 1 GOTO utilityError
 IF ERRORLEVEL 1 GOTO utilityError
 
 "%PYTHON3%" %TOOLKIT_PY% convert_mod "%ORIGINAL%" "%TARGET%" "%OLDRIM%"
-PAUSE
 
 GOTO :EOF
 

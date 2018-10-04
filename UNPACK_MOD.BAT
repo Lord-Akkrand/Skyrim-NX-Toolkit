@@ -14,7 +14,6 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO toolkit.exe is set at %TOOLKIT_EXE%
-PAUSE
 
 >CON ECHO Making "%TARGET%"
 
@@ -23,7 +22,6 @@ ROBOCOPY "%EMPTY%" "%TARGET%" /MIR /PURGE /XF .gitignore
 PUSHD "%SCRIPTS_PATH%"
 %TOOLKIT_EXE% unpack_mod "%ORIGINAL%" "%TARGET%"
 POPD
-PAUSE
 
 GOTO :EOF
 

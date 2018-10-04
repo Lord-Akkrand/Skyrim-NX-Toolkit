@@ -16,7 +16,6 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO toolkit.py is set at %TOOLKIT_PY%
-PAUSE
 
 >CON ECHO Finding Python 3.x path
 >CON CALL "%SCRIPTS_PATH%FIND_PYTHON_PATH"
@@ -27,7 +26,6 @@ IF ERRORLEVEL 1 GOTO pythonError
 ROBOCOPY "%PRISTINE%" "%TARGET%" /MIR /XF .gitignore
 
 "%PYTHON3%" %TOOLKIT_PY% load_order "%ORIGINAL%" "%TARGET%" %LOAD_ORDER%
-PAUSE
 
 GOTO :EOF
 

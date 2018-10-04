@@ -17,15 +17,12 @@ SET PATH=%PATH%;%SCRIPTS_PATH%
 >CON ECHO Starting up...
 
 >CON ECHO toolkit.exe is set at %TOOLKIT_EXE%
-PAUSE
 
 ROBOCOPY "%PRISTINE%" "%TARGET%" /MIR /XF .gitignore
 
 PUSHD "%SCRIPTS_PATH%"
 %TOOLKIT_EXE% load_order "%ORIGINAL%" "%TARGET%" %LOAD_ORDER%
 POPD
-
-PAUSE
 
 GOTO :EOF
 

@@ -48,7 +48,7 @@ def LIPMCADPCM2FUZ(baseFile, lipFile, mcadpcmFile):
 	util.RemoveFile(lipFile)
 	util.RemoveFile(mcadpcmFile)
 
-def LP2WAV(filepath):
+def LP2WAV(wavFile):
 	soundconverter = GetTool()
 	commandLine = [soundconverter, "-mcwav", wavFile]
 	util.RunCommandLine(commandLine)

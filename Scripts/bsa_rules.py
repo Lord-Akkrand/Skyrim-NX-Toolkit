@@ -32,12 +32,13 @@ if FullRules:
 	
 else:
 
-	# Basic Rules, only make Textures/Meshes/''
+	# Basic Rules, only make Textures/Meshes/Animations/''
 	# "BSA":"" will just be PluginName.bsa
+
 	BSARules.append({"BSA":"Textures", "Folder":"textures"})
 	
-	BSARules.append({"BSA":"", "Folder":"meshes", "Extension":"hkx"})
-	BSARules.append({"BSA":"", "Folder":"meshes", "Extension":"txt"})
+	BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"hkx"})
+	BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"txt"})
 
 	BSARules.append({"BSA":"Meshes", "Folder":"meshes"})
 	BSARules.append({"BSA":"Meshes", "Folder":"lodsettings"})

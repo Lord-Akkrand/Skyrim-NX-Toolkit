@@ -60,7 +60,8 @@ def LoadOrder(origin, target, loadOrderName):
 		return retVal
 	sResourceArchiveList = GetArchiveList("sResourceArchiveList", newSkyrimIni)
 	sResourceArchiveList2 = GetArchiveList("sResourceArchiveList2", newSkyrimIni)
-
+	sArchiveToLoadInMemoryList = GetArchiveList("sArchiveToLoadInMemoryList", newSkyrimIni)
+	
 	def GetTestFile(tfn):
 		tfn = str(tfn)
 		util.LogDebug("Find test file " + tfn)
@@ -107,6 +108,15 @@ def LoadOrder(origin, target, loadOrderName):
 		nonlocal newResourceArchiveList
 		newResourceArchiveList += ", " + name
 		util.LogDebug(newResourceArchiveList)
+		CopyFile(file, filename)
+		
+	newArchiveToLoadInMemoryList = sArchiveToLoadInMemoryList
+	def InsertInMemoryBSA(name, filename):
+		nonlocal newResourceArchiveList, newArchiveToLoadInMemoryList
+		newResourceArchiveList += ", " + name
+		newArchiveToLoadInMemoryList += ", " + name
+		util.LogDebug(newResourceArchiveList)
+		util.LogDebug(newArchiveToLoadInMemoryList)
 		CopyFile(file, filename)
 		
 	if loadOrderStart <= 4:
@@ -172,6 +182,8 @@ def LoadOrder(origin, target, loadOrderName):
 					InsertTestFile(file, filename)
 				elif file.endswith("Textures.bsa"):
 					InsertTextureBSA(file, filename)
+				elif file.endswith("Animations.bsa"):
+					InsertInMemoryBSA(file, filename)
 				elif file.endswith(".bsa"):
 					InsertMainBSA(file, filename)
 				elif file.endswith(".ini"):
@@ -190,6 +202,7 @@ def LoadOrder(origin, target, loadOrderName):
 
 	newSkyrimIni = newSkyrimIni.replace(sResourceArchiveList, newResourceArchiveList)
 	newSkyrimIni = newSkyrimIni.replace(sResourceArchiveList2, newResourceArchiveList2)
+	newSkyrimIni = newSkyrimIni.replace(sArchiveToLoadInMemoryList, newArchiveToLoadInMemoryList)
 	WriteIniFile("Skyrim.ini", newSkyrimIni)
 
 	for languageIni in languageInis:

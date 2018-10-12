@@ -96,7 +96,7 @@ def LoadOrder(origin, target, loadOrderName):
 	
 	resourceArchiveList2Additions = ''
 	newResourceArchiveList2 = sResourceArchiveList2
-	def InsertTextureBSA(name, filename):
+	def InsertLanguageBSA(name, filename):
 		nonlocal resourceArchiveList2Additions, newResourceArchiveList2
 		resourceArchiveList2Additions += ", " + name
 		newResourceArchiveList2 += ", " + name
@@ -181,7 +181,9 @@ def LoadOrder(origin, target, loadOrderName):
 				if file.endswith(".esm") or file.endswith(".esp"):
 					InsertTestFile(file, filename)
 				elif file.endswith("Textures.bsa"):
-					InsertTextureBSA(file, filename)
+					InsertLanguageBSA(file, filename)
+				elif file.endswith("Voices.bsa"):
+					InsertLanguageBSA(file, filename)
 				elif file.endswith("Animations.bsa"):
 					InsertInMemoryBSA(file, filename)
 				elif file.endswith(".bsa"):

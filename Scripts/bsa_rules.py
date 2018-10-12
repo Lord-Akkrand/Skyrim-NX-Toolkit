@@ -50,8 +50,9 @@ else:
 	BSARules.append({"BSA":"", "Folder":"strings"})
 	BSARules.append({"BSA":"", "Folder":"interface"})
 
+	BSARules.append({"BSA":"Voices", "Folder":"sound\\voice"})
 	BSARules.append({"BSA":"", "Folder":"music"})
-	BSARules.append({"BSA":"", "Folder":"sound"})
+	BSARules.append({"BSA":"", "Folder":"sound\\fx"})
 	
 # Not implemented yet
 #BSARules.append({"NotIncluded":True, "Folder":"source"})

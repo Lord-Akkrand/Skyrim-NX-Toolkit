@@ -125,7 +125,7 @@ def ConvertPath(mod_name, target):
 				
 			for i in range(len(convertList)):
 				file_path = convertList[i]
-				job = job_manager.Job(cb, convertFn, target, file_path)
+				job = job_manager.Job(cb, convertFn, target.lower(), file_path.lower())
 				jm.AddJob(job)
 			jm.ProcessBatch()
 			

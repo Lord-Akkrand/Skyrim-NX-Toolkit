@@ -203,6 +203,7 @@ def PackMod(mod_name, target):
 			else:
 				#util.LogDebug("No folder match, check files")
 				for filename in files:
+					filename = filename.lower()
 					file_path = os.path.join(root, filename)
 					relative_path = os.path.relpath(file_path, target)
 					should_apply = False

@@ -45,7 +45,8 @@ class SolutionExplorer:
 			self.treeView.selection_set(rowID)
 			self.treeView.focus_set()
 			self.treeView.focus(rowID)
-			logging.debug("SolutionExplorer:rightClickMenu()->{}".format(rowID))
+			ir = self.treeView.item(rowID)
+			logging.debug("SolutionExplorer:rightClickMenu()->{} ({})".format(rowID, ir))
 
 			menu = Menu(self.root, tearoff=0)
 			menu.add_command(label="Undo", command=undo)

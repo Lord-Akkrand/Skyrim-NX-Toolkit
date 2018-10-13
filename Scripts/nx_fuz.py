@@ -10,7 +10,6 @@ def FuzMend(filename):
 	
 	try:
 		with open(filename + ".lip", "rb") as lip_file:
-			lip_file.seek(12)
 			lip_data = lip_file.read()
 			lip_len = len(lip_data)
 	except FileNotFoundError:

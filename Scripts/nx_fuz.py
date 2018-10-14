@@ -9,7 +9,7 @@ def FuzMend(filename):
     header_content = b'\x46\x55\x5A\x45\x01\x00\x00\x00'
     
     try:
-    with open(filename + ".lip", "rb") as lip_file:
+        with open(filename + ".lip", "rb") as lip_file:
             lip_data = lip_file.read()
             lip_len = len(lip_data)
     except FileNotFoundError:
@@ -28,7 +28,7 @@ def FuzMend(filename):
         fuz_file.write(lip_len.to_bytes(4, byteorder='little', signed=False))
         fuz_file.write(voice_start.to_bytes(4, byteorder='little', signed=False))
         if lip_len != 0:
-          fuz_file.write(lip_data)
+            fuz_file.write(lip_data)
         fuz_file.write(b'\x00' * lip_pad)
         fuz_file.write(voice_data)
     

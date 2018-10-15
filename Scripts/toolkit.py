@@ -34,6 +34,11 @@ if __name__ == '__main__':
 		target = sys.argv[3]
 		loadOrderName = sys.argv[4]
 		load_order.LoadOrder_External(origin, target, loadOrderName)
+	elif py_script == 'packed_load_order':
+		origin = sys.argv[2]
+		target = sys.argv[3]
+		loadOrderName = sys.argv[4]
+		packed_load_order.PackedLoadOrder_External(origin, target, loadOrderName)
 	elif py_script == 'pack_mod':
 		mod_name = sys.argv[2]
 		target = sys.argv[3]

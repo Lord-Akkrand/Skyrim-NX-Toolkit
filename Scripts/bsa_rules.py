@@ -3,57 +3,60 @@
 # 2GB Limit for BSA Files (I know 2GB is actually 2048 MB, not 2000, but Bethesdas BSAs limit seemed to be 2000MB)
 BSASizeLimit = 1024 * 1024 * 2000
 
-BSARules = []
+import toolkit_config
 
-FullRules = False
+FullRules = []
 
-if FullRules:
-	# In order to be placed in a BSA you must meet all the criteria.  First rule evaluated wins.
-	BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"hkx"})
-	BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"txt"})
+# In order to be placed in a BSA you must meet all the criteria.  First rule evaluated wins.
+FullRules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"hkx"})
+FullRules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"txt"})
 
-	BSARules.append({"BSA":"Meshes", "Folder":"meshes"})
-	BSARules.append({"BSA":"Meshes", "Folder":"lodsettings"})
+FullRules.append({"BSA":"Meshes", "Folder":"meshes"})
+FullRules.append({"BSA":"Meshes", "Folder":"lodsettings"})
 
-	BSARules.append({"BSA":"Misc", "Folder":"grass"})
-	BSARules.append({"BSA":"Misc", "Folder":"scripts"})
-	BSARules.append({"BSA":"Misc", "Folder":"seq"})
-	BSARules.append({"BSA":"Shaders", "Folder":"shadersfx"})
+FullRules.append({"BSA":"Misc", "Folder":"grass"})
+FullRules.append({"BSA":"Misc", "Folder":"scripts"})
+FullRules.append({"BSA":"Misc", "Folder":"seq"})
+FullRules.append({"BSA":"Shaders", "Folder":"shadersfx"})
 
-	BSARules.append({"BSA":"Sounds", "Folder":"music"})
-	BSARules.append({"BSA":"Sounds", "Folder":"sound\\fx"})
+FullRules.append({"BSA":"Sounds", "Folder":"music"})
+FullRules.append({"BSA":"Sounds", "Folder":"sound\\fx"})
 
-	BSARules.append({"BSA":"Interface", "Folder":"strings"})
-	BSARules.append({"BSA":"Interface", "Folder":"interface"})
+FullRules.append({"BSA":"Interface", "Folder":"strings"})
+FullRules.append({"BSA":"Interface", "Folder":"interface"})
+
+FullRules.append({"BSA":"Textures", "Folder":"textures"})
+
+FullRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
+
+BasicRules = []	
+# Basic Rules, only make Textures/Meshes/Animations/''
+# "BSA":"" will just be PluginName.bsa
+
+BasicRules.append({"BSA":"Textures", "Folder":"textures"})
+
+BasicRules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"hkx"})
+BasicRules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"txt"})
+
+BasicRules.append({"BSA":"Meshes", "Folder":"meshes"})
+BasicRules.append({"BSA":"Meshes", "Folder":"lodsettings"})
+
+BasicRules.append({"BSA":"", "Folder":"grass"})
+BasicRules.append({"BSA":"", "Folder":"scripts"})
+BasicRules.append({"BSA":"", "Folder":"seq"})
+BasicRules.append({"BSA":"", "Folder":"shadersfx"})
+BasicRules.append({"BSA":"", "Folder":"strings"})
+BasicRules.append({"BSA":"", "Folder":"interface"})
+
+BasicRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
+BasicRules.append({"BSA":"", "Folder":"music"})
+BasicRules.append({"BSA":"", "Folder":"sound\\fx"})
 	
-	BSARules.append({"BSA":"Textures", "Folder":"textures"})
+def GetBSARules():
+	fullRules = toolkit_config.get_bool_setting("BSA", "FullRules")
+	if fullRules:
+		return FullRules
+	return BasicRules
 
-	BSARules.append({"BSA":"Voices", "Folder":"sound\\voice"})
-	
-else:
-
-	# Basic Rules, only make Textures/Meshes/Animations/''
-	# "BSA":"" will just be PluginName.bsa
-
-	BSARules.append({"BSA":"Textures", "Folder":"textures"})
-	
-	BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"hkx"})
-	BSARules.append({"BSA":"Animations", "Folder":"meshes", "Extension":"txt"})
-
-	BSARules.append({"BSA":"Meshes", "Folder":"meshes"})
-	BSARules.append({"BSA":"Meshes", "Folder":"lodsettings"})
-
-	BSARules.append({"BSA":"", "Folder":"grass"})
-	BSARules.append({"BSA":"", "Folder":"scripts"})
-	BSARules.append({"BSA":"", "Folder":"seq"})
-	BSARules.append({"BSA":"", "Folder":"shadersfx"})
-	BSARules.append({"BSA":"", "Folder":"strings"})
-	BSARules.append({"BSA":"", "Folder":"interface"})
-
-	BSARules.append({"BSA":"Voices", "Folder":"sound\\voice"})
-	BSARules.append({"BSA":"", "Folder":"music"})
-	BSARules.append({"BSA":"", "Folder":"sound\\fx"})
-	
 # Not implemented yet
 #BSARules.append({"NotIncluded":True, "Folder":"source"})
-

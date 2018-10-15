@@ -25,6 +25,7 @@ def LoadOrder(origin, target, loadOrderName):
 	loadOrderList = loadOrder.splitlines()
 	loadOrderStart = int(loadOrderList[0])
 	loadOrderList = loadOrderList[1:]
+	loadOrderList = list(filter(None, loadOrderList))
 	util.LogDebug("ESP Start at " + str(loadOrderStart))
 	util.LogDebug("LOAD ORDER LIST <" + str(loadOrderList) + ">")
 
@@ -61,7 +62,8 @@ def LoadOrder(origin, target, loadOrderName):
 		return retVal
 	sResourceArchiveList = GetArchiveList("sResourceArchiveList", newSkyrimIni)
 	sResourceArchiveList2 = GetArchiveList("sResourceArchiveList2", newSkyrimIni)
-
+	sArchiveToLoadInMemoryList = GetArchiveList("sArchiveToLoadInMemoryList", newSkyrimIni)
+	
 	def GetTestFile(tfn):
 		tfn = str(tfn)
 		util.LogDebug("Find test file " + tfn)
@@ -96,7 +98,7 @@ def LoadOrder(origin, target, loadOrderName):
 
 	resourceArchiveList2Additions = ''
 	newResourceArchiveList2 = sResourceArchiveList2
-	def InsertTextureBSA(name, filename):
+	def InsertLanguageBSA(name, filename):
 		nonlocal resourceArchiveList2Additions, newResourceArchiveList2
 		resourceArchiveList2Additions += ", " + name
 		newResourceArchiveList2 += ", " + name
@@ -107,6 +109,13 @@ def LoadOrder(origin, target, loadOrderName):
 		nonlocal newResourceArchiveList
 		newResourceArchiveList += ", " + name
 		util.LogDebug(newResourceArchiveList)
+	newArchiveToLoadInMemoryList = sArchiveToLoadInMemoryList
+	def InsertInMemoryBSA(name, filename):
+		nonlocal newResourceArchiveList, newArchiveToLoadInMemoryList
+		newResourceArchiveList += ", " + name
+		newArchiveToLoadInMemoryList += ", " + name
+		util.LogDebug(newResourceArchiveList)
+		util.LogDebug(newArchiveToLoadInMemoryList)
 		
 	if loadOrderStart <= 4:
 		util.LogDebug("Hyrule.esp will not be loaded, so removing Skyrim - Hyrule.bsa from newResourceArchiveList")
@@ -163,7 +172,7 @@ def LoadOrder(origin, target, loadOrderName):
 		if plugin.startswith("#"):
 			util.LogDebug("Passing on " + plugin)
 		else:
-			unpack_mod.UnpackMod(pluginFolder, target)
+			unpack_mod.UnpackMod(pluginFolder, targetData)
 			for file in os.listdir(targetData):
 				if file.endswith(".ini"):
 					filename = os.path.join(targetData, file)
@@ -183,11 +192,15 @@ def LoadOrder(origin, target, loadOrderName):
 					else:
 						shutil.copy2(filename, os.path.join(targetData, file))
 					
-	bsaList = pack_mod.PackMod(loadOrderName, target)
+	bsaList = pack_mod.PackMod(loadOrderName, targetData)
 	for filename in bsaList:
 		file = os.path.basename(filename)
 		if file.endswith("Textures.bsa"):
-			InsertTextureBSA(file, filename)
+			InsertLanguageBSA(file, filename)
+		elif file.endswith("Voices.bsa"):
+			InsertLanguageBSA(file, filename)
+		elif file.endswith("Animations.bsa"):
+			InsertInMemoryBSA(file, filename)
 		elif file.endswith(".bsa"):
 			InsertMainBSA(file, filename)
 	
@@ -199,6 +212,7 @@ def LoadOrder(origin, target, loadOrderName):
 
 	newSkyrimIni = newSkyrimIni.replace(sResourceArchiveList, newResourceArchiveList)
 	newSkyrimIni = newSkyrimIni.replace(sResourceArchiveList2, newResourceArchiveList2)
+	newSkyrimIni = newSkyrimIni.replace(sArchiveToLoadInMemoryList, newArchiveToLoadInMemoryList)
 	WriteIniFile("Skyrim.ini", newSkyrimIni)
 
 	for languageIni in languageInis:
@@ -222,7 +236,7 @@ if __name__ == '__main__':
 	origin = sys.argv[1]
 	target = sys.argv[2]
 	loadOrderName = sys.argv[3]
-	util.StartTimer()
 	util.InitialiseLog(os.path.join(origin, loadOrderName) + ".log")
+	util.StartTimer()
 	LoadOrder(origin, target, loadOrderName)
 	util.EndTimer()

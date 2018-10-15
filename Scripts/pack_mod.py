@@ -26,7 +26,7 @@ def PackMod(mod_name, target):
 	data_list = os.listdir(target)
 	util.LogDebug(str(data_list))
 	
-	BSARules = bsa_rules.BSARules
+	BSARules = bsa_rules.GetBSARules()
 	
 	BSAs = {}
 	

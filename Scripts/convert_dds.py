@@ -51,6 +51,7 @@ import os.path
 import sizes
 import util
 import shutil
+import toolkit_config
 import xtx_extract
 
 import subprocess
@@ -126,7 +127,7 @@ def ConvertDDS(basePath, ddsFileName):
 
 	util.LogDebug("FourCC is " + str(fourCC))
 
-	maxSize = sizes.DefaultSizeLimit
+	maxSize = toolkit_config.get_int_setting("Textures", "DefaultSizeLimit")
 	forceFormat = None
 	shouldRun = False
 	util.LogDebug('File is ' + relativeFilename)

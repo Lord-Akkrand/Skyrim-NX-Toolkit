@@ -93,9 +93,3 @@ ConvertFromToSDK = []
 ConvertFromToSDK.append(('R8UN',DXT1))
 ConvertFromToSDK.append(('BC3_UNORM_SRGB',DX10))
 
-
-# Fallback, if not found, use 1024*1024 as default
-DefaultSizeLimit = 1024*1024
-
-# 2GB Limit for BSA Files (I know 2GB is actually 2048 MB, not 2000, but Bethesdas BSAs limit seemed to be 2000MB)
-BSASizeLimit = 1024 * 1024 * 2000

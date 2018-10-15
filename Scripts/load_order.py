@@ -170,14 +170,14 @@ def LoadOrder(origin, target, loadOrderName):
 		
 	for plugin in loadOrderList:
 		util.LogDebug("Found " + plugin)
-		pluginFolder = origin + "\\" + plugin
+		pluginFolder = os.path.join(origin, plugin)
 		if plugin.startswith("#"):
 			util.LogDebug("Passing on " + plugin)
 		else:
 			util.LogInfo("Adding " + plugin)
 			for file in os.listdir(pluginFolder):
 				util.LogDebug("   Found " + file)
-				filename = pluginFolder + "\\" + file
+				filename = os.path.join(pluginFolder, file)
 				if file.endswith(".esm") or file.endswith(".esp"):
 					InsertTestFile(file, filename)
 				elif file.endswith("Textures.bsa"):

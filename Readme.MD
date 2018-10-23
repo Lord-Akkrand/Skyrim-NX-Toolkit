@@ -6,9 +6,9 @@ There are several external tools that are used by my scripts to get things done.
   It is available on Nexus here  
   <https://www.nexusmods.com/newvegas/mods/64745> and the source code is available here  
   <https://github.com/TES5Edit/TES5Edit/tree/dev/Tools/BSArchive>
-- `Skyim NX Audio-Voice Dialog Converter.exe` was created by Clayson  
-  <https://github.com/clayclayson>  It is included with permission.  
-  `VGAudioCli.exe` is used during processing of Clayson's audio conversion tool.  
+- `Skyim NX Audio-Voice Dialog Converter.exe` was created by SockNastre  
+  <https://github.com/SockNastre>  It is included with permission.  
+  `VGAudioCli.exe` is used during processing of SockNastre's audio conversion tool.  
   <https://github.com/Thealexbarney/VGAudio>
 - `XTX-Extractor` was created by AboodXD  
   <https://github.com/aboood40091> and is available here  

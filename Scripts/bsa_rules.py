@@ -19,15 +19,17 @@ FullRules.append({"BSA":"Misc", "Folder":"scripts"})
 FullRules.append({"BSA":"Misc", "Folder":"seq"})
 FullRules.append({"BSA":"Shaders", "Folder":"shadersfx"})
 
+FullRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
+
 FullRules.append({"BSA":"Sounds", "Folder":"music"})
-FullRules.append({"BSA":"Sounds", "Folder":"sound\\fx"})
+FullRules.append({"BSA":"Sounds", "Folder":"sound"})
 
 FullRules.append({"BSA":"Interface", "Folder":"strings"})
 FullRules.append({"BSA":"Interface", "Folder":"interface"})
 
 FullRules.append({"BSA":"Textures", "Folder":"textures"})
 
-FullRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
+
 
 BasicRules = []	
 # Basic Rules, only make Textures/Meshes/Animations/''
@@ -50,7 +52,7 @@ BasicRules.append({"BSA":"", "Folder":"interface"})
 
 BasicRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
 BasicRules.append({"BSA":"", "Folder":"music"})
-BasicRules.append({"BSA":"", "Folder":"sound\\fx"})
+BasicRules.append({"BSA":"", "Folder":"sound"})
 	
 def GetBSARules():
 	fullRules = toolkit_config.get_bool_setting("BSA", "FullRules")

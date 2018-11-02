@@ -22,7 +22,8 @@ FullRules.append({"BSA":"Shaders", "Folder":"shadersfx"})
 FullRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
 
 FullRules.append({"BSA":"Sounds", "Folder":"music"})
-FullRules.append({"BSA":"Sounds", "Folder":"sound"})
+FullRules.append({"BSA":"Sounds", "Folder":"sound\\fx"})
+FullRules.append({"BSA":"Sounds", "Folder":"sound\\ebt"})
 
 FullRules.append({"BSA":"Interface", "Folder":"strings"})
 FullRules.append({"BSA":"Interface", "Folder":"interface"})
@@ -52,7 +53,8 @@ BasicRules.append({"BSA":"", "Folder":"interface"})
 
 BasicRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
 BasicRules.append({"BSA":"", "Folder":"music"})
-BasicRules.append({"BSA":"", "Folder":"sound"})
+BasicRules.append({"BSA":"", "Folder":"sound\\fx"})
+BasicRules.append({"BSA":"", "Folder":"sound\\ebt"})
 	
 def GetBSARules():
 	fullRules = toolkit_config.get_bool_setting("BSA", "FullRules")

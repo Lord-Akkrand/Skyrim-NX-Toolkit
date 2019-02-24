@@ -8,7 +8,7 @@ import util
 import job_manager
 import toolkit_config
 import check_dds, convert_dds
-import check_hkx, convert_hkx
+import check_hkx, convert_hkx, convert_hkx64
 import convert_txt
 import convert_sound
 
@@ -29,6 +29,7 @@ def ConvertPath(mod_name, target):
 	WarnConversion = {}
 	ConvertListDDS = []
 	ConvertListHKX = []
+	ConvertListHKX64 = []
 	ConvertListTXT = []
 	ConvertListSound = []
 	for root, subdirs, files in os.walk(target):
@@ -57,9 +58,12 @@ def ConvertPath(mod_name, target):
 					elif hkxChecked == check_hkx.PC_XML:
 						ConvertListHKX.append(file_path)
 					elif hkxChecked == check_hkx.PC_64:
-						if 'HKX' not in WarnConversion:
-							WarnConversion['HKX'] = []
-						WarnConversion['HKX'].append( (filename, "SSE hkx animation") )
+						if root.lower().find("behaviors") > 0 or filename.lower().find("skeleton") > 0:
+							if 'HKX' not in WarnConversion:
+								WarnConversion['HKX'] = []
+							WarnConversion['HKX'].append( (filename, "SSE hkx animation") )
+						else:
+							ConvertListHKX64.append(file_path)
 					elif hkxChecked == check_hkx.NX_64:
 						if 'HKX' not in NoConversion:
 							NoConversion['HKX'] = 0
@@ -85,6 +89,7 @@ def ConvertPath(mod_name, target):
 			
 	util.LogInfo("Found {} dds files to convert".format(len(ConvertListDDS)))
 	if has_havoc: util.LogInfo("Found {} hkx files to convert".format(len(ConvertListHKX)))
+	util.LogInfo("Found {} 64 hkx files to convert".format(len(ConvertListHKX64)))	
 	util.LogInfo("Found {} txt files to convert".format(len(ConvertListTXT)))
 	util.LogInfo("Found {} sound files to convert".format(len(ConvertListSound)))
 	
@@ -134,6 +139,7 @@ def ConvertPath(mod_name, target):
 	LogProgress(ConvertListDDS, convert_dds.ConvertDDS, "DDS", "MaxTextureThreads")
 	if has_havoc:
 		LogProgress(ConvertListHKX, convert_hkx.ConvertHKX, "HKX", "MaxAnimationThreads")
+	LogProgress(ConvertListHKX64, convert_hkx64.ConvertHKX64, "HKX64", "MaxAnimationThreads")
 	LogProgress(ConvertListTXT, convert_txt.ConvertTXT, "TXT", "MaxOtherThreads")
 	LogProgress(ConvertListSound, convert_sound.ConvertSound, "Sounds", "MaxSoundThreads")
 

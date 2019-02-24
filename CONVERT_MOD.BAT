@@ -27,6 +27,8 @@ PUSHD "%SCRIPTS_PATH%"
 %TOOLKIT_EXE% convert_mod "%ORIGINAL%" "%TARGET%" "%OLDRIM%"
 POPD
 
+GOTO :EOF
+
 :pythonError
 >CON ECHO Error finding Python path
 GOTO :EOF

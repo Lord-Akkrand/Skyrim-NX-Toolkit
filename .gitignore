@@ -19,3 +19,5 @@ test me*/
 
 # Log files
 *.log
+
+.vs/

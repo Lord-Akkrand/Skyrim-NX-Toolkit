@@ -2,7 +2,7 @@
 #
 # by Zappastuff - 02-19-19
 #
-# convert XBOX HKX to PS4 / SWITCH format
+# convert 64-bit SSE HKX to PS4 / SWITCH format
 #
 # DOESN'T WORK for these animation files:
 #

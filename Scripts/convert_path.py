@@ -88,8 +88,8 @@ def ConvertPath(mod_name, target):
 			util.LogInfo("Warning, cannot convert {} because <{}>".format(fileTypeWarnings[i][0], fileTypeWarnings[i][1]))
 			
 	util.LogInfo("Found {} dds files to convert".format(len(ConvertListDDS)))
-	if has_havoc: util.LogInfo("Found {} hkx files to convert".format(len(ConvertListHKX)))
-	util.LogInfo("Found {} 64 hkx files to convert".format(len(ConvertListHKX64)))	
+	if has_havoc: util.LogInfo("Found {} 32-bit hkx files to convert".format(len(ConvertListHKX)))
+	util.LogInfo("Found {} 64-bit hkx files to convert".format(len(ConvertListHKX64)))	
 	util.LogInfo("Found {} txt files to convert".format(len(ConvertListTXT)))
 	util.LogInfo("Found {} sound files to convert".format(len(ConvertListSound)))
 	
@@ -138,8 +138,8 @@ def ConvertPath(mod_name, target):
 			
 	LogProgress(ConvertListDDS, convert_dds.ConvertDDS, "DDS", "MaxTextureThreads")
 	if has_havoc:
-		LogProgress(ConvertListHKX, convert_hkx.ConvertHKX, "HKX", "MaxAnimationThreads")
-	LogProgress(ConvertListHKX64, convert_hkx64.ConvertHKX64, "HKX64", "MaxAnimationThreads")
+		LogProgress(ConvertListHKX, convert_hkx.ConvertHKX, "HKX 32-bit", "MaxAnimationThreads")
+	LogProgress(ConvertListHKX64, convert_hkx64.ConvertHKX64, "HKX 64-bit", "MaxAnimationThreads")
 	LogProgress(ConvertListTXT, convert_txt.ConvertTXT, "TXT", "MaxOtherThreads")
 	LogProgress(ConvertListSound, convert_sound.ConvertSound, "Sounds", "MaxSoundThreads")
 

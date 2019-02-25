@@ -27,6 +27,10 @@ These tools are:
   It is necessary to convert any mod that has animations in it, and you are also required to have a 32-bit version of those animation files in order to perform that conversion.  
   If you have the CK, you need to copy `Tools\HavokBehaviorPostProcessHavocBehaviourPostProcess.exe` to the `Utilities` directory in the Skyrim-NX-Toolkit.
 
+- It won’t convert skeleton and skeleton_female files. Get them from XPMS Switch version on Nexus
+- It won’t convert files in behaviors folders. Only occurrence I found in all SSE mods so far were in USSEP and FNIS. You can fish 32 bit equivalent
+- FNIS based mods can regenerate their behavior files in 32 bit by using the “Generate Behavior for Modders” tool included in FNIS oldrim
+  
 #### Running in Python
 All my scripts were written in Python 3.x, then packaged into an exe using PyInstaller.
 If you have Python 3.x (and Python Launcher, or 'py') accessible from your command line, you may run the scripts directly if you like.

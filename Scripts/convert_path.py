@@ -88,7 +88,10 @@ def ConvertPath(mod_name, target):
 			util.LogInfo("Warning, cannot convert {} because <{}>".format(fileTypeWarnings[i][0], fileTypeWarnings[i][1]))
 			
 	util.LogInfo("Found {} dds files to convert".format(len(ConvertListDDS)))
-	if has_havoc: util.LogInfo("Found {} 32-bit hkx files to convert".format(len(ConvertListHKX)))
+	if has_havoc: 
+		util.LogInfo("Found {} 32-bit hkx files to convert".format(len(ConvertListHKX)))
+	else:
+		util.LogInfo("Found {} 32-bit hkx files that won't convert as Havoc utility wasn't found.".format(len(ConvertListHKX)))
 	util.LogInfo("Found {} 64-bit hkx files to convert".format(len(ConvertListHKX64)))	
 	util.LogInfo("Found {} txt files to convert".format(len(ConvertListTXT)))
 	util.LogInfo("Found {} sound files to convert".format(len(ConvertListSound)))

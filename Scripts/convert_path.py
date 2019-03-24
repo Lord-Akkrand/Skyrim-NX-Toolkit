@@ -10,7 +10,7 @@ import toolkit_config
 import check_dds, convert_dds
 import check_hkx, convert_hkx, convert_hkx64
 import convert_txt
-import convert_sound
+import convert_sound_zappa as convert_sound
 
 
 import bitflag
@@ -77,8 +77,9 @@ def ConvertPath(mod_name, target):
 					file_path = os.path.join(root, filename)
 					ConvertListTXT.append(file_path)
 				elif filename.lower().endswith(".xwm") or filename.lower().endswith(".fuz") or filename.lower().endswith(".wav"):
-					file_path = os.path.join(root, filename)
-					ConvertListSound.append(file_path)
+					file_path = os.path.join(root, filename[:-4])
+					if not file_path in ConvertListSound:
+						ConvertListSound.append(file_path)
 
 	for fileType in NoConversion:
 		util.LogInfo("Found {} {} files that are already in NX format".format(NoConversion[fileType], fileType))

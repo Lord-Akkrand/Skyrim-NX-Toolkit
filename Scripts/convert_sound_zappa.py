@@ -2,7 +2,6 @@
 
 import os
 import util
-import time
 
 def GetVGAudioCli():
 	utilities_path = util.GetUtilitiesPath()
@@ -41,9 +40,6 @@ def ConvertDSP(dsp_data, base):
 	dsp_data[base+0x1D:base+0x60:2], dsp_data[base+0x1C:base+0x5F:2]
 
 def DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, sound_file):
-	header_single = b'\x01\x00\x00\x00\x0C\x00\x00\x00'
-	header_stereo = b'\x02\x00\x00\x00\x14\x00\x00\x00'
-	
 	with open(filename_dsp0, "rb") as dsp0_file: dsp0_data = bytearray(dsp0_file.read())
 	dsp0_size = len(dsp0_data)
 	ConvertDSP(dsp0_data, 0x00)
@@ -54,6 +50,7 @@ def DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, sound_file):
 		dsp1_offset = 0x14 + dsp0_size
 		ConvertDSP(dsp1_data, 0x00)
 
+		header_stereo = b'\x02\x00\x00\x00\x14\x00\x00\x00'
 		sound_file.write(header_stereo)
 		sound_file.write(dsp0_size.to_bytes(4, byteorder = 'little', signed = False))
 		sound_file.write(dsp1_offset.to_bytes(4, byteorder = 'little', signed = False))
@@ -62,6 +59,7 @@ def DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, sound_file):
 		sound_file.write(dsp1_data)
 		
 	else:
+		header_single = b'\x01\x00\x00\x00\x0C\x00\x00\x00'
 		sound_file.write(header_single)
 		sound_file.write(dsp0_size.to_bytes(4, byteorder = 'little', signed = False))
 		sound_file.write(dsp0_data)
@@ -82,7 +80,7 @@ def ConvertSound_Internal(filepath_without_extension):
 
 	util.LogDebug("Convert Sound <{}> WAV:{} XWM:{} LIP:{} FUZ:{}".format(filepath_without_extension, has_wav, has_xwm, has_lip, has_fuz))
 
-	# get LIP and convert sound to DSP
+	# try to find a LIP and convert sound to DSP
 	#  - loose WAV files take precedence over FUZ or XWM
 	#  - loose XWM files take precedence over FUZ
 	#  - loose LIP files take precedence over FUZ
@@ -111,15 +109,14 @@ def ConvertSound_Internal(filepath_without_extension):
 
 	channels = WAV2DSP(filename_wav, filename_dsp0, filename_dsp1)
 
-	# convert DSP to MCADPCM and save as MCADPCM or as FUZ if LIP exists
+	# convert DSP to MCADPCM and save as MCADPCM or as FUZ if there is a LIP
 	if lip_size > 0:
-		header_fuz = b'\x46\x55\x5A\x45\x01\x00\x00\x00'
-		
 		lip_padding = lip_size % 4
 		if lip_padding != 0: lip_padding = 4 - lip_padding
 		voice_offset = 0x10 + lip_size + lip_padding
 		
 		with open(filename_fuz, "wb") as fuz_nx_file:
+			header_fuz = b'\x46\x55\x5A\x45\x01\x00\x00\x00'
 			fuz_nx_file.write(header_fuz)
 			fuz_nx_file.write(lip_size.to_bytes(4, byteorder = 'little', signed = False))
 			fuz_nx_file.write(voice_offset.to_bytes(4, byteorder = 'little', signed = False))

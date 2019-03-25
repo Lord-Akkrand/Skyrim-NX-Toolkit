@@ -2,6 +2,7 @@
 
 import os
 import util
+import soundfile
 
 def GetVGAudioCli():
 	utilities_path = util.GetUtilitiesPath()
@@ -26,7 +27,7 @@ def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1):
 		wav_channel_count = int.from_bytes(wav_header[0x16:0x18], byteorder = 'little', signed = False)
 		wav_bits_per_sample = int.from_bytes(wav_header[0x22:0x24], byteorder = 'little', signed = False)
 
-	# checking for collateral case where Mod Authors save XWM with WAV filepath_without_extension
+	# checking for a collateral case where Mod Authors save XWM with WAV extension
 	if wav_format == "XWMA":
 		util.LogDebug("<{}> has WAV extension but is a XWMA. Fixing.".format(filename_wav))
 		filename_temp = filename_wav + ".TEMP"
@@ -34,18 +35,20 @@ def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1):
 		XWM2WAV(filename_temp, filename_wav)
 		util.RemoveFile(filename_temp)
 
-	# only create DSP if a VGAudioCli compatible WAVE format is found
-	if wav_format == "WAVE" and wav_audio_format == 1 and (wav_bits_per_sample == 8 or wav_bits_per_sample == 16):
-		VGAudioCli = GetVGAudioCli()
-		commandLine = [VGAudioCli, "-i:0", filename_wav, filename_dsp0]
+	# make the WAV file compatible with VGAudioCLi
+	if wav_audio_format != 1 or wav_bits_per_sample != 8 or wav_bits_per_sample != 16:
+		wav_data, wav_samplerate = soundfile.read(filename_wav)
+		soundfile.write(filename_wav, wav_data, wav_samplerate, subtype='PCM_16')
+
+	# relying on VGAudioCli to create the DSP streams
+	VGAudioCli = GetVGAudioCli()
+	commandLine = [VGAudioCli, "-i:0", filename_wav, filename_dsp0]
+	util.RunCommandLine(commandLine)
+	if wav_channel_count > 1:
+		commandLine = [VGAudioCli, "-i:1", filename_wav, filename_dsp1]
 		util.RunCommandLine(commandLine)
-		if wav_channel_count > 1:
-			commandLine = [VGAudioCli, "-i:1", filename_wav, filename_dsp1]
-			util.RunCommandLine(commandLine)
-			wav_channel_count = 2
-		return wav_channel_count
-	else:
-		return -1 if wav_format != "WAVE" else -2 if wav_audio_format != 1 else -3
+		wav_channel_count = 2
+	return wav_channel_count
 
 def ConvertDSP(dsp_data, base):
 	dsp_data[base+0x00:base+0x19:4], dsp_data[base+0x01:base+0x1A:4], dsp_data[base+0x02:base+0x1B:4], dsp_data[base+0x03:base+0x1C:4] = \
@@ -125,32 +128,22 @@ def ConvertSound_Internal(filepath_without_extension):
 	# it returns -1 on a failed conversion
 	channels = WAV2DSP(filename_wav, filename_dsp0, filename_dsp1)
 
-	# only proceed if previous conversion was successful
-	if channels > 0:
-		if lip_size > 0:
-			lip_padding = lip_size % 4
-			if lip_padding != 0: lip_padding = 4 - lip_padding
-			voice_offset = 0x10 + lip_size + lip_padding
+	if lip_size > 0:
+		lip_padding = lip_size % 4
+		if lip_padding != 0: lip_padding = 4 - lip_padding
+		voice_offset = 0x10 + lip_size + lip_padding
 
-			with open(filename_fuz, "wb") as fuz_nx_file:
-				header_fuz = b'\x46\x55\x5A\x45\x01\x00\x00\x00'
-				fuz_nx_file.write(header_fuz)
-				fuz_nx_file.write(lip_size.to_bytes(4, byteorder = 'little', signed = False))
-				fuz_nx_file.write(voice_offset.to_bytes(4, byteorder = 'little', signed = False))
-				fuz_nx_file.write(lip_data)
-				fuz_nx_file.write(b'\x00' * lip_padding)
-				DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, fuz_nx_file)
-		else:
-			with open(filename_mcadpcm, "wb") as mcadpcm_file:
-				DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, mcadpcm_file)
+		with open(filename_fuz, "wb") as fuz_nx_file:
+			header_fuz = b'\x46\x55\x5A\x45\x01\x00\x00\x00'
+			fuz_nx_file.write(header_fuz)
+			fuz_nx_file.write(lip_size.to_bytes(4, byteorder = 'little', signed = False))
+			fuz_nx_file.write(voice_offset.to_bytes(4, byteorder = 'little', signed = False))
+			fuz_nx_file.write(lip_data)
+			fuz_nx_file.write(b'\x00' * lip_padding)
+			DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, fuz_nx_file)
 	else:
-		reason = "Unknown format" if channels == -1 else "Unkonwn audio format" if channels == -2 else "Not 8 or 16 bits per sample"
-		if has_fuz:
-			util.LogInfo("Warning, {}, cannot convert sound {}".format(reason, filename_fuz))
-		elif has_xwm:
-			util.LogInfo("Warning, {}, cannot convert sound {}".format(reason, filename_xwm))
-		else:
-			util.LogInfo("Warning, {}, cannot convert sound {}".format(reason, filename_wav))
+		with open(filename_mcadpcm, "wb") as mcadpcm_file:
+			DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, mcadpcm_file)
 
 	# clean up temporary files
 	util.RemoveFile(filename_wav)

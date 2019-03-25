@@ -14,7 +14,7 @@ DefaultValues = {
 	"Performance":{
 		"MaxTextureThreads" : 5,
 		"MaxAnimationThreads" : 5,
-		"MaxSoundThreads" : 5,
+		"MaxSoundThreads" : 10,
 		"MaxOtherThreads" : 5
 	},
 	"BSA":{

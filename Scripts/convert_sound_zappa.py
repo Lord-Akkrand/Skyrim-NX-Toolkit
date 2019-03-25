@@ -35,8 +35,8 @@ def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1):
 		XWM2WAV(filename_temp, filename_wav)
 		util.RemoveFile(filename_temp)
 
-	# make the WAV file compatible with VGAudioCLi
-	if wav_audio_format != 1 or not (wav_bits_per_sample == 8 or wav_bits_per_sample == 16):
+	# make the WAV file compatible with VGAudioCLi whenever required
+	elif wav_audio_format != 1 or not (wav_bits_per_sample == 8 or wav_bits_per_sample == 16):
 		util.LogInfo("Warning, <{}> isn't compatible with VGAudioCLi. Fixing.".format(filename_wav))
 		wav_data, wav_samplerate = soundfile.read(filename_wav)
 		soundfile.write(filename_wav, wav_data, wav_samplerate, subtype='PCM_16')

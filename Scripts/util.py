@@ -12,7 +12,7 @@ def StartTimer():
 	global gStartTime
 	gStartTime = datetime.datetime.now()
 	LogInfo("Timer Started {}".format(gStartTime.strftime('%Y-%m-%d %H:%M:%S')))
-	
+
 def EndTimer():
 	ts = datetime.datetime.now()
 	delta = ts - gStartTime
@@ -21,7 +21,7 @@ def EndTimer():
 
 def RunCommandLine(commandLine, useShell=False):
 	LogDebug("RunCommandLine({}, shell={})".format(str(commandLine), str(useShell)))
-	
+
 	p = subprocess.Popen(commandLine, shell=useShell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	output, err = p.communicate()
 	p_status = p.wait()
@@ -34,7 +34,7 @@ def RunCommandLine(commandLine, useShell=False):
 		#err = err.decode('ascii')
 		LogDebug("Errors:" + err)#str(err.splitlines()))
 	return (output, err)
-	
+
 g_loggingInitialised = False
 def InitialiseLog(newFileName):
 	global g_loggingInitialised
@@ -42,10 +42,10 @@ def InitialiseLog(newFileName):
 		g_loggingInitialised = True
 		with open(newFileName, "w") as myfile:
 			myfile.write("")
-			
+
 		logging.basicConfig(format='%(message)s', filename=newFileName, level=logging.DEBUG)
 		logger = logging.getLogger(__name__)
-		
+
 		# define a Handler which writes INFO messages or higher to the sys.stderr
 		console = logging.StreamHandler()
 		console.setLevel(logging.INFO)
@@ -55,7 +55,7 @@ def InitialiseLog(newFileName):
 		console.setFormatter(formatter)
 		# add the handler to the root logger
 		logging.getLogger('').addHandler(console)
-		
+
 		LogInfo("Logger Initialised {}".format(newFileName))
 
 g_LogGUI_Initialised = False
@@ -65,22 +65,22 @@ def InitialiseGUILog():
 	if not g_LogGUI_Initialised:
 		g_LogGUI_Initialised = True
 	g_LogGUI = ''
-		
+
 def LogDebug(msg):
 	if g_LogGUI_Initialised:
 		g_LogGUI
 	else:
 		logging.debug(msg)
-	
+
 def LogInfo(msg):
 	logging.info(msg)
-	
+
 def LogWarn(msg):
 	logging.warning(msg)
 
 def LogError(msg):
 	logging.error(msg)
-	
+
 def OldRemoveTree(tree):
 	success = False
 	for i in range(0,3):
@@ -118,6 +118,18 @@ def RemoveTree(tree):
 		LogWarn("RemoveTree({}) not successful".format(tree))
 	return success
 
+def RenameFile(source_filename, destination_filename):
+	success = False
+	for i in range(0,3):
+		LogDebug("Rename File <" + source_filename + "> to <" + destination_filename + ">")
+		try:
+			os.rename(source_filename, destination_filename)
+			success = True
+			break
+		except Exception:
+			pass
+	return success
+
 def RemoveFile(filename):
 	success = False
 	for i in range(0,3):
@@ -133,7 +145,7 @@ def RemoveFile(filename):
 def CreateTarget(target):
 	LogInfo("CreateTarget({})".format(target))
 	empty_path = GetEmptyPath()
-	
+
 	commandLine = ["ROBOCOPY", empty_path, target, "/MIR", "/XF", ".gitignore"]
 	RunCommandLine(commandLine, True)
 
@@ -143,8 +155,8 @@ def CopyOriginToTarget(origin, target):
 
 	commandLine = ["ROBOCOPY", origin, target, "/MIR"]
 	RunCommandLine(commandLine, True)
-	
-	
+
+
 def GetScriptPath():
 	script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 	return script_path
@@ -163,39 +175,39 @@ def GetUtilitiesPath():
 	toolkit_path = GetToolKitPath()
 	utilities_path = os.path.join(toolkit_path, "Utilities")
 	return utilities_path
-	
+
 def HasSDK():
 	# NvnTools\NvnTexpkg.exe
 	toolkit_path = GetToolKitPath()
 	sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
-	return os.path.exists(sdk_path)		
-	
+	return os.path.exists(sdk_path)
+
 def HasArchive():
 	# Utilities\Archive.exe
 	utilities_path = GetUtilitiesPath()
 	archive_path = os.path.join(utilities_path, "Archive.exe")
-	return os.path.exists(archive_path)		
-		
+	return os.path.exists(archive_path)
+
 def GetNvnTexpkg():
 	toolkit_path = GetToolKitPath()
 	sdk_path = os.path.join(toolkit_path, "NvnTools", "NvnTexpkg.exe")
 	return sdk_path
-	
+
 def HasHavokBPP():
 	# Utilities\HavokBehaviorPostProcess.exe
 	utilities_path = GetUtilitiesPath()
 	havok_path = os.path.join(utilities_path, "HavokBehaviorPostProcess.exe")
 	return os.path.exists(havok_path)
-	
+
 def GetHavokBPP():
 	utilities_path = GetUtilitiesPath()
 	havok_path = os.path.join(utilities_path, "HavokBehaviorPostProcess.exe")
-	return havok_path	
+	return havok_path
 
 def GetXTXExtract():
 	toolkit_path = GetToolKitPath()
 	xtx_extract_path = os.path.join(toolkit_path, "XTX-Extractor-master", "xtx_extract.py")
 	return xtx_extract_path
-	
+
 def ForceMove(fromFile, toFile):
 	shutil.move(fromFile, toFile)

@@ -20,31 +20,32 @@ def XWM2WAV(filename_xwm, filename_wav):
 
 def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1):
 	with open(filename_wav, "rb") as wav_file:
-		wav_header = wav_file.read(0x17)
-		wav_signature = wav_header[0x08:0x0F].decode()
-		channel_count = wav_header[-1]
+		wav_header = wav_file.read(0x25)
+		wav_format = wav_header[0x08:0x0C].decode()
+		wav_audio_format = int.from_bytes(wav_header[0x14:0x16], byteorder = 'little', signed = False)
+		wav_channel_count = int.from_bytes(wav_header[0x16:0x18], byteorder = 'little', signed = False)
+		wav_bits_per_sample = int.from_bytes(wav_header[0x22:0x24], byteorder = 'little', signed = False)
 
 	# checking for collateral case where Mod Authors save XWM with WAV filepath_without_extension
-	if wav_signature == "XWMAfmt":
+	if wav_format == "XWMA":
 		util.LogDebug("<{}> has WAV extension but is a XWMA. Fixing.".format(filename_wav))
 		filename_temp = filename_wav + ".TEMP"
 		util.RenameFile(filename_wav, filename_temp)
 		XWM2WAV(filename_temp, filename_wav)
 		util.RemoveFile(filename_temp)
 
-	# only create DSP if a valid WAVE format is found
-	if wav_signature == "WAVEfmt":
+	# only create DSP if a VGAudioCli compatible WAVE format is found
+	if wav_format == "WAVE" and wav_audio_format == 1 and (wav_bits_per_sample == 8 or wav_bits_per_sample == 16):
 		VGAudioCli = GetVGAudioCli()
 		commandLine = [VGAudioCli, "-i:0", filename_wav, filename_dsp0]
 		util.RunCommandLine(commandLine)
-		if channel_count > 1:
+		if wav_channel_count > 1:
 			commandLine = [VGAudioCli, "-i:1", filename_wav, filename_dsp1]
 			util.RunCommandLine(commandLine)
-			channel_count = 2
+			wav_channel_count = 2
+		return wav_channel_count
 	else:
-		channel_count = -1
-
-	return channel_count
+		return -1 if wav_format != "WAVE" else -2 if wav_audio_format != 1 else -3
 
 def ConvertDSP(dsp_data, base):
 	dsp_data[base+0x00:base+0x19:4], dsp_data[base+0x01:base+0x1A:4], dsp_data[base+0x02:base+0x1B:4], dsp_data[base+0x03:base+0x1C:4] = \
@@ -142,6 +143,14 @@ def ConvertSound_Internal(filepath_without_extension):
 		else:
 			with open(filename_mcadpcm, "wb") as mcadpcm_file:
 				DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, mcadpcm_file)
+	else:
+		reason = "Unknown format" if channels == -1 else "Unkonwn audio format" if channels == -2 else "Not 8 or 16 bits per sample"
+		if has_fuz:
+			util.LogInfo("Warning, {}, cannot convert sound {}".format(reason, filename_fuz))
+		elif has_xwm:
+			util.LogInfo("Warning, {}, cannot convert sound {}".format(reason, filename_xwm))
+		else:
+			util.LogInfo("Warning, {}, cannot convert sound {}".format(reason, filename_wav))
 
 	# clean up temporary files
 	util.RemoveFile(filename_wav)

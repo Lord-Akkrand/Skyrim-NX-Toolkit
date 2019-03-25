@@ -29,7 +29,7 @@ def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1):
 
 	# checking for a collateral case where Mod Authors save XWM with WAV extension
 	if wav_format == "XWMA":
-		util.LogDebug("<{}> has WAV extension but is a XWMA. Fixing.".format(filename_wav))
+		util.LogInfo("Warning, <{}> has WAV extension but is a XWMA. Fixing.".format(filename_wav))
 		filename_temp = filename_wav + ".TEMP"
 		util.RenameFile(filename_wav, filename_temp)
 		XWM2WAV(filename_temp, filename_wav)
@@ -37,6 +37,7 @@ def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1):
 
 	# make the WAV file compatible with VGAudioCLi
 	if wav_audio_format != 1 or not (wav_bits_per_sample == 8 or wav_bits_per_sample == 16):
+		util.LogInfo("Warning, <{}> isn't compatible with VGAudioCLi. Fixing.".format(filename_wav))
 		wav_data, wav_samplerate = soundfile.read(filename_wav)
 		soundfile.write(filename_wav, wav_data, wav_samplerate, subtype='PCM_16')
 

@@ -182,7 +182,7 @@ def LoadOrder(origin, target, loadOrderName):
 					InsertTestFile(file, filename)
 				elif re.match(".*Textures[0-9]?.bsa$", file):
 					InsertLanguageBSA(file, filename)
-				elif re.match(".*Voices.[0-9]?.bsa$", file):
+				elif re.match(".*Voices[0-9]?.bsa$", file):
 				elif file.endswith("Animations.bsa"):
 					InsertInMemoryBSA(file, filename)
 				elif file.endswith(".bsa"):

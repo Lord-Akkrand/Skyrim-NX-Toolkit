@@ -48,20 +48,23 @@ def UnpackMod(origin, target):
 				FilesToCopy.append( (filename, newFileName) )
 				
 	util.LogInfo("Found {} BSAs & {} loose files".format(len(BSAsToUnpack), len(FilesToCopy)))
+	for bsaToUnpack in BSAsToUnpack:
+		(file, filename) = bsaToUnpack
+		UnpackBSA(file, filename)		
+	
+	clobbered = 0
 	for i in range(len(FilesToCopy)):
 		fileToCopy = FilesToCopy[i]
 		(filename, newFileName) = fileToCopy
 		folderName = os.path.dirname(newFileName)
 		util.LogDebug("Copying {}->{}, makedirs {}".format(filename, newFileName, folderName))
 		os.makedirs(folderName, exist_ok=True)
+		if os.path.exists(newFileName):
+			clobbered = clobbered + 1
 		shutil.copy2(filename, newFileName)
-		sys.stdout.write("Copied {}/{} \r".format(i+1, len(FilesToCopy)))
+		sys.stdout.write("Copied {}/{} ({})\r".format(i+1, len(FilesToCopy), clobbered))
 		sys.stdout.flush()
 	sys.stdout.write("\n")
-			
-	for bsaToUnpack in BSAsToUnpack:
-		(file, filename) = bsaToUnpack
-		UnpackBSA(file, filename)		
 		
 def UnpackMod_External(origin, target):
 	util.InitialiseLog(origin + ".log")

@@ -102,6 +102,13 @@ def LoadOrder(origin, target, loadOrderName):
 		newResourceArchiveList2 += ", " + name
 		util.LogDebug(newResourceArchiveList2)
 		CopyFile(file, filename)
+		
+	def InsertVoiceBSA(name, filename):
+		nonlocal resourceArchiveList2Additions, newResourceArchiveList2
+		resourceArchiveList2Additions += ", " + name
+		newResourceArchiveList2 += ", " + name
+		util.LogDebug(newResourceArchiveList2)
+		CopyFile(file, filename)
 
 	newResourceArchiveList = sResourceArchiveList
 	def InsertMainBSA(name, filename):
@@ -183,6 +190,7 @@ def LoadOrder(origin, target, loadOrderName):
 				elif re.match(".*Textures[0-9]?.bsa$", file):
 					InsertLanguageBSA(file, filename)
 				elif re.match(".*Voices[0-9]?.bsa$", file):
+					InsertVoiceBSA(file, filename)
 				elif file.endswith("Animations.bsa"):
 					InsertInMemoryBSA(file, filename)
 				elif file.endswith(".bsa"):

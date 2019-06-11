@@ -5,6 +5,8 @@ CALL :convertMod
 CALL :loadOrder
 CALL :packMod
 CALL :unpackMod
+CALL :unitTest1
+CALL :unitTest2
 
 GOTO :EOF
 
@@ -31,4 +33,12 @@ EXIT /B
 PUSHD "Examples\Unpack Mod"
 CALL PY_TEST_UNPACK_MOD.BAT
 POPD
+EXIT /B
+
+:unitTest1
+CALL PY_CONVERT_MOD.BAT "Unit Test 1"
+EXIT /B
+
+:unitTest2
+CALL PY_CONVERT_MOD.BAT "Unit Test 2"
 EXIT /B

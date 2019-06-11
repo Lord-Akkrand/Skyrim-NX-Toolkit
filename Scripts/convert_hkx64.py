@@ -32,7 +32,7 @@ def ConvertHKX64_Internal(filename):
 
 	# it should not happen here as convert_path already doing some checks
 	if is_behavior_container or is_skeleton_container:
-		util.LogInfo("Warning, cannot convert {} because <{}>".format(filename, 'SSE hkx animation')
+		util.LogInfo("Warning, cannot convert {} because <{}>".format(filename, 'SSE hkx animation'))
 		return False
 
 	# swap some fields in the AMD64 HKX header structure to make it PS4 compatible

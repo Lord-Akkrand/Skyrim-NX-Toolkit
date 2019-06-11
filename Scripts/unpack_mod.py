@@ -37,15 +37,16 @@ def UnpackMod(origin, target):
 		for file in files:
 			util.LogDebug("   Found <" + file + ">")
 			filename = os.path.join(root, file)
-			if file.endswith(".bsa"):
-				BSAsToUnpack.append( (file, filename) )
-			elif file.endswith(".esp") or file.endswith(".ini") or file.endswith(".esm"):
-				newFileName = os.path.join(target, file)
-				FilesToCopy.append( (filename, newFileName) )
-			else:
-				relativePath = root.replace(origin, target)
-				newFileName = os.path.join(relativePath, file)
-				FilesToCopy.append( (filename, newFileName) )
+			if not "desktop.ini" in file:
+				if file.endswith(".bsa"):
+					BSAsToUnpack.append( (file, filename) )
+				elif file.endswith(".esp") or file.endswith(".ini") or file.endswith(".esm"):
+					newFileName = os.path.join(target, file)
+					FilesToCopy.append( (filename, newFileName) )
+				else:
+					relativePath = root.replace(origin, target)
+					newFileName = os.path.join(relativePath, file)
+					FilesToCopy.append( (filename, newFileName) )
 				
 	util.LogInfo("Found {} BSAs & {} loose files".format(len(BSAsToUnpack), len(FilesToCopy)))
 	for bsaToUnpack in BSAsToUnpack:
@@ -61,6 +62,8 @@ def UnpackMod(origin, target):
 		os.makedirs(folderName, exist_ok=True)
 		if os.path.exists(newFileName):
 			clobbered = clobbered + 1
+			sys.stdout.write("Clobbering <{}>\n\n".format(newFileName))
+			util.LogWarn("Clobbering <{}>\n\n".format(newFileName))
 		shutil.copy2(filename, newFileName)
 		sys.stdout.write("Copied {}/{} ({})\r".format(i+1, len(FilesToCopy), clobbered))
 		sys.stdout.flush()

@@ -235,8 +235,9 @@ def PackMod(mod_name, target):
 		util.LogDebug("Cleanup {}".format(folder))
 		util.RemoveTree(folder)
 	
-	MoveFromTo = []
 	def CleanPluginSpecificPaths(cleanup_directory):
+		MoveFromTo = []
+		DeleteUnmatched = []
 		for root, subdirs, files in os.walk(cleanup_directory):
 			directory = root.lower()
 			dir_name = os.path.basename(directory)
@@ -251,7 +252,8 @@ def PackMod(mod_name, target):
 						util.LogDebug("Move plugin files from directory {} to {}".format(directory, new_path))
 						MoveFromTo.append( (directory, new_path) )
 				else:
-					util.LogWarn("There's a plugin-like path <{}> in your data, but no ESP matching it or listing it as a merge parent".format(dir_name))
+					util.LogWarn("Marking <{}> for deletion.".format(dir_name))
+					DeleteUnmatched.append(directory)
 
 		for moveFromTo in MoveFromTo:
 			(move_from, move_to) = moveFromTo
@@ -266,6 +268,10 @@ def PackMod(mod_name, target):
 					new_directory = os.path.dirname(new_path)
 					os.makedirs(new_directory, exist_ok=True)
 					shutil.move(file_path, new_path)
+		for deleteDirectory in DeleteUnmatched:
+			util.LogDebug("Deleting <{}>".format(deleteDirectory))
+			util.RemoveTree(deleteDirectory)
+			util.LogDebug("Deleted <{}>".format(deleteDirectory))
 					
 	util.LogDebug("Build BSAs")
 	bsaList = []

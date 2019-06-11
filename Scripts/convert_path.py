@@ -58,12 +58,12 @@ def ConvertPath(mod_name, target):
 					elif hkxChecked == check_hkx.PC_XML:
 						ConvertListHKX.append(file_path)
 					elif hkxChecked == check_hkx.PC_64:
-						if root.lower().find("behaviors") > 0 or filename.lower().find("skeleton") > 0:
-							if 'HKX' not in WarnConversion:
-								WarnConversion['HKX'] = []
-							WarnConversion['HKX'].append( (filename, "SSE hkx animation") )
-						else:
-							ConvertListHKX64.append(file_path)
+						# if root.lower().find("behaviors") > 0 or filename.lower().find("skeleton") > 0:
+						# 	if 'HKX' not in WarnConversion:
+						# 		WarnConversion['HKX'] = []
+						# 	WarnConversion['HKX'].append( (filename, "SSE hkx animation") )
+						# else:
+						ConvertListHKX64.append(file_path)
 					elif hkxChecked == check_hkx.NX_64:
 						if 'HKX' not in NoConversion:
 							NoConversion['HKX'] = 0

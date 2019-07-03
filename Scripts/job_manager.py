@@ -60,8 +60,6 @@ class Job():
 			newProcess.join()
 			retVal = return_dict.values()
 
-			retVal = False
-	
 		if not validMultiprocessor:
 			retVal = self.m_Func(*self.m_Args)
 		

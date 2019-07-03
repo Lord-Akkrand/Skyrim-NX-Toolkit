@@ -187,9 +187,9 @@ def LoadOrder(origin, target, loadOrderName):
 				filename = os.path.join(pluginFolder, file)
 				if file.endswith(".esm") or file.endswith(".esp"):
 					InsertTestFile(file, filename)
-				elif re.match(".*Textures[0-9]?.bsa$", file):
+				elif re.match(".*Textures[0-9]*.bsa$", file):
 					InsertLanguageBSA(file, filename)
-				elif re.match(".*Voices[0-9]?.bsa$", file):
+				elif re.match(".*Voices[0-9]*.bsa$", file):
 					InsertVoiceBSA(file, filename)
 				elif file.endswith("Animations.bsa"):
 					InsertInMemoryBSA(file, filename)

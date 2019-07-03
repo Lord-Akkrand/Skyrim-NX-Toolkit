@@ -22,7 +22,11 @@ def ConvertHKX_Internal(filename):
 
 def ConvertHKX(target, filename):
 	return ConvertHKX_Internal(filename)
-	
+
+def ConvertHKXAsync(target, filename, ret):
+	retVal = ConvertHKX(target, filename)
+	ret[retVal] = retVal
+
 if __name__ == '__main__':
 	filename = sys.argv[1]
 	ConvertHKX_Internal(filename)

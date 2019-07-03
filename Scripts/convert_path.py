@@ -113,7 +113,7 @@ def ConvertPath(mod_name, target):
 			sys.stdout.write("\n")
 	'''
 	
-	def LogProgress(convertList, convertFn, name, threadSetting):
+	def LogProgress(convertList, fnName, convertFn, name, threadSetting):
 		if len(convertList) > 0:
 			failedCount = 0
 			maxThreads = toolkit_config.get_int_setting("Performance", threadSetting)
@@ -134,18 +134,18 @@ def ConvertPath(mod_name, target):
 				
 			for i in range(len(convertList)):
 				file_path = convertList[i]
-				job = job_manager.Job(cb, convertFn, target.lower(), file_path.lower())
+				job = job_manager.Job(cb, fnName, convertFn, target.lower(), file_path.lower())
 				jm.AddJob(job)
 			jm.ProcessBatch()
 			
 			sys.stdout.write("\n")
 			
-	LogProgress(ConvertListDDS, convert_dds.ConvertDDS, "DDS", "MaxTextureThreads")
+	LogProgress(ConvertListDDS, "ConvertDDS", convert_dds.ConvertDDS, "DDS", "MaxTextureThreads")
 	if has_havoc:
-		LogProgress(ConvertListHKX, convert_hkx.ConvertHKX, "HKX 32-bit", "MaxAnimationThreads")
-	LogProgress(ConvertListHKX64, convert_hkx64.ConvertHKX64, "HKX 64-bit", "MaxAnimationThreads")
-	LogProgress(ConvertListTXT, convert_txt.ConvertTXT, "TXT", "MaxOtherThreads")
-	LogProgress(ConvertListSound, convert_sound.ConvertSound, "Sounds", "MaxSoundThreads")
+		LogProgress(ConvertListHKX, "ConvertHKX", convert_hkx.ConvertHKX, "HKX 32-bit", "MaxAnimationThreads")
+	LogProgress(ConvertListHKX64, "ConvertHKX64", convert_hkx64.ConvertHKX64, "HKX 64-bit", "MaxAnimationThreads")
+	LogProgress(ConvertListTXT, "ConvertTXT", convert_txt.ConvertTXT, "TXT", "MaxOtherThreads")
+	LogProgress(ConvertListSound, "ConvertSound", convert_sound.ConvertSound, "Sounds", "MaxSoundThreads")
 
 def ConvertPath_External(mod_name, target):
 	util.InitialiseLog(target + ".log")

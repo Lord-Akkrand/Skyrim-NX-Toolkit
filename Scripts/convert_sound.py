@@ -101,7 +101,11 @@ def ConvertSound_Internal(filepath):
 	
 def ConvertSound(target, filepath):
 	return ConvertSound_Internal(filepath)
-	
+
+def ConvertSoundAsync(target, filename, ret):
+	retVal = ConvertSound(target, filename)
+	ret[retVal] = retVal
+
 if __name__ == '__main__':
 	filepath = sys.argv[1]
 	util.InitialiseLog(filepath + ".log")

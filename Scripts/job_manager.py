@@ -3,11 +3,16 @@
 import threading
 import util
 import toolkit_config
+import multiprocessing
+
+import convert_dds, convert_hkx, convert_hkx64, convert_txt
+import convert_sound_zappa as convert_sound
 
 class Job():
-	def __init__(self, cb, func, *args):
+	def __init__(self, cb, funcName, func, *args):
 		self.m_Callback = cb
 		self.m_Func = func
+		self.m_FuncName = funcName
 		self.m_Args = args
 		
 	def SetFunc(self, func, *args):
@@ -25,7 +30,41 @@ class Job():
 		return not isAlive
 	
 	def Run(self):
-		retVal = self.m_Func(*self.m_Args)
+		retVal = True
+		
+		manager = multiprocessing.Manager()
+		return_dict = manager.dict()
+
+		validMultiprocessor = True
+		
+		if self.m_FuncName == "ConvertDDS":
+			basePath, fileName = (self.m_Args)
+			newProcess = multiprocessing.Process(target=convert_dds.ConvertDDSAsync, args=(basePath, fileName, return_dict))
+		elif self.m_FuncName == "ConvertHKX":
+			basePath, fileName = (self.m_Args)
+			newProcess = multiprocessing.Process(target=convert_hkx.ConvertHKXAsync, args=(basePath, fileName, return_dict))
+		elif self.m_FuncName == "ConvertHKX64":
+			basePath, fileName = (self.m_Args)
+			newProcess = multiprocessing.Process(target=convert_hkx64.ConvertHKX64Async, args=(basePath, fileName, return_dict))
+		elif self.m_FuncName == "ConvertTXT":
+			basePath, fileName = (self.m_Args)
+			newProcess = multiprocessing.Process(target=convert_txt.ConvertTXTAsync, args=(basePath, fileName, return_dict))
+		elif self.m_FuncName == "ConvertSound":
+			basePath, fileName = (self.m_Args)
+			newProcess = multiprocessing.Process(target=convert_sound.ConvertSoundAsync, args=(basePath, fileName, return_dict))
+		else:
+			validMultiprocessor = False
+
+		if validMultiprocessor:
+			newProcess.start()
+			newProcess.join()
+			retVal = return_dict.values()
+
+			retVal = False
+	
+		if not validMultiprocessor:
+			retVal = self.m_Func(*self.m_Args)
+		
 		self.m_Callback and self.m_Callback(retVal)
 
 class JobManager:

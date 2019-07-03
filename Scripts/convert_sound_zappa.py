@@ -159,6 +159,10 @@ def ConvertSound_Internal(filepath_without_extension):
 def ConvertSound(target, filepath_without_extension):
 	return ConvertSound_Internal(filepath_without_extension)
 
+def ConvertSoundAsync(target, filename, ret):
+	retVal = ConvertSound(target, filename)
+	ret[retVal] = retVal
+
 if __name__ == '__main__':
 	import sys
 	filepath = sys.argv[1]

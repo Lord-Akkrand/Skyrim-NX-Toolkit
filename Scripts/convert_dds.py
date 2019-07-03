@@ -249,7 +249,10 @@ def ConvertDDS(basePath, ddsFileName):
 			return True
 		util.LogDebug("Error During Conversion of {}".format(ddsFileName))
 		return False
-
+def ConvertDDSAsync(basePath, ddsFileName, ret):
+	retVal = ConvertDDS(basePath, ddsFileName)
+	ret[retVal] = retVal
+	
 if __name__ == '__main__':
 	basePath = sys.argv[1]
 	ddsFileName = sys.argv[2]

@@ -26,7 +26,11 @@ def ConvertTXT_Internal(filename):
 
 def ConvertTXT(target, filename):
 	return ConvertTXT_Internal(filename)
-	
+
+def ConvertTXTAsync(target, filename, ret):
+	retVal = ConvertTXT(target, filename)
+	ret[retVal] = retVal
+
 if __name__ == '__main__':
 	filename = sys.argv[1]
 	util.InitialiseLog(filename + ".log")

@@ -131,14 +131,17 @@ def ConvertPath(mod_name, target):
 					failedCount += 1
 				sys.stdout.write("{} Processed {}/{} ({}/{}) success/failure. \r".format(name, processedCount, totalCount, convertedCount, failedCount))
 				sys.stdout.flush()
-				
 			for i in range(len(convertList)):
 				file_path = convertList[i]
 				job = job_manager.Job(cb, fnName, convertFn, target.lower(), file_path.lower())
 				jm.AddJob(job)
+
 			jm.ProcessBatch()
-			
+			sys.stdout.write("{} Processing Complete: {}/{} ({}/{}) success/failure. \r".format(name, processedCount, totalCount, convertedCount, failedCount))
 			sys.stdout.write("\n")
+			if processedCount != totalCount:
+				sys.stdout.write("Not all were processed.\n")
+			sys.stdout.flush()
 			
 	LogProgress(ConvertListDDS, "ConvertDDS", convert_dds.ConvertDDS, "DDS", "MaxTextureThreads")
 	if has_havoc:

@@ -37,28 +37,32 @@ class Job():
 
 		validMultiprocessor = True
 		
-		if self.m_FuncName == "ConvertDDS":
-			basePath, fileName = (self.m_Args)
-			newProcess = multiprocessing.Process(target=convert_dds.ConvertDDSAsync, args=(basePath, fileName, return_dict))
-		elif self.m_FuncName == "ConvertHKX":
-			basePath, fileName = (self.m_Args)
-			newProcess = multiprocessing.Process(target=convert_hkx.ConvertHKXAsync, args=(basePath, fileName, return_dict))
-		elif self.m_FuncName == "ConvertHKX64":
-			basePath, fileName = (self.m_Args)
-			newProcess = multiprocessing.Process(target=convert_hkx64.ConvertHKX64Async, args=(basePath, fileName, return_dict))
-		elif self.m_FuncName == "ConvertTXT":
-			basePath, fileName = (self.m_Args)
-			newProcess = multiprocessing.Process(target=convert_txt.ConvertTXTAsync, args=(basePath, fileName, return_dict))
-		elif self.m_FuncName == "ConvertSound":
-			basePath, fileName = (self.m_Args)
-			newProcess = multiprocessing.Process(target=convert_sound.ConvertSoundAsync, args=(basePath, fileName, return_dict))
+		useMultiprocessor = toolkit_config.get_bool_setting("Performance", "Multiprocessing")
+		if useMultiprocessor:
+			if self.m_FuncName == "ConvertDDS":
+				basePath, fileName = (self.m_Args)
+				newProcess = multiprocessing.Process(target=convert_dds.ConvertDDSAsync, args=(basePath, fileName, return_dict))
+			elif self.m_FuncName == "ConvertHKX":
+				basePath, fileName = (self.m_Args)
+				newProcess = multiprocessing.Process(target=convert_hkx.ConvertHKXAsync, args=(basePath, fileName, return_dict))
+			elif self.m_FuncName == "ConvertHKX64":
+				basePath, fileName = (self.m_Args)
+				newProcess = multiprocessing.Process(target=convert_hkx64.ConvertHKX64Async, args=(basePath, fileName, return_dict))
+			elif self.m_FuncName == "ConvertTXT":
+				basePath, fileName = (self.m_Args)
+				newProcess = multiprocessing.Process(target=convert_txt.ConvertTXTAsync, args=(basePath, fileName, return_dict))
+			elif self.m_FuncName == "ConvertSound":
+				basePath, fileName = (self.m_Args)
+				newProcess = multiprocessing.Process(target=convert_sound.ConvertSoundAsync, args=(basePath, fileName, return_dict))
+			else:
+				validMultiprocessor = False
+
+			if validMultiprocessor:
+				newProcess.start()
+				newProcess.join()
+				retVal = return_dict["retVal"]
 		else:
 			validMultiprocessor = False
-
-		if validMultiprocessor:
-			newProcess.start()
-			newProcess.join()
-			retVal = return_dict["retVal"]
 
 		if not validMultiprocessor:
 			retVal = self.m_Func(*self.m_Args)

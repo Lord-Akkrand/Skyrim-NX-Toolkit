@@ -58,7 +58,7 @@ class Job():
 		if validMultiprocessor:
 			newProcess.start()
 			newProcess.join()
-			retVal = return_dict.values()
+			retVal = return_dict["retVal"]
 
 		if not validMultiprocessor:
 			retVal = self.m_Func(*self.m_Args)

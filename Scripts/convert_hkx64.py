@@ -54,7 +54,7 @@ def ConvertHKX64(target, filename):
 	
 def ConvertHKX64Async(target, filename, ret):
 	retVal = ConvertHKX64(target, filename)
-	ret[retVal] = retVal
+	ret["retVal"] = retVal
 
 if __name__ == '__main__':
 	filename = sys.argv[1]

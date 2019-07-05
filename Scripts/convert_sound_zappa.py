@@ -161,7 +161,7 @@ def ConvertSound(target, filepath_without_extension):
 
 def ConvertSoundAsync(target, filename, ret):
 	retVal = ConvertSound(target, filename)
-	ret[retVal] = retVal
+	ret["retVal"] = retVal
 
 if __name__ == '__main__':
 	import sys

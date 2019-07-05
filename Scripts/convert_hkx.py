@@ -25,7 +25,7 @@ def ConvertHKX(target, filename):
 
 def ConvertHKXAsync(target, filename, ret):
 	retVal = ConvertHKX(target, filename)
-	ret[retVal] = retVal
+	ret["retVal"] = retVal
 
 if __name__ == '__main__':
 	filename = sys.argv[1]

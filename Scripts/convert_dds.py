@@ -222,7 +222,7 @@ def ConvertDDS(basePath, ddsFileName):
 		(output, err) = util.RunCommandLine(commandLine)
 	else:
 		util.LogDebug("TexConv will not run")
-		
+
 	util.LogDebug("Now for NX texture conversion")
 	if hasSDK:
 		nvntexpkg = util.GetNvnTexpkg()
@@ -251,8 +251,8 @@ def ConvertDDS(basePath, ddsFileName):
 		return False
 def ConvertDDSAsync(basePath, ddsFileName, ret):
 	retVal = ConvertDDS(basePath, ddsFileName)
-	ret[retVal] = retVal
-	
+	ret["retVal"] = retVal
+
 if __name__ == '__main__':
 	basePath = sys.argv[1]
 	ddsFileName = sys.argv[2]

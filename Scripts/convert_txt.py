@@ -29,7 +29,7 @@ def ConvertTXT(target, filename):
 
 def ConvertTXTAsync(target, filename, ret):
 	retVal = ConvertTXT(target, filename)
-	ret[retVal] = retVal
+	ret["retVal"] = retVal
 
 if __name__ == '__main__':
 	filename = sys.argv[1]

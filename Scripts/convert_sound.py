@@ -104,7 +104,7 @@ def ConvertSound(target, filepath):
 
 def ConvertSoundAsync(target, filename, ret):
 	retVal = ConvertSound(target, filename)
-	ret[retVal] = retVal
+	ret["retVal"] = retVal
 
 if __name__ == '__main__':
 	filepath = sys.argv[1]

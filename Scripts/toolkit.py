@@ -1,11 +1,14 @@
 #! python3
 
 import sys
+import multiprocessing
 import gui
 import util, download_file, unzip_file
 import convert_mod, convert_path, load_order, pack_mod, packed_load_order, repack_mod, unpack_mod
 	
 if __name__ == '__main__':
+	multiprocessing.freeze_support()
+
 	py_script = sys.argv[1]
 	print("Skyrim-NX-Toolkit {}, sys.argv <{}>".format(util.GetToolkitVersion(), str(sys.argv)))
 	if py_script == 'gui':

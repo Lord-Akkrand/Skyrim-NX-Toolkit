@@ -75,9 +75,6 @@ BaseRules.append({"Name":"FaceTint", 'Path':[r'\bfacetint\b'], 'Size':512*512})
 Rules['Base'] = BaseRules
 # If you come across a texture that is the following type, convert it to the other type
 
-PreResizeStep = []
-PreResizeStep.append(('DX10',DXT5))
-
 ConvertFromTo = []
 ConvertFromTo.append(('DX10',DXT5))
 ConvertFromTo.append(('BGRA',RGBA))
@@ -87,4 +84,5 @@ ConvertFromTo.append(('BC3_UNORM_SRGB',DXT5))
 ConvertFromToSDK = []
 ConvertFromToSDK.append(('R8UN',DXT1))
 ConvertFromToSDK.append(('BC3_UNORM_SRGB',DX10))
+ConvertFromToSDK.append(('DX10',DXT5))
 

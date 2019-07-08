@@ -57,7 +57,7 @@ import xtx_extract
 
 import subprocess
 
-def ConvertDDS(basePath, ddsFileName, opt_InRecursion=False):
+def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 	relativeFilename = ddsFileName.replace(basePath, '')
 	ddsFilePath = os.path.dirname(ddsFileName)
 	hasSDK = util.HasSDK()
@@ -199,7 +199,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=False):
 		commandLine += [ddsFileName]
 		commandLine += ["-o", ddsFilePath]
 		(output, err) = util.RunCommandLine(commandLine)
-		util.LogDebug("Done a pre-resize conversion, coming back in here for a 2nd pass")
+		util.LogDebug("Done a pre-resize conversion, coming back in here for pass " + str(opt_InRecursion + 1))
 		#return True
 		return ConvertDDS(basePath, ddsFileName, opt_InRecursion + 1)
 

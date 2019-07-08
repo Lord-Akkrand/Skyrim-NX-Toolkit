@@ -54,34 +54,29 @@ Formats.append(R8UN)
 Formats.append(DX10)
 Formats.append(DX10_SRGB)
 
-Rules = []
+Rules = {}
 
 # As an example, the dragon skeleton textures are 2048^2 on Switch, and stored in /actors/dragon/dragonskeleton.dds
 # There can be gaps in it - for example, the following would also match /actors/dragon/something/dragonskeleton.dds
 # But all elements must be in the order specified
-Rules.append({"Name":"ExampleDragon", 'Path':[r'\bactors\b', r'\bdragon\b', 'dragonskeleton.dds'], 'Size':2048*2048})
 
-Rules.append({"Name":"WeaponDiffuse", 'Path':[r'\bweapons\b'], 'Size':1024*1024})
-Rules.append({"Name":"WeaponNormalMap", 'Path':[r'\bweapons\b', r'[.]*_n\.dds'], 'Size':1024*1024})
-Rules.append({"Name":"WeaponSpecularMap", 'Path':[r'\bweapons\b', r'[.]*_m\.dds'], 'Size':512*512})
-Rules.append({"Name":"WeaponGlowMap", 'Path':[r'\bweapons\b', r'[.]*_g\.dds'], 'Size':512*512, 'Format':DXT1})
+#Rules.append({"Name":"ExampleDragon", 'Path':[r'\bactors\b', r'\bdragon\b', 'dragonskeleton.dds'], 'Size':2048*2048})
 
-Rules.append({"Name":"ArmorDiffuse", 'Path':[r'\barmor\b'], 'Size':1024*1024})
-Rules.append({"Name":"ArmorNormalMap", 'Path':[r'\barmor\b', r'[.]*_n\.dds'], 'Size':1024*1024})
-Rules.append({"Name":"ArmorSpecularMap", 'Path':[r'\barmor\b', r'[.]*_m\.dds'], 'Size':512*512})
-Rules.append({"Name":"ArmorGlowMap", 'Path':[r'\barmor\b', r'[.]*_g\.dds'], 'Size':512*512, 'Format':DXT1})
+BaseRules = []
 
-# CBBE requires quite hi-res textures in order to look good.  The body textures are all in actors/character/*
-Rules.append({"Name":"ActorCharacter", 'Path':[r'\bactors\b', r'\bcharacter\b'], 'Size':2048*2048})
-Rules.append({"Name":"ActorModelSpaceNormal", 'Path':[r'\bactors\b', r'\bcharacter\b', r'[.]*_msn\.dds'], 'Size':1024*1024})
+# UNP/CBBE requires quite hi-res textures in order to look good.  The body textures are all in actors/character/*
+BaseRules.append({"Name":"ActorCharacter", 'Path':[r'\bactors\b', r'\bcharacter\b'], 'Size':2048*2048})
+BaseRules.append({"Name":"ActorModelSpaceNormal", 'Path':[r'\bactors\b', r'\bcharacter\b', r'[.]*_msn\.dds'], 'Size':1024*1024})
 
 # no tintmasks or facetint from SkyrimNX are bigger than this
-Rules.append({"Name":"TintMasks", 'Path':[r'\btintmasks\b'], 'Size':512*512})
-Rules.append({"Name":"FaceTint", 'Path':[r'\bfacetint\b'], 'Size':512*512})
+BaseRules.append({"Name":"TintMasks", 'Path':[r'\btintmasks\b'], 'Size':512*512})
+BaseRules.append({"Name":"FaceTint", 'Path':[r'\bfacetint\b'], 'Size':512*512})
 
-#Rules.append({"Name":"ActorToneMap", 'Path':[r'\bactors\b', r'\bcharacter\b', r'[.]*_sk\.dds'], 'Size':2048*2048})
-
+Rules['Base'] = BaseRules
 # If you come across a texture that is the following type, convert it to the other type
+
+PreResizeStep = []
+PreResizeStep.append(('DX10',DXT5))
 
 ConvertFromTo = []
 ConvertFromTo.append(('DX10',DXT5))

@@ -48,6 +48,7 @@ Example RGBA from texdiag:
 import sys
 import re
 import os.path
+import math
 import sizes
 import util
 import shutil
@@ -56,7 +57,7 @@ import xtx_extract
 
 import subprocess
 
-def ConvertDDS(basePath, ddsFileName):
+def ConvertDDS(basePath, ddsFileName, opt_InRecursion=False):
 	relativeFilename = ddsFileName.replace(basePath, '')
 	ddsFilePath = os.path.dirname(ddsFileName)
 	hasSDK = util.HasSDK()
@@ -131,7 +132,9 @@ def ConvertDDS(basePath, ddsFileName):
 	forceFormat = None
 	shouldRun = False
 	util.LogDebug('File is ' + relativeFilename)
-	for rule in sizes.Rules:
+	ruleSet = sizes.Rules['Base']
+
+	for rule in ruleSet:
 		rulePath = rule['Path']
 		pathStart = rulePath[0]
 		match = False
@@ -173,7 +176,6 @@ def ConvertDDS(basePath, ddsFileName):
 						
 				break
 
-
 	convertTable = None
 	if hasSDK:
 		convertTable = sizes.ConvertFromToSDK
@@ -187,40 +189,75 @@ def ConvertDDS(basePath, ddsFileName):
 			forceFormat = conv[1][1]
 			util.LogDebug('Match.  Force convert to ' + forceFormat)
 			break
-	
-	shouldRun = shouldRun or linearSize > maxSize
-	shouldRun = shouldRun or (forceFormat != None)
-	if shouldRun:
-		resizePercentage = 1
-		newLinearSize = linearSize
-		newWidth = width
-		newHeight = height
-		newMipmaps = mipmaps
-		while newLinearSize > maxSize:
-			resizePercentage *= 0.5
-			newWidth = int(width * resizePercentage)
-			newHeight = int(height * resizePercentage)
-			newLinearSize = newWidth * newHeight
-			newMipmaps -= 1
-			util.LogDebug('Resizing ' + str(resizePercentage) + ' results in ' + str(newWidth) + 'x' + str(newHeight))
+
+	if forceFormat!= None:
+		if opt_InRecursion > 5:
+			util.LogError("Infinite Recursion???")
+			return False
 		texconv = os.path.join(utilities_path, "texconv.exe")
-		commandLine = [texconv, "-pow2", "-fl", "9.3", "-y"]
-		if newWidth < width:
-			commandLine += ["-w", str(newWidth)]
-		if newHeight < height:
-			commandLine += ["-h", str(newHeight)]
-		if newMipmaps < mipmaps:
-			commandLine += ["-m", str(newMipmaps)]
-		
-		if forceFormat != None:
-			commandLine += ["-f", forceFormat]
-		
+		commandLine = [texconv, "-y", "-f", conv[1][1]]
 		commandLine += [ddsFileName]
 		commandLine += ["-o", ddsFilePath]
 		(output, err) = util.RunCommandLine(commandLine)
-	else:
-		util.LogDebug("TexConv will not run")
+		util.LogDebug("Done a pre-resize conversion, coming back in here for a 2nd pass")
+		#return True
+		return ConvertDDS(basePath, ddsFileName, opt_InRecursion + 1)
 
+	adp_dds = os.path.join(utilities_path, "AdPDDS.exe")
+	
+	if os.path.exists(adp_dds):
+		adp_config = 101552000100
+		maxSizeSingle = math.sqrt(maxSize)
+		util.LogDebug('adPDDS.exe exists.  MaxSingleSize is ' + str(maxSizeSingle))
+		if maxSizeSingle >= 2048:
+			adp_config += 50
+		elif maxSizeSingle >= 1024:
+			adp_config += 40
+		elif maxSizeSingle >= 512:
+			adp_config += 30
+		elif maxSizeSingle >= 256:
+			adp_config += 20
+		else:
+			adp_config += 10
+		commandLine = [adp_dds, str(adp_config), ddsFileName]
+		(output, err) = util.RunCommandLine(commandLine)
+	else:
+		shouldRun = shouldRun or linearSize > maxSize
+		shouldRun = shouldRun or (forceFormat != None)
+		if shouldRun:
+			resizePercentage = 1
+			newLinearSize = linearSize
+			newWidth = width
+			newHeight = height
+			newMipmaps = mipmaps
+			while newLinearSize > maxSize:
+				resizePercentage *= 0.5
+				newWidth = int(width * resizePercentage)
+				newHeight = int(height * resizePercentage)
+				newLinearSize = newWidth * newHeight
+				newMipmaps -= 1
+				util.LogDebug('Resizing ' + str(resizePercentage) + ' results in ' + str(newWidth) + 'x' + str(newHeight))
+			texconv = os.path.join(utilities_path, "texconv.exe")
+			commandLine = [texconv, "-pow2", "-fl", "9.3", "-y"]
+			if newWidth < width:
+				commandLine += ["-w", str(newWidth)]
+			if newHeight < height:
+				commandLine += ["-h", str(newHeight)]
+			if newMipmaps < mipmaps:
+				commandLine += ["-m", str(newMipmaps)]
+			
+			if forceFormat != None:
+				commandLine += ["-f", forceFormat]
+			
+			commandLine += [ddsFileName]
+			commandLine += ["-o", ddsFilePath]
+			(output, err) = util.RunCommandLine(commandLine)
+		else:
+			util.LogDebug("TexConv will not run")
+	doNXConversion = True
+	if not doNXConversion:
+		util.LogDebug("Debug passing on NX texture conversion")
+		return True
 	util.LogDebug("Now for NX texture conversion")
 	if hasSDK:
 		nvntexpkg = util.GetNvnTexpkg()
@@ -237,14 +274,17 @@ def ConvertDDS(basePath, ddsFileName):
 	else:
 		out_filename = ddsFileName + "out.xtx"
 		out_file = os.path.join(ddsFilePath, out_filename)
-		xtx_extract.main_external(["-o", out_file, ddsFileName])
-		#commandLine = ["py", "-3", xtx_extract, ddsFileName]
-		#util.RunCommandLine(commandLine)
-		
-		#out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
-		if os.path.exists(out_file):
-			util.ForceMove(out_file, ddsFileName)
-			return True
+		try:
+			xtx_extract.main_external(["-o", out_file, ddsFileName])
+			#commandLine = ["py", "-3", xtx_extract, ddsFileName]
+			#util.RunCommandLine(commandLine)
+			
+			#out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
+			if os.path.exists(out_file):
+				util.ForceMove(out_file, ddsFileName)
+				return True
+		except:
+			pass
 	util.LogError("Error During Conversion of {}".format(ddsFileName))
 	return False
 def ConvertDDSAsync(basePath, ddsFileName, logname, ret):

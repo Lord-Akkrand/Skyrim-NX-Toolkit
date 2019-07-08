@@ -15,6 +15,7 @@ There are several external tools that are used by my scripts to get things done.
   <https://github.com/aboood40091/XTX-Extractor>
 - `nx_fuz.py` was written by Zappastuff <https://github.com/thywoof>
 - `convert_hkx64.py` was written by Zappastuff <https://github.com/thywoof>
+- `AdPDDS.exe` was created by apipino on Nexus <https://www.nexusmods.com/skyrim/users/1522687> and is distributed as a part of his texture opimizer `Ordenador` <https://www.nexusmods.com/skyrim/mods/12801/>
 
 There are further external tools that the toolkit will attempt to download if you don't have them in the `Utilities` directory, or that you must source yourself.
 These tools are:

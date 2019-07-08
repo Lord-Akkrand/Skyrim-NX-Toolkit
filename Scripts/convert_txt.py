@@ -27,7 +27,8 @@ def ConvertTXT_Internal(filename):
 def ConvertTXT(target, filename):
 	return ConvertTXT_Internal(filename)
 
-def ConvertTXTAsync(target, filename, ret):
+def ConvertTXTAsync(target, filename, logname, ret):
+	util.InitialiseMPLog(logname)
 	retVal = ConvertTXT(target, filename)
 	ret["retVal"] = retVal
 

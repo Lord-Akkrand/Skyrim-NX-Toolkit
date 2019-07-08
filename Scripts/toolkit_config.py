@@ -63,8 +63,6 @@ def get_setting(section, setting):
 		util.LogInfo("Added default setting {}/{} as {}".format(section, setting, value))
 		update_setting(section, setting, str(value))
 		
-	util.LogDebug("{section} {setting} is {value}".format(
-		section=section, setting=setting, value=value))
 	return value
 
 def get_int_setting(section, setting):

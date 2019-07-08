@@ -52,7 +52,8 @@ def ConvertHKX64_Internal(filename):
 def ConvertHKX64(target, filename):
 	return ConvertHKX64_Internal(filename)
 	
-def ConvertHKX64Async(target, filename, ret):
+def ConvertHKX64Async(target, filename, logname, ret):
+	util.InitialiseMPLog(logname)
 	retVal = ConvertHKX64(target, filename)
 	ret["retVal"] = retVal
 

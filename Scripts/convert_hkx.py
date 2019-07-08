@@ -23,7 +23,8 @@ def ConvertHKX_Internal(filename):
 def ConvertHKX(target, filename):
 	return ConvertHKX_Internal(filename)
 
-def ConvertHKXAsync(target, filename, ret):
+def ConvertHKXAsync(target, filename, logname, ret):
+	util.InitialiseMPLog(logname)
 	retVal = ConvertHKX(target, filename)
 	ret["retVal"] = retVal
 

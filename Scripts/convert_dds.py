@@ -214,8 +214,6 @@ def ConvertDDS(basePath, ddsFileName):
 		
 		if forceFormat != None:
 			commandLine += ["-f", forceFormat]
-		elif fourCC == "DX10" and not hasSDK:
-			commandLine += ["-f", BC3_UNORM]
 		
 		commandLine += [ddsFileName]
 		commandLine += ["-o", ddsFilePath]
@@ -234,8 +232,8 @@ def ConvertDDS(basePath, ddsFileName):
 		#if "Everything went OK" in convOutput:
 		if os.path.exists(out_file):
 			util.ForceMove(out_file, ddsFileName)
+			util.LogDebug("Error During Conversion of {}".format(ddsFileName))
 			return True
-		return False
 	else:
 		out_filename = ddsFileName + "out.xtx"
 		out_file = os.path.join(ddsFilePath, out_filename)
@@ -247,10 +245,12 @@ def ConvertDDS(basePath, ddsFileName):
 		if os.path.exists(out_file):
 			util.ForceMove(out_file, ddsFileName)
 			return True
-		util.LogDebug("Error During Conversion of {}".format(ddsFileName))
-		return False
-def ConvertDDSAsync(basePath, ddsFileName, ret):
+	util.LogError("Error During Conversion of {}".format(ddsFileName))
+	return False
+def ConvertDDSAsync(basePath, ddsFileName, logname, ret):
+	util.InitialiseMPLog(logname)
 	retVal = ConvertDDS(basePath, ddsFileName)
+	util.LogDebug("retVal for {} was <{}>".format(ddsFileName, str(retVal)))
 	ret["retVal"] = retVal
 
 if __name__ == '__main__':

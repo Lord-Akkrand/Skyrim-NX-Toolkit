@@ -159,7 +159,8 @@ def ConvertSound_Internal(filepath_without_extension):
 def ConvertSound(target, filepath_without_extension):
 	return ConvertSound_Internal(filepath_without_extension)
 
-def ConvertSoundAsync(target, filename, ret):
+def ConvertSoundAsync(target, filename, logname, ret):
+	util.InitialiseMPLog(logname)
 	retVal = ConvertSound(target, filename)
 	ret["retVal"] = retVal
 

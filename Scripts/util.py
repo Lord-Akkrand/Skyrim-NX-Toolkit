@@ -36,10 +36,12 @@ def RunCommandLine(commandLine, useShell=False):
 	return (output, err)
 
 g_loggingInitialised = False
+g_logname = ''
 def InitialiseLog(newFileName):
-	global g_loggingInitialised
+	global g_loggingInitialised, g_logname
 	if not g_loggingInitialised:
 		g_loggingInitialised = True
+		g_logname = newFileName
 		with open(newFileName, "w") as myfile:
 			myfile.write("")
 
@@ -57,6 +59,26 @@ def InitialiseLog(newFileName):
 		logging.getLogger('').addHandler(console)
 
 		LogInfo("Logger Initialised {}".format(newFileName))
+
+def GetLogName():
+	global g_logname
+	return g_logname
+
+def InitialiseMPLog(newFileName):
+	global g_loggingInitialised
+	if not g_loggingInitialised:
+		g_loggingInitialised = True
+		logging.basicConfig(format='%(message)s', filename=newFileName, level=logging.DEBUG)
+		logger = logging.getLogger(__name__)
+		# define a Handler which writes INFO messages or higher to the sys.stderr
+		console = logging.StreamHandler()
+		console.setLevel(logging.INFO)
+		# set a format which is simpler for console use
+		formatter = logging.Formatter('%(message)s')
+		# tell the handler to use this format
+		console.setFormatter(formatter)
+		# add the handler to the root logger
+		logging.getLogger('').addHandler(console)
 
 g_LogGUI_Initialised = False
 g_LogGUI = ''

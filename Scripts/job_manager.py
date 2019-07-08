@@ -41,26 +41,30 @@ class Job():
 		if useMultiprocessor:
 			if self.m_FuncName == "ConvertDDS":
 				basePath, fileName = (self.m_Args)
-				newProcess = multiprocessing.Process(target=convert_dds.ConvertDDSAsync, args=(basePath, fileName, return_dict))
+				newProcess = multiprocessing.Process(target=convert_dds.ConvertDDSAsync, args=(basePath, fileName, util.GetLogName(), return_dict))
 			elif self.m_FuncName == "ConvertHKX":
 				basePath, fileName = (self.m_Args)
-				newProcess = multiprocessing.Process(target=convert_hkx.ConvertHKXAsync, args=(basePath, fileName, return_dict))
+				newProcess = multiprocessing.Process(target=convert_hkx.ConvertHKXAsync, args=(basePath, fileName, util.GetLogName(), return_dict))
 			elif self.m_FuncName == "ConvertHKX64":
 				basePath, fileName = (self.m_Args)
-				newProcess = multiprocessing.Process(target=convert_hkx64.ConvertHKX64Async, args=(basePath, fileName, return_dict))
+				newProcess = multiprocessing.Process(target=convert_hkx64.ConvertHKX64Async, args=(basePath, fileName, util.GetLogName(), return_dict))
 			elif self.m_FuncName == "ConvertTXT":
 				basePath, fileName = (self.m_Args)
-				newProcess = multiprocessing.Process(target=convert_txt.ConvertTXTAsync, args=(basePath, fileName, return_dict))
+				newProcess = multiprocessing.Process(target=convert_txt.ConvertTXTAsync, args=(basePath, fileName, util.GetLogName(), return_dict))
 			elif self.m_FuncName == "ConvertSound":
 				basePath, fileName = (self.m_Args)
-				newProcess = multiprocessing.Process(target=convert_sound.ConvertSoundAsync, args=(basePath, fileName, return_dict))
+				newProcess = multiprocessing.Process(target=convert_sound.ConvertSoundAsync, args=(basePath, fileName, util.GetLogName(), return_dict))
 			else:
 				validMultiprocessor = False
 
 			if validMultiprocessor:
 				newProcess.start()
 				newProcess.join()
-				retVal = return_dict["retVal"]
+				if "retVal" in return_dict:
+					retVal = return_dict["retVal"]
+				else:
+					basePath, fileName = (self.m_Args)
+					util.LogError("Error with retVal from {} {}".format(basePath, fileName))
 		else:
 			validMultiprocessor = False
 

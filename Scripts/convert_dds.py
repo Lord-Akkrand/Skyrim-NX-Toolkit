@@ -132,7 +132,12 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 	forceFormat = None
 	shouldRun = False
 	util.LogDebug('File is ' + relativeFilename)
-	ruleSet = sizes.Rules['Base']
+	size_rules = toolkit_config.get_setting("Textures", "SizeRules")
+	ruleSet = None
+	if size_rules in sizes.Rules:
+		ruleSet = sizes.Rules[size_rules]
+	else:
+		ruleSet = sizes.Rules['Base']
 
 	for rule in ruleSet:
 		rulePath = rule['Path']

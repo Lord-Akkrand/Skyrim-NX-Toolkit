@@ -64,13 +64,10 @@ Rules = {}
 
 BaseRules = []
 
+# Some landscapes large meshes look all kinds of wrong with small textures stretched over them.
+BaseRules.append({"Name":"Landscape", 'Path':[r'\blandscape\b'], 'Size':1024*1024})
 # UNP/CBBE requires quite hi-res textures in order to look good.  The body textures are all in actors/character/*
-BaseRules.append({"Name":"ActorCharacter", 'Path':[r'\bactors\b', r'\bcharacter\b'], 'Size':2048*2048})
-BaseRules.append({"Name":"ActorModelSpaceNormal", 'Path':[r'\bactors\b', r'\bcharacter\b', r'[.]*_msn\.dds'], 'Size':1024*1024})
-
-# no tintmasks or facetint from SkyrimNX are bigger than this
-BaseRules.append({"Name":"TintMasks", 'Path':[r'\btintmasks\b'], 'Size':512*512})
-BaseRules.append({"Name":"FaceTint", 'Path':[r'\bfacetint\b'], 'Size':512*512})
+BaseRules.append({"Name":"Actors", 'Path':[r'\bactors\b'], 'Size':2048*2048})
 
 Rules['Base'] = BaseRules
 # If you come across a texture that is the following type, convert it to the other type
@@ -78,7 +75,6 @@ Rules['Base'] = BaseRules
 ConvertFromTo = []
 ConvertFromTo.append(('DX10',DXT5))
 ConvertFromTo.append(('BGRA',RGBA))
-ConvertFromTo.append(('DX10',DXT5))
 ConvertFromTo.append(('BC3_UNORM_SRGB',DXT5))
 
 ConvertFromToSDK = []

@@ -16,13 +16,14 @@ DefaultValues = {
 		"MaxAnimationThreads" : 5,
 		"MaxSoundThreads" : 10,
 		"MaxOtherThreads" : 5,
-		"Multiprocessing" : True
+		"Multiprocessing" : False
 	},
 	"BSA":{
 		"FullRules" : False
 	},
 	"Textures":{
-	"DefaultSizeLimit" : 2048*2048
+	"DefaultSizeLimit" : 512*512,
+	"SizeRules" : "Base"
 	}
 }
 

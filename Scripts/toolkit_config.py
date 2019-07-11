@@ -14,7 +14,7 @@ DefaultValues = {
 	"Performance":{
 		"MaxTextureThreads" : 5,
 		"MaxAnimationThreads" : 5,
-		"MaxSoundThreads" : 10,
+		"MaxSoundThreads" : 5,
 		"MaxOtherThreads" : 5,
 		"Multiprocessing" : False
 	},
@@ -24,6 +24,9 @@ DefaultValues = {
 	"Textures":{
 	"DefaultSizeLimit" : 512*512,
 	"SizeRules" : "Base"
+	},
+	"Version":{
+	"ToolkitVersion" : util.GetToolkitVersion(),
 	}
 }
 
@@ -49,8 +52,30 @@ def get_config():
  
 	config = configparser.ConfigParser()
 	config.read(path)
- 
-	return config
+
+	return config	
+
+def check_clear():
+	config = get_config()
+	util.LogInfo("Checking if settings.ini should be updated.")
+	clearOldConfig = False
+	currentVersion = util.GetToolkitVersion()
+	try:
+		settingsVersion = config.get("Version", "ToolkitVersion")
+		util.LogInfo("Version:ToolkitVersion is {}.  Currrent Version is {}".format(settingsVersion, currentVersion))
+		if settingsVersion != currentVersion:
+			util.LogInfo("Not a match.  Clearing settings.ini")
+			clearOldConfig = True
+	except:
+		util.LogInfo("Version:ToolkitVersion was not found.  Clearing settings.ini")
+		clearOldConfig = True
+	if clearOldConfig:
+		util.LogInfo("Clearing settings.ini")
+		
+		toolkit_path = util.GetToolKitPath()
+		path = os.path.join(toolkit_path, "settings.ini")
+		create_config(path)
+		config.read(path)
 	
 def get_setting(section, setting):
 	"""

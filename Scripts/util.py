@@ -37,8 +37,9 @@ def RunCommandLine(commandLine, useShell=False):
 
 g_loggingInitialised = False
 g_logname = ''
+g_tempLog = []
 def InitialiseLog(newFileName):
-	global g_loggingInitialised, g_logname
+	global g_loggingInitialised, g_logname, g_tempLog
 	if not g_loggingInitialised:
 		g_loggingInitialised = True
 		g_logname = newFileName
@@ -59,6 +60,8 @@ def InitialiseLog(newFileName):
 		logging.getLogger('').addHandler(console)
 
 		LogInfo("Logger Initialised {}".format(newFileName))
+		for msg in g_tempLog:
+			LogInfo(msg)
 
 def GetLogName():
 	global g_logname
@@ -89,19 +92,36 @@ def InitialiseGUILog():
 	g_LogGUI = ''
 
 def LogDebug(msg):
+	global g_loggingInitialised, g_tempLog
 	if g_LogGUI_Initialised:
 		g_LogGUI
 	else:
-		logging.debug(msg)
+		if g_loggingInitialised:
+			logging.debug(msg)
+		else:
+			g_tempLog.append("[Debug]" + msg)
 
 def LogInfo(msg):
-	logging.info(msg)
+	global g_loggingInitialised, g_tempLog
+	if g_loggingInitialised:
+		logging.info(msg)
+	else:
+		g_tempLog.append('Info' + msg)
 
 def LogWarn(msg):
-	logging.warning(msg)
+	global g_loggingInitialised, g_tempLog
+	if g_loggingInitialised:
+		logging.warning(msg)
+	else:
+		g_tempLog.append('Warn' + msg)
+	
 
 def LogError(msg):
-	logging.error(msg)
+	global g_loggingInitialised, g_tempLog
+	if g_loggingInitialised:
+		logging.error(msg)
+	else:
+		g_tempLog.append('Error' + msg)
 
 def OldRemoveTree(tree):
 	success = False

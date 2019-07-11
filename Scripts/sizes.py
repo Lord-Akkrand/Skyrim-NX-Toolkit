@@ -64,9 +64,8 @@ Rules = {}
 
 BaseRules = []
 
-# Some landscapes large meshes look all kinds of wrong with small textures stretched over them.
+BaseRules.append({"Name":"Architecture", 'Path':[r'\barchitecture\b'], 'Size':1024*1024})
 BaseRules.append({"Name":"Landscape", 'Path':[r'\blandscape\b'], 'Size':1024*1024})
-# UNP/CBBE requires quite hi-res textures in order to look good.  The body textures are all in actors/character/*
 BaseRules.append({"Name":"Actors", 'Path':[r'\bactors\b'], 'Size':2048*2048})
 
 Rules['Base'] = BaseRules

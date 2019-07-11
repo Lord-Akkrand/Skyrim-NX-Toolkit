@@ -36,7 +36,7 @@ def LoadOrder(origin, target, loadOrderName):
 
 	languageInis = {}
 	for file in os.listdir(pristineFolder):
-		if file.endswith(".ini") and file != "Skyrim.ini" and file != "desktop.ini":
+		if file.endswith(".ini") and file != "Skyrim.ini" and file != "desktop.ini" and file != "meta.ini":
 			util.LogDebug("Language ini <" + file + ">")
 			languageInis[file] = pristineFolder + "\\" + file
 
@@ -195,7 +195,7 @@ def LoadOrder(origin, target, loadOrderName):
 					InsertInMemoryBSA(file, filename)
 				elif file.endswith(".bsa"):
 					InsertMainBSA(file, filename)
-				elif file.endswith(".ini"):
+				elif file.endswith(".ini") and file != "desktop.ini" and file != "meta.ini":
 					InsertIni(filename)
 				else:
 					if os.path.isdir(filename):

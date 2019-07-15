@@ -23,11 +23,14 @@ DefaultValues = {
 		"FullRules" : False
 	},
 	"Textures":{
-	"DefaultSizeLimit" : 512*512,
+		"DefaultSizeLimit" : 512*512,
 	"SizeRules" : "Base"
 	},
+	"Meshes":{
+		"ConversionMode" : "RemoveMarkers"
+	},
 	"Version":{
-	"ToolkitVersion" : util.GetToolkitVersion(),
+		"ToolkitVersion" : util.GetToolkitVersion(),
 	}
 }
 

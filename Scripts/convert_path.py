@@ -11,7 +11,7 @@ import check_dds, convert_dds
 import check_hkx, convert_hkx, convert_hkx64
 import convert_txt
 import convert_sound_zappa as convert_sound
-
+import convert_nif
 
 import bitflag
 
@@ -32,6 +32,7 @@ def ConvertPath(mod_name, target):
 	ConvertListHKX64 = []
 	ConvertListTXT = []
 	ConvertListSound = []
+	ConvertListMesh = []
 	for root, subdirs, files in os.walk(target):
 		if root != target:
 			util.LogDebug("Walking folder " + root)
@@ -80,6 +81,10 @@ def ConvertPath(mod_name, target):
 					file_path = os.path.join(root, filename[:-4])
 					if not file_path in ConvertListSound:
 						ConvertListSound.append(file_path)
+				elif filename.lower().endswith(".nif"):
+					file_path = os.path.join(root, filename[:-4])
+					if not file_path in ConvertListMesh:
+						ConvertListMesh.append(file_path)
 
 	for fileType in NoConversion:
 		util.LogInfo("Found {} {} files that are already in NX format".format(NoConversion[fileType], fileType))
@@ -96,7 +101,7 @@ def ConvertPath(mod_name, target):
 	util.LogInfo("Found {} 64-bit hkx files to convert".format(len(ConvertListHKX64)))	
 	util.LogInfo("Found {} txt files to convert".format(len(ConvertListTXT)))
 	util.LogInfo("Found {} sound files to convert".format(len(ConvertListSound)))
-	
+	util.LogInfo("Found {} mesh files to convert".format(len(ConvertListMesh)))
 	
 	
 	'''
@@ -149,6 +154,7 @@ def ConvertPath(mod_name, target):
 	LogProgress(ConvertListHKX64, "ConvertHKX64", convert_hkx64.ConvertHKX64, "HKX 64-bit", "MaxAnimationThreads")
 	LogProgress(ConvertListTXT, "ConvertTXT", convert_txt.ConvertTXT, "TXT", "MaxOtherThreads")
 	LogProgress(ConvertListSound, "ConvertSound", convert_sound.ConvertSound, "Sounds", "MaxSoundThreads")
+	LogProgress(ConvertListMesh, "ConvertMesh", convert_nif.ConvertNIF, "Meshes", "MaxMeshThreads")
 
 def ConvertPath_External(mod_name, target):
 	util.InitialiseLog(target + ".log")

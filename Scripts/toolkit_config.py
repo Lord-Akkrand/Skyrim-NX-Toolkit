@@ -16,6 +16,7 @@ DefaultValues = {
 		"MaxAnimationThreads" : 5,
 		"MaxSoundThreads" : 5,
 		"MaxOtherThreads" : 5,
+		"MaxMeshThreads" : 5, 
 		"Multiprocessing" : False
 	},
 	"BSA":{

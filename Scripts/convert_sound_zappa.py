@@ -45,6 +45,12 @@ def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1):
 	VGAudioCli = GetVGAudioCli()
 	commandLine = [VGAudioCli, "-i:0", filename_wav, filename_dsp0]
 	util.RunCommandLine(commandLine)
+	if not os.path.exists(filename_dsp0):
+		util.LogInfo("Warning, <{}> isn't compatible with VGAudioCLi. Fixing for SushiSquid.".format(filename_wav))
+		wav_data, wav_samplerate = soundfile.read(filename_wav)
+		soundfile.write(filename_wav, wav_data, wav_samplerate, subtype='PCM_16')
+		util.RunCommandLine(commandLine)
+
 	if wav_channel_count > 1:
 		commandLine = [VGAudioCli, "-i:1", filename_wav, filename_dsp1]
 		util.RunCommandLine(commandLine)

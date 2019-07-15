@@ -5,7 +5,7 @@ import util
 import toolkit_config
 import multiprocessing
 
-import convert_dds, convert_hkx, convert_hkx64, convert_txt
+import convert_dds, convert_hkx, convert_hkx64, convert_txt, convert_nif
 import convert_sound_zappa as convert_sound
 
 class Job():
@@ -54,6 +54,9 @@ class Job():
 			elif self.m_FuncName == "ConvertSound":
 				basePath, fileName = (self.m_Args)
 				newProcess = multiprocessing.Process(target=convert_sound.ConvertSoundAsync, args=(basePath, fileName, util.GetLogName(), return_dict))
+			elif self.m_FuncName == "ConvertMesh":
+				basePath, fileName = (self.m_Args)
+				newProcess = multiprocessing.Process(target=convert_nif.ConvertNIFAsync, args=(basePath, fileName, util.GetLogName(), return_dict))
 			else:
 				validMultiprocessor = False
 

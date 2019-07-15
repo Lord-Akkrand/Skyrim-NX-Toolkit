@@ -3,6 +3,7 @@
 import os
 import util
 import sys
+import toolkit_config
 
 def ConvertNIF_Internal(filename):
 	utilities_path = util.GetUtilitiesPath()
@@ -10,7 +11,8 @@ def ConvertNIF_Internal(filename):
 
 	util.LogDebug("ConvertNIF_Internal: " + " " +  filename)
 
-	commandLine = [nswnifopt, "RemoveMarkers", filename]
+	conversionMode = toolkit_config.get_setting("Meshes", "ConversionMode")
+	commandLine = [nswnifopt, conversionMode, filename]
 	util.RunCommandLine(commandLine)
 	
 	return True

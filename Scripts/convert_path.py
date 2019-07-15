@@ -82,9 +82,8 @@ def ConvertPath(mod_name, target):
 					if not file_path in ConvertListSound:
 						ConvertListSound.append(file_path)
 				elif filename.lower().endswith(".nif"):
-					file_path = os.path.join(root, filename[:-4])
-					if not file_path in ConvertListMesh:
-						ConvertListMesh.append(file_path)
+					file_path = os.path.join(root, filename)
+					ConvertListMesh.append(file_path)
 
 	for fileType in NoConversion:
 		util.LogInfo("Found {} {} files that are already in NX format".format(NoConversion[fileType], fileType))

@@ -2,6 +2,7 @@
 
 import os
 import util
+import sys
 
 def ConvertNIF_Internal(filename):
 	utilities_path = util.GetUtilitiesPath()
@@ -9,13 +10,13 @@ def ConvertNIF_Internal(filename):
 
 	util.LogDebug("ConvertNIF_Internal: " + " " +  filename)
 
-	commandLine = [nswnifopt, "RemoveAndOptmize", filename, filename]
-	dds_buffer, dds_err = util.RunCommandLine(commandLine)
-
+	commandLine = [nswnifopt, "RemoveMarkers", filename]
+	util.RunCommandLine(commandLine)
+	
 	return True
 
 def ConvertNIF(target, filename):
-	return ConvertTXT_Internal(filename)
+	return ConvertNIF_Internal(filename)
 
 def ConvertNIFAsync(target, filename, logname, ret):
 	util.InitialiseMPLog(logname)

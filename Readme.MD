@@ -8,12 +8,12 @@ There are several external tools that are used by my scripts to get things done.
   <https://github.com/TES5Edit/TES5Edit/tree/dev/Tools/BSArchive>
 - `Skyim NX Audio-Voice Dialog Converter.exe` was created by SockNastre  
   <https://github.com/SockNastre>  It is included with permission.  
-  `VGAudioCli.exe` is used during processing of SockNastre's audio conversion tool.  
+  `VGAudioCli.exe` is used during processing of Zappastuff audio conversion process.  
   <https://github.com/Thealexbarney/VGAudio>
 - `XTX-Extractor` was created by AboodXD  
   <https://github.com/aboood40091> and is available here  
   <https://github.com/aboood40091/XTX-Extractor>
-- `nx_fuz.py` was written by Zappastuff <https://github.com/thywoof>
+- `convert_sound_zappa.py` was written by Zappastuff <https://github.com/thywoof>
 - `convert_hkx64.py` was written by Zappastuff <https://github.com/thywoof>
 - `AdPDDS.exe` was created by apipino on Nexus <https://www.nexusmods.com/skyrim/users/1522687> and is distributed as a part of his texture opimizer `Ordenador` <https://www.nexusmods.com/skyrim/mods/12801/>
 - `nswnifopt.exe` was written by Zappastuff <https://github.com/thywoof>, it was based on the work of <https://github.com/opparco/nifopt>

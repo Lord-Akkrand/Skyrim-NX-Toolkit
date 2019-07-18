@@ -1,4 +1,4 @@
-![Skyrim NX Toolkit](https://media.discordapp.net/attachments/490595683418636304/497188424273494047/ACH003_big.png)
+![Skyrim NX Toolkit](https://camo.githubusercontent.com/b10a380e93a478c591f32704011f9bd54012d1f3/68747470733a2f2f692e696d6775722e636f6d2f5a4979553079612e706e67)
 
 #### External Tools and Credits
 There are several external tools that are used by my scripts to get things done.  

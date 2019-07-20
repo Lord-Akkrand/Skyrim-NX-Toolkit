@@ -117,12 +117,12 @@ def ConvertSound_Internal(filepath_without_extension):
 	#  - loose LIP files take precedence over FUZ
 	if has_fuz and (lip_size == 0 or not (has_wav or has_xwm)):
 		with open(filename_fuz, "rb") as fuz_file:
-			if lip_size == 0:
-				fuz_file.seek(0x08)
-				lip_size = int.from_bytes(fuz_file.read(0x04), byteorder = 'little', signed = False)
-				lip_data = fuz_file.read(lip_size)
-			else:
-				fuz_file.seek(0x12)
+			# if lip_size == 0:
+			fuz_file.seek(0x08)
+			lip_size = int.from_bytes(fuz_file.read(0x04), byteorder = 'little', signed = False)
+			lip_data = fuz_file.read(lip_size)
+			# else:
+			#	fuz_file.seek(0x12)
 			if not (has_wav or has_xwm):
 				with open(filename_xwm, "wb") as xwm_file:
 					xwm_file.write(fuz_file.read())

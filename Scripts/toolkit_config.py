@@ -27,7 +27,10 @@ DefaultValues = {
 	"SizeRules" : "Base"
 	},
 	"Meshes":{
-		"ConversionMode" : "RemoveMarkers"
+		"RemoveEditorMarker" : True,
+		"PrettySortBlocks": True,
+		"TrimTexturesPath": True,
+		"OptimizeForSSE": False
 	},
 	"Version":{
 		"ToolkitVersion" : util.GetToolkitVersion(),

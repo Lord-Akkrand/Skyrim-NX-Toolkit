@@ -11,8 +11,11 @@ def ConvertNIF_Internal(filename):
 
 	util.LogDebug("ConvertNIF_Internal: " + " " +  filename)
 
-	conversionMode = toolkit_config.get_setting("Meshes", "ConversionMode")
-	commandLine = [nswnifopt, conversionMode, filename]
+	removeEditorMarker = "--remove-editor-marker" if toolkit_config.get_bool_setting("Meshes", "RemoveEditorMarker") else ""
+	prettySortBlocks = "--pretty-sort-blocks" if toolkit_config.get_bool_setting("Meshes", "PrettySortBlocks") else ""
+	trimTexturesPath = "--trim-textures-path" if toolkit_config.get_bool_setting("Meshes", "TrimTexturesPath") else ""
+	optimizeForSSE = "--optimize-for-sse" if toolkit_config.get_bool_setting("Meshes", "OptimizeForSSE") else ""
+	commandLine = [nswnifopt, "-i", filename, "-o", filename, removeEditorMarker, prettySortBlocks, trimTexturesPath, optimizeForSSE]
 	util.RunCommandLine(commandLine)
 	
 	return True

@@ -81,8 +81,9 @@ def BsarchBSA(target_folder, bsa_filename):
 		
 		flags_value = flags.GetValue()
 		flags_hexvalue = hex(flags_value)
-		
-		commandLine = [bsarch, "pack", temp_data, bsa_filename, "-sse", "-af:"+flags_hexvalue]
+		compress = "-z" if flags.IsSet(Flag_Compressed) else ""
+
+		commandLine = [bsarch, "pack", temp_data, bsa_filename, "-sse", compress, "-af:"+flags_hexvalue]
 		util.RunCommandLine(commandLine)
 		
 		bsaFileWritten.append({"Folder":target_folder, "FileName":bsa_filename})
@@ -98,8 +99,9 @@ def BsarchBSA(target_folder, bsa_filename):
 			if "meshes" in lower_case_data_list:
 				util.LogDebug("found meshes")
 				flags.SetFlag(Flag_StartupStr)
+				flags.SetFlag(Flag_Compressed)
 			if "textures" in lower_case_data_list:
-				util.LogDebug("found texttures")
+				util.LogDebug("found textures")
 			if "interface" in lower_case_data_list:
 				util.LogDebug("found interface")
 			if "music" in lower_case_data_list:

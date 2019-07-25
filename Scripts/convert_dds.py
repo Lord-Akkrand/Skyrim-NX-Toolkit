@@ -284,7 +284,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 		#if "Everything went OK" in convOutput:
 		if os.path.exists(out_file):
 			util.ForceMove(out_file, ddsFileName)
-			util.LogDebug("Error During Conversion of {}".format(ddsFileName))
+			util.LogDebug("SDK conversion success for {}".format(ddsFileName))
 			return True
 	else:
 		out_filename = ddsFileName + "out.xtx"
@@ -297,6 +297,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 			#out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
 			if os.path.exists(out_file):
 				util.ForceMove(out_file, ddsFileName)
+				util.LogDebug("XTX conversion success for {}".format(ddsFileName))
 				return True
 		except:
 			pass

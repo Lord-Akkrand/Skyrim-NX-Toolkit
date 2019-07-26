@@ -1,0 +1,1 @@
+@POWERSHELL -NoProfile -ExecutionPolicy ByPass -File test.ps1

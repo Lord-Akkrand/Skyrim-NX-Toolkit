@@ -211,9 +211,18 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 	adp_dds = os.path.join(utilities_path, "AdPDDS.exe")
 	
 	if os.path.exists(adp_dds):
-		adp_config = 101552000100
 		maxSizeSingle = math.sqrt(maxSize)
-		util.LogDebug('adPDDS.exe exists.  MaxSingleSize is ' + str(maxSizeSingle))
+		numberOfRuns = 0
+		currentSingleSize = math.sqrt(linearSize)
+		util.LogDebug('adPDDS.exe exists.  MaxSingleSize is ' + str(maxSizeSingle) + " CurrentSingleSize is " + str(currentSingleSize))
+		while (currentSingleSize > maxSizeSingle):
+			numberOfRuns += 1
+			currentSingleSize *= 0.5
+			util.LogDebug('adPDDS.exe will halve to ' + str(currentSingleSize) + " in run " + str(numberOfRuns))
+		numberOfRuns = max(1, numberOfRuns)
+		util.LogDebug('adPDDS.exe will run a total of ' + str(numberOfRuns) + " times.")
+
+		adp_config = 101552000100
 		if maxSizeSingle >= 2048:
 			adp_config += 50
 		elif maxSizeSingle >= 1024:
@@ -226,16 +235,14 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 			adp_config += 10
 		commandLine = [adp_dds, str(adp_config), ddsFileName]
 		(output, err) = util.RunCommandLine(commandLine)
-		util.LogDebug(output)
 		#subsequent runs, remove the 'Rebuild' mipmaps back to 'Make'
 		adp_config -= 1000000
-		numberExtraRuns = math.ceil(maxSizeSingle / math.sqrt(linearSize)) - 1
+		numberExtraRuns = numberOfRuns - 1
 		if numberExtraRuns > 0:
 			util.LogDebug("Going to run AdpDDS.exe " + str(numberExtraRuns) + " extra times to get the size down")
 			for i in range(numberExtraRuns):
 				commandLine = [adp_dds, str(adp_config), ddsFileName]
 				(output, err) = util.RunCommandLine(commandLine)
-				util.LogDebug(output)
 	else:
 		shouldRun = shouldRun or linearSize > maxSize
 		shouldRun = shouldRun or (forceFormat != None)

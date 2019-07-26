@@ -20,7 +20,7 @@ function Get-Utility([string] $util)
             return $testPath
         }
     } 
-    return False
+    return $False
 }
 
 function Get-RelativeFilename([string] $fullPath)

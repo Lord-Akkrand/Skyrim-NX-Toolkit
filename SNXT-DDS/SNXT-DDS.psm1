@@ -118,7 +118,7 @@ function Compress-DDS([string] $fullpath, [hashtable] $textureInfo, [int] $passN
     {
         $relativeFilename = Get-RelativeFilename $fullpath
         $LogTreeFilename = Get-LogTreeFilename $fullpath
-        Trace-Debug ('Compress-DDS Pass="{0}" RelativeFilename="{2}"' -f $passNumber, $relativeFilename) $LogTreeFilename 1
+        Trace-Debug ('Compress-DDS Pass="{0}" RelativeFilename="{1}"' -f $passNumber, $relativeFilename) $LogTreeFilename 1
     }
     
     Process
@@ -325,12 +325,24 @@ function Convert-DDS([string] $fullpath, [hashtable] $textureInfo)
             {
                 Move-Item -Path $out_filename -Destination $fullpath -Force
             }
-            $retValue.Success = $True
+            $retValue.Success = $outSuccess
             return $retValue
         }
         else
         {
-
+            $out_filename = $fullpath + "out.xtx"
+		    
+            $xtx_extractexe = Get-Utility("xtx_extract.exe")
+			$xtx_extract = [string] (& $xtx_extractexe -o $out_filename $fullpath 2>&1) 
+			$outSuccess = Test-Path -Path $out_filename
+            Trace-Verbose ('xtx_extract Output="{0}"' -f $xtx_extract) $LogTreeFilename
+            Trace-Debug ('Output Success="{0}"' -f $outSuccess) $LogTreeFilename
+		    if ($outSuccess)
+            {
+                Move-Item -Path $out_filename -Destination $fullpath -Force
+            }
+            $retValue.Success = $outSuccess
+            return $retValue
         }
         $retValue.Success = $False
         return $retValue

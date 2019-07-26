@@ -6,31 +6,31 @@ function Unpack-BSAs([string[]] $bsaPaths, [string] $targetPath)
 {
     Begin
     {
-        Trace-Verbose ('Unpack-BSAs Count="{0}" TargetPath="{1}"' -f $bsaPaths.Count, $targetPath) $True $null 1 
+        Trace-Verbose ('Unpack-BSAs Count="{0}" TargetPath="{1}"' -f $bsaPaths.Count, $targetPath) $Global:SNXT.Logfile 1 
         $bsaarchexe = Get-Utility "bsarch.exe"
     }
     
     Process
     {
-        Trace-Debug ('BSAList') $True $null 1
+        Trace-Verbose ('BSAList') $Global:SNXT.Logfile 1
         foreach ($bsaFile in $bsaFiles)
         {
-            Trace-Debug ('Unpack-BSA File="{0}"' -f $bsaFile) $True $null 1
+            Trace-Verbose ('Unpack-BSA File="{0}"' -f $bsaFile) $Global:SNXT.Logfile 1
             $bsarch = [string[]] (& $bsaarchexe unpack $bsaFile $targetPath 2>&1)
             $bsarch = $bsarch -replace '"', "'"
             foreach ($line in $bsarch)
             {
-                Trace-Debug ('bsarch Output="{0}"' -f $line) $True
+                Trace-Verbose ('bsarch Output="{0}"' -f $line) $Global:SNXT.Logfile
             }
 
-            Trace-Debug ('Unpack-BSA' -f $bsaFile) $True $null -1
+            Trace-Verbose ('Unpack-BSA' -f $bsaFile) $Global:SNXT.Logfile -1
         }
-        Trace-Debug ('BSAList') $True $null -1
+        Trace-Verbose ('BSAList') $Global:SNXT.Logfile -1
     }
 
     End
     {
-        Trace-Verbose 'Unpack-BSAs' $True $LogTreeFilename -1
+        Trace-Verbose 'Unpack-BSAs' $Global:SNXT.Logfile -1
     }
 }
 
@@ -38,7 +38,7 @@ function Stash-Loose([string[]] $files, [string[]] $directories, [string] $targe
 {
     Begin
     {
-        Trace-Verbose ('Stash-Loose FileCount="{0}" DirectoryCount="{1}" TargetPath="{2}"' -f $files.Count, $directories.Count, $targetPath) $True $null 1 
+        Trace-Verbose ('Stash-Loose FileCount="{0}" DirectoryCount="{1}" TargetPath="{2}"' -f $files.Count, $directories.Count, $targetPath) $Global:SNXT.Logfile 1 
         $bsaarchexe = Get-Utility "bsarch.exe"
     }
     
@@ -53,15 +53,14 @@ function Stash-Loose([string[]] $files, [string[]] $directories, [string] $targe
             $relativeFilename = Get-RelativeFilename $item
             $target = Join-Path -Path $stashPath -ChildPath $relativeFilename
             $relativeTarget = Get-RelativeFilename $target
-            Trace-Debug ('Stash Origin="{0}" Target="{1}"' -f $relativeFilename, $relativeTarget) $True
+            Trace-Verbose ('Stash Origin="{0}" Target="{1}"' -f $relativeFilename, $relativeTarget) $Global:SNXT.Logfile
             Move-Item -Path $item -Destination $target
         }
-
     }
 
     End
     {
-        Trace-Verbose 'Stash-Loose' $True $LogTreeFilename -1
+        Trace-Verbose 'Stash-Loose' $Global:SNXT.Logfile -1
     }
 }
 
@@ -69,21 +68,21 @@ function Restore-Stash([string] $targetPath)
 {
     Begin
     {
-        Trace-Verbose ('Restore-Stash') $True $null 1 
+        Trace-Verbose ('Restore-Stash') $Global:SNXT.Logfile 1 
     }
     
     Process
     {
         $stashPath = Join-Path -Path $targetPath -ChildPath "LooseStash"
         $originPath = ("{0}{1}*" -f $stashPath, [IO.Path]::DirectorySeparatorChar)
-        Trace-Verbose ('Origin Path="{0}"' -f $originPath) $True
-        Trace-Verbose ('Target Path="{0}"' -f $targetPath) $True
+        Trace-Verbose ('Origin Path="{0}"' -f $originPath) $Global:SNXT.Logfile
+        Trace-Verbose ('Target Path="{0}"' -f $targetPath) $Global:SNXT.Logfile
         $AllTheItems = Get-ChildItem $originPath -Recurse 
         $allTheFiles = $AllTheItems | Where { !($_.PSIsContainer) } | Select-Object -ExpandProperty FullName
         foreach ($file in $allTheFiles)
         {
             $target = $file.Replace($stashPath, $targetPath)
-            Trace-Verbose ('Move Origin="{0}" Target="{1}"' -f (Get-RelativeFilename $file), (Get-RelativeFilename $target)) $True
+            Trace-Verbose ('Move Origin="{0}" Target="{1}"' -f (Get-RelativeFilename $file), (Get-RelativeFilename $target)) $Global:SNXT.Logfile
             Move-Item -Path $file -Destination $target -Force
         }
         Remove-Item $stashPath -Force -Recurse
@@ -91,7 +90,7 @@ function Restore-Stash([string] $targetPath)
 
     End
     {
-        Trace-Verbose 'Restore-Stash' $True $LogTreeFilename -1
+        Trace-Verbose 'Restore-Stash' $Global:SNXT.Logfile -1
     }
 }
 
@@ -99,7 +98,7 @@ function Unpack-Mod([string] $modPath)
 {
     Begin
     {
-        Trace-Verbose ('Unpack-Mod Path="{0}"' -f $modPath) $True $null 1 
+        Trace-Verbose ('Unpack-Mod Path="{0}"' -f $modPath) $Global:SNXT.Logfile 1 
     }
     
     Process
@@ -113,7 +112,7 @@ function Unpack-Mod([string] $modPath)
         
         $bsaFiles = $AllTheFiles | Where { $_.Extension -eq ".bsa" } | Select-Object -ExpandProperty FullName
         $hasBSAs = $bsaFiles.Count -gt 0
-        Trace-Verbose ('HasBSAs Value="{0}"' -f $hasBSAs) $True
+        Trace-Verbose ('HasBSAs Value="{0}"' -f $hasBSAs) $Global:SNXT.Logfile
         if ($hasBSAs)
         {
             Report-Measure { Stash-Loose $looseFiles $looseDirectories $modPath } "Stash-Loose"
@@ -129,7 +128,7 @@ function Unpack-Mod([string] $modPath)
 
     End
     {
-        Trace-Verbose 'Unpack-Mod' $True $null -1
+        Trace-Verbose 'Unpack-Mod' $Global:SNXT.Logfile -1
     }
 }
 

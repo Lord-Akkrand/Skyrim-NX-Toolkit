@@ -18,7 +18,7 @@ Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Util\
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-BSA\SNXT-BSA.psm1") -Force -WarningAction SilentlyContinue
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Job\SNXT-Job.psm1") -Force -WarningAction SilentlyContinue
 
-$UnitTest = "Unit Test 5"
+$UnitTest = "Unit Test 1"
 
 $UnitTests = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Unit Tests"
 $UnitTestPath = Join-Path -Path $UnitTests -ChildPath $UnitTest

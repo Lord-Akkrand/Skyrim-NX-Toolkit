@@ -43,29 +43,13 @@ function Read-DDS([string] $fullpath, [hashtable] $textureInfo)
         $data = Get-Content -Path $fullpath -Encoding Byte -TotalCount 4
         
         Trace-Verbose ('Read MagicBytes="{0}"' -f [string]$data) $LogTreeFilename
-        foreach ($key in $MagicBytes.GetEnumerator()) 
-        {
-            $magic = $key.Value
-            $isType = $True
-            for ($i=0; $i -lt $magic.length; $i++)
-            {
-                $local = $data[$i]
-                $target = $magic[$i]
-                if ($local -ne $target)
-                {
-                    $isType = $False
-                    break
-                }
-            }
-            if ($isType -eq $True -And $key.Key -eq "NX")
-            {
-                $textureInfo.SKU = "NX"
-                Trace-Debug ('Determine TextureSKU="{0}"' -f $textureInfo.SKU) $LogTreeFilename
-                return $textureInfo
-            }
-        }
-        $textureInfo.SKU = "PC"
+        $textureInfo.SKU = "XXX"
+        $textureInfo.SKU = Get-Magic $MagicBytes $data
         Trace-Debug ('Determine TextureSKU="{0}"' -f $textureInfo.SKU) $LogTreeFilename
+        if ($textureInfo.SKU -eq "NX")
+        {
+            return $textureInfo
+        }
     
         $nvddsinfoexe = Get-Utility "nvddsinfo.exe"
 

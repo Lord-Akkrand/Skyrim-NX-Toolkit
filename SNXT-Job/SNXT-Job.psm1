@@ -16,6 +16,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
     $started = 0
     $finished = 0
     $successCount = 0
+    $skippedCount = 0
     $errorCount = 0
     $total = $JobQueue.Count
     $changed = $True
@@ -61,6 +62,10 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
                     {
                         $successCount++
                     }
+                    elseif ($assetReturn.Skipped -eq $True)
+                    {
+                        $skippedCount++
+                    }
                     else
                     {
                         $errorCount++
@@ -100,7 +105,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
         }
         $changed = $False
     }
-    Write-Host ('JobsComplete Job="{0}" Count="{1}" Success="{2}" Errors="{3}"' -f $BatchName, $total, $successCount, $errorCount)
+    Write-Host ('JobsComplete Job="{0}" Count="{1}" Success="{2}" Errors="{3}" Skipped="{4}"' -f $BatchName, $total, $successCount, $errorCount, $skippedCount)
     Trace-Debug 'Submit-JobQueue' $Global:SNXT.Logfile -1
 }
 

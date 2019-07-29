@@ -47,7 +47,7 @@ function Open-LogTree([array] $assets)
     }
 }
 
-$ProcessScriptBlock = {
+$ProcessDDSScriptBlock = {
     param($globals, $jobBatch)
     $Global:SNXT = $globals
 
@@ -74,14 +74,20 @@ $ProcessScriptBlock = {
         # Read the texture information
         $textureRet.Read = Read-DDS $texture $textureInfo 1
 
-        # Change texture format and resize textures
-        $textureRet.Compress = Compress-DDS $texture $textureInfo 1
+        if ($textureInfo.SKU -eq "NX")
+        {
+            $textureRet['Skipped'] = $True
+        }
+        else
+        {
+            # Change texture format and resize textures
+            $textureRet.Compress = Compress-DDS $texture $textureInfo 1
 
-        # Convert DDS to XTX
-        $textureRet.Convert = Convert-DDS $texture $textureInfo
+            # Convert DDS to XTX
+            $textureRet.Convert = Convert-DDS $texture $textureInfo
 
-        $textureRet.Success = $textureRet.Convert.Success
-        
+            $textureRet.Success = $textureRet.Convert.Success
+        }
         $outputHash.Add($texture, $textureRet)
         Trace-Debug ('Process-Texture' -f $relativeFilename) $LogTreeFilename -1
     }
@@ -104,11 +110,17 @@ function Convert-Textures([array] $textures)
         $texturesLength = $textures.length
         $textureNumber = 0
         $batchSize = $Global:SNXT.BatchSize
-        if ($batchSize -le 0)
+        
+        if ($texturesLength -le -$batchSize)
+        {
+            $batchSize = $texturesLength
+        }
+        else
         {
             $batchSize = [int]($texturesLength / (-$batchSize))
         }
         $batchInProgress = [System.Collections.ArrayList]@()
+        $batchCount = 0
         foreach ($texture in $textures)
         {
             # Update Progress Bar
@@ -122,21 +134,140 @@ function Convert-Textures([array] $textures)
                 $jobBatch = [System.Collections.ArrayList]@() + $batchInProgress
                 
                 $task = @{
-                    ScriptBlock = $ProcessScriptBlock
+                    ScriptBlock = $ProcessDDSScriptBlock
                     Arguments = @($Global:SNXT, $jobBatch)
                 }
 
                 $batchInProgress = [System.Collections.ArrayList]@()
                 Add-JobToQueue $task
+                $batchCount += 1
+                Write-Host ('Batch Queued Job="{0}" Assets="{1}"' -f $JobName, $jobBatch.Count)
             }
         }
-        Write-Host ('JobQueued Job="{0}" Count="{1}"' -f $JobName, $textureNumber)
+        Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
         Submit-Jobs "Textures Processing" $JobName $MyProgressId
     }
 
     End
     {
         Trace-Verbose ("Convert-Textures") $Global:SNXT.Logfile -1
+    }
+}
+
+$ProcessHKXScriptBlock = {
+    param($globals, [System.Collections.ArrayList]$jobBatch)
+    $Global:SNXT = $globals
+
+    $VerbosePreference = 'SilentlyContinue'
+    $DebugPreference = 'SilentlyContinue'
+
+    Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath 'SNXT-HKX\SNXT-HKX.psm1') -Force -WarningAction SilentlyContinue
+    Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath 'SNXT-Util\SNXT-Util.psm1') -WarningAction SilentlyContinue
+
+    $VerbosePreference = 'Continue'
+    $DebugPreference = 'Continue'
+    
+    $outputHash = @{}
+    # Read the asset information
+    foreach ($asset in $jobBatch)
+    {
+        $assetInfo = @{}
+        $relativeFilename = Get-RelativeFilename $asset
+        $LogTreeFilename = Get-LogTreeFilename $asset
+
+        Trace-Debug ('Process-HKX RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        
+        $assetRet = @{}
+        # Read the asset information
+        $assetRet.Read = Read-HKX $asset $assetInfo
+
+        if ($assetInfo.Type -eq "NX_64")
+        {
+            # This has already been converted, don't do it again.
+            $assetRet['Skipped'] = $True
+        }
+        else
+        {
+            if ($assetInfo.Type -eq "PC_32" -or $assetInfo.Type -eq "PC_XML")
+            {
+                # Attempt 32-bit conversion
+                $assetRet.Convert = Convert-HKX32 $asset $assetInfo
+            }
+            elseif ($assetInfo.Type -eq "PC_64")
+            {
+                # Attempt 64-bit conversion
+                $assetRet.Convert = Convert-HKX64 $asset $assetInfo
+            }
+
+            $assetRet['Success'] = $assetRet.Convert['Success']
+        }
+       
+        $outputHash.Add($asset, $assetRet)
+        Trace-Debug ('Process-HKX' -f $relativeFilename) $LogTreeFilename -1
+    }
+    return $outputHash
+}
+function Convert-HKXs([array] $assets)
+{
+    Begin
+    {
+        Trace-Verbose ("Convert-HKXs") $Global:SNXT.Logfile 1
+        $MyProgressId = $ProgressId++
+        $JobName = "Convert-HKX"
+    }
+
+    Process
+    {
+        # Progress Bar information
+        $Activity = "Queuing HKX Process"
+        $Task = ""
+        $assetsLength = $assets.length
+        $assetNumber = 0
+        $batchSize = $Global:SNXT.BatchSize
+        if ($batchSize -le 0)
+        {
+            if ($assetsLength -le -$batchSize)
+            {
+                $batchSize = $assetsLength
+            }
+            else
+            {
+                $batchSize = [int]($assetsLength / (-$batchSize))
+            }
+        }
+        $batchInProgress = [System.Collections.ArrayList]@()
+        $batchCount = 0
+        foreach ($asset in $assets)
+        {
+            # Update Progress Bar
+            $filename = Split-Path -Leaf $asset
+            $percentComplete = (++$assetNumber / $assetsLength) * 100
+            Write-Progress -Activity $Activity -Status $filename -Id $MyProgressId -PercentComplete $percentComplete
+
+            $batchInProgress += $asset
+            if ($batchInProgress.Count -ge $batchSize -or $assetNumber -eq $assetsLength)
+            {
+                $jobBatch = [System.Collections.ArrayList]@() + $batchInProgress
+                
+                $task = @{
+                    ScriptBlock = $ProcessHKXScriptBlock
+                    Arguments = @($Global:SNXT, $jobBatch)
+                }
+
+                $batchInProgress = [System.Collections.ArrayList]@()
+                Add-JobToQueue $task
+
+                $batchCount += 1
+                Write-Host ('Batch Queued Job="{0}" Assets="{1}"' -f $JobName, $jobBatch.Count)
+            }
+        }
+        Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
+        Submit-Jobs "HKX Processing" $JobName $MyProgressId
+    }
+
+    End
+    {
+        Trace-Verbose ("Convert-HKXs") $Global:SNXT.Logfile -1
     }
 }
 
@@ -158,10 +289,14 @@ function Convert-Path
 
         # Filter it to all the textures
         $textures = $AllTheFiles | Where-Object { $_.Extension -eq ".dds" } | Select-Object -ExpandProperty FullName
-
-        Report-Measure { Open-LogTree $textures } "Open-LogTreeTime"
+        $hkxs = $AllTheFiles | Where-Object { $_.Extension -eq ".hkx" } | Select-Object -ExpandProperty FullName
+        [array]$allAssets = $textures
+        $allAssets += $hkxs
+        Report-Measure { Open-LogTree $allAssets } "Open-LogTreeTime"
 
         Report-Measure { Convert-Textures $textures } "Convert-TexturesTime"
+
+        Report-Measure { Convert-HKXs $hkxs } "Convert-HKXsTime"
     }
 
     End

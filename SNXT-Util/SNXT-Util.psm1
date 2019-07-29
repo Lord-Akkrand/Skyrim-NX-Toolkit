@@ -48,6 +48,31 @@ function Test-SDK
     return ($sdkPath -ne $False)
 }
 
+function Get-Magic($spellbook, $data)
+{
+    foreach ($key in $spellbook.Keys) 
+    {
+        $magic = $spellbook.$key
+        $isType = $True
+        for ($i=0; $i -lt $magic.length; $i++)
+        {
+            $local = $data[$i]
+            $target = $magic[$i]
+            if ($local -ne $target)
+            {
+                $isType = $False
+                break
+            }
+        }
+        if ($isType -eq $True)
+        {
+            return $key
+        }
+    }
+    
+    return "UNKNOWN"
+}
+
 function Resolve-Message([string] $msg, [string] $level, [int] $opt_Begin)
 {
     #Write-Host ("[{0}] {1}" -f $msg, $opt_Begin)

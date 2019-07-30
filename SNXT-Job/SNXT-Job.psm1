@@ -71,6 +71,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
                         $errorCount++
                     }
                 }
+                Remove-Job -Job $job
                 $jobsToRemove += $jobName
                 $finished++
                 $changed = $True

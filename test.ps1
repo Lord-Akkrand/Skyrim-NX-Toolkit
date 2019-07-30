@@ -12,11 +12,18 @@ Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Util\
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-BSA\SNXT-BSA.psm1") -Force -WarningAction SilentlyContinue
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Job\SNXT-Job.psm1") -Force -WarningAction SilentlyContinue
 
-$UnitTest = "Unit Test 3"
+$UnitTest = "Unit Test NIF"
 
 $UnitTests = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Unit Tests"
 $UnitTestPath = Join-Path -Path $UnitTests -ChildPath $UnitTest
 $Global:SNXT.BasePath = $UnitTestPath + "_Processed"
+
+$Global:SNXT.Settings = @{}
+$Global:SNXT.Settings.Meshes = @{}
+$Global:SNXT.Settings.Meshes.RemoveEditorMarker = $True
+$Global:SNXT.Settings.Meshes.PrettySortBlocks = $True
+$Global:SNXT.Settings.Meshes.TrimTexturesPath = $True
+$Global:SNXT.Settings.Meshes.OptimizeForSSE = $False
 
 $Global:SNXT.Logfile = Join-Path -Path $UnitTests -ChildPath ($UnitTest + ".xml")
 $Global:SNXT.LogBase = Join-Path -Path $Global:SNXT.BasePath -ChildPath "LogTree"

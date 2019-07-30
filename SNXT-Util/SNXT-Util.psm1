@@ -73,6 +73,55 @@ function Get-Magic($spellbook, $data)
     return "UNKNOWN"
 }
 
+function Find-FirstMatch([byte[]] $source, [byte []]$target)
+{
+    $sourceLen = $source.Length
+    $targetLen = $target.Length
+    for ($i=0; $i -lt $sourceLen; $i++)
+    {
+        if ($source[$i] -eq $target[0])
+        {
+            $matchIndex = $i
+            for ($j=1; $j -lt $targetLen; $j++)
+            {
+                $sourceIndex = $i+$j
+                if ($sourceIndex -ge $sourceLen)
+                {
+                    #Write-Host ('Reached sourceIndex {0} at sourceLen {1}' -f $sourceIndex, $sourceLen)
+                    $matchIndex = -1
+                    break
+                }
+                if ($source[$sourceIndex] -ne $target[$j])
+                {
+                    #Write-Host ('source[{0}]{1} ne target[{2}]{3}' -f $sourceIndex, $source[$sourceIndex], $j, $target[$j])
+                    $matchIndex = -1
+                    break
+                }
+            }
+            if ($matchIndex -ge 0)
+            {
+                return $matchIndex
+            }
+        }
+    }
+    return -1
+}
+
+function Slice-ArrayPython([byte []] $data, [int]$startSlice, [int]$endSlice)
+{
+    if ($startSlice -lt 0)
+    {
+        $startSlice = $data.Length + $startSlice + 1
+    }
+    if ($endSlice -lt 0)
+    {
+        $endSlice = $data.Length + $endSlice + 1
+    }
+    #python slicing doesn't include the last entry in a slice
+    $endSlice -= 1
+    return $data[$startSlice..$endSlice]
+}
+
 function Resolve-Message([string] $msg, [string] $level, [int] $opt_Begin)
 {
     #Write-Host ("[{0}] {1}" -f $msg, $opt_Begin)

@@ -4,8 +4,6 @@ Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Util\
 $MagicBytes = @{}
 $MagicBytes.PC_XML = 60, 63, 120, 109, 108 # "<?xml"
 
-
-
 function Read-HKX([string] $fullpath, [hashtable] $info)
 {
     Begin
@@ -94,55 +92,6 @@ function Convert-HKX32([string] $fullpath, [hashtable] $info)
     }
 }
 
-function Find-FirstMatch([byte[]] $source, [byte []]$target)
-{
-    $sourceLen = $source.Length
-    $targetLen = $target.Length
-    for ($i=0; $i -lt $sourceLen; $i++)
-    {
-        if ($source[$i] -eq $target[0])
-        {
-            $matchIndex = $i
-            for ($j=1; $j -lt $targetLen; $j++)
-            {
-                $sourceIndex = $i+$j
-                if ($sourceIndex -ge $sourceLen)
-                {
-                    #Write-Host ('Reached sourceIndex {0} at sourceLen {1}' -f $sourceIndex, $sourceLen)
-                    $matchIndex = -1
-                    break
-                }
-                if ($source[$sourceIndex] -ne $target[$j])
-                {
-                    #Write-Host ('source[{0}]{1} ne target[{2}]{3}' -f $sourceIndex, $source[$sourceIndex], $j, $target[$j])
-                    $matchIndex = -1
-                    break
-                }
-            }
-            if ($matchIndex -ge 0)
-            {
-                return $matchIndex
-            }
-        }
-    }
-    return -1
-}
-
-function Slice-Array([byte []] $data, [int]$startSlice, [int]$endSlice)
-{
-    if ($startSlice -lt 0)
-    {
-        $startSlice = $data.Length + $startSlice + 1
-    }
-    if ($endSlice -lt 0)
-    {
-        $endSlice = $data.Length + $endSlice + 1
-    }
-    #python slicing doesn't include the last entry in a slice
-    $endSlice -= 1
-    return $data[$startSlice..$endSlice]
-}
-
 function Convert-HKX64([string] $fullpath, [hashtable] $info)
 {
     Begin
@@ -201,12 +150,12 @@ function Convert-HKX64([string] $fullpath, [hashtable] $info)
                 $offset = 72
             }
             [byte []] $newPayload = @()
-            $newPayload += Slice-Array $payload 0 18
+            $newPayload += Slice-ArrayPython $payload 0 18
             $newPayload += 0x01
-            $newPayload += Slice-Array $payload 19 ($headerStartIndex+16)
-            $newPayload += Slice-Array $payload ($headerStartIndex+20) ($headerStartIndex+$offset)
-            $newPayload += Slice-Array $payload ($headerStartIndex) ($headerStartIndex+4)
-            $newPayload += Slice-Array $payload ($headerStartIndex+$offset) -1
+            $newPayload += Slice-ArrayPython $payload 19 ($headerStartIndex+16)
+            $newPayload += Slice-ArrayPython $payload ($headerStartIndex+20) ($headerStartIndex+$offset)
+            $newPayload += Slice-ArrayPython $payload ($headerStartIndex) ($headerStartIndex+4)
+            $newPayload += Slice-ArrayPython $payload ($headerStartIndex+$offset) -1
 
             [System.Io.File]::WriteAllBytes( $fullpath, $newPayload )
         }

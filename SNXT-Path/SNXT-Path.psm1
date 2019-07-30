@@ -271,6 +271,104 @@ function Convert-HKXs([array] $assets)
     }
 }
 
+$ProcessNIFScriptBlock = {
+    param($globals, [System.Collections.ArrayList]$jobBatch)
+    $Global:SNXT = $globals
+
+    $VerbosePreference = 'SilentlyContinue'
+    $DebugPreference = 'SilentlyContinue'
+
+    Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath 'SNXT-NIF\SNXT-NIF.psm1') -Force -WarningAction SilentlyContinue
+    Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath 'SNXT-Util\SNXT-Util.psm1') -WarningAction SilentlyContinue
+
+    $VerbosePreference = 'Continue'
+    $DebugPreference = 'Continue'
+    
+    $outputHash = @{}
+    # Read the asset information
+    foreach ($asset in $jobBatch)
+    {
+        $assetInfo = @{}
+        $relativeFilename = Get-RelativeFilename $asset
+        $LogTreeFilename = Get-LogTreeFilename $asset
+
+        Trace-Debug ('Process-NIF RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        
+        $assetRet = @{}
+        # Read the asset information
+        $assetRet.Convert = Convert-NIF $asset $assetInfo
+
+        $assetRet['Success'] = $assetRet.Convert['Success']
+       
+        $outputHash.Add($asset, $assetRet)
+        Trace-Debug ('Process-NIF' -f $relativeFilename) $LogTreeFilename -1
+    }
+    return $outputHash
+}
+function Convert-NIFs([array] $assets)
+{
+    Begin
+    {
+        Trace-Verbose ("Convert-NIFs") $Global:SNXT.Logfile 1
+        $MyProgressId = $ProgressId++
+        $JobName = "Convert-NIF"
+    }
+
+    Process
+    {
+        # Progress Bar information
+        $Activity = "Queuing NIF Process"
+        $Task = ""
+        $assetsLength = $assets.length
+        $assetNumber = 0
+        $batchSize = $Global:SNXT.BatchSize
+        if ($batchSize -le 0)
+        {
+            if ($assetsLength -le -$batchSize)
+            {
+                $batchSize = $assetsLength
+            }
+            else
+            {
+                $batchSize = [int]($assetsLength / (-$batchSize))
+            }
+        }
+        $batchInProgress = [System.Collections.ArrayList]@()
+        $batchCount = 0
+        foreach ($asset in $assets)
+        {
+            # Update Progress Bar
+            $filename = Split-Path -Leaf $asset
+            $percentComplete = (++$assetNumber / $assetsLength) * 100
+            Write-Progress -Activity $Activity -Status $filename -Id $MyProgressId -PercentComplete $percentComplete
+
+            $batchInProgress += $asset
+            if ($batchInProgress.Count -ge $batchSize -or $assetNumber -eq $assetsLength)
+            {
+                $jobBatch = [System.Collections.ArrayList]@() + $batchInProgress
+                
+                $task = @{
+                    ScriptBlock = $ProcessNIFScriptBlock
+                    Arguments = @($Global:SNXT, $jobBatch)
+                }
+
+                $batchInProgress = [System.Collections.ArrayList]@()
+                Add-JobToQueue $task
+
+                $batchCount += 1
+                Write-Host ('Batch Queued Job="{0}" Assets="{1}"' -f $JobName, $jobBatch.Count)
+            }
+        }
+        Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
+        Submit-Jobs "NIF Processing" $JobName $MyProgressId
+    }
+
+    End
+    {
+        Trace-Verbose ("Convert-NIFs") $Global:SNXT.Logfile -1
+    }
+}
+
 function Convert-Path
 {
     Param 
@@ -288,15 +386,21 @@ function Convert-Path
         $AllTheFiles = Get-ChildItem $Global:SNXT.BasePath -Recurse 
 
         # Filter it to all the textures
+        [array]$allAssets = @()
         $textures = $AllTheFiles | Where-Object { $_.Extension -eq ".dds" } | Select-Object -ExpandProperty FullName
+        $allAssets += $textures
         $hkxs = $AllTheFiles | Where-Object { $_.Extension -eq ".hkx" } | Select-Object -ExpandProperty FullName
-        [array]$allAssets = $textures
         $allAssets += $hkxs
+        $nifs = $AllTheFiles | Where-Object { $_.Extension -eq ".nif" } | Select-Object -ExpandProperty FullName
+        $allAssets += $nifs
+        
         Report-Measure { Open-LogTree $allAssets } "Open-LogTreeTime"
 
         Report-Measure { Convert-Textures $textures } "Convert-TexturesTime"
 
         Report-Measure { Convert-HKXs $hkxs } "Convert-HKXsTime"
+
+        Report-Measure { Convert-NIFs $nifs } "Convert-NIFsTime"
     }
 
     End

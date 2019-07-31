@@ -2,7 +2,7 @@
 
 import datetime, inspect, logging, os, subprocess, shutil
 
-g_ToolkitVersion = 'v2.5.1'
+g_ToolkitVersion = 'v2.6.0'
 
 def GetToolkitVersion():
 	return g_ToolkitVersion
@@ -114,7 +114,7 @@ def LogWarn(msg):
 		logging.warning(msg)
 	else:
 		g_tempLog.append('Warn' + msg)
-	
+
 
 def LogError(msg):
 	global g_loggingInitialised, g_tempLog

@@ -44,12 +44,17 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
                     $newAssetLog = ""
                     foreach ($line in $assetLog)
                     {
-                        $addToMainLog = ($line -like "*Debug_*")
-                        $line = $line -replace "SNXTDebug_", "" -replace "SNXTWarning_", "" -replace "SNXTError_", ""
+                        $addToMainLog = ($line -like "*SNXTDebug_*")
+                        $displayToScreen = ($line -like "*SNXTWarning_*")
+                        $line = $line -replace "SNXTDebug_", "" -replace "SNXTWarning_", ""
                         $line += "`n"
-                        if ($addToMainLog)
+                        if ($addToMainLog -or $displayToScreen)
                         {
                             $mainLog += $line 
+                        }
+                        if ($displayToScreen)
+                        {
+                            Write-Host ($line -replace "`n","" -replace "`r", "")
                         }
                         $newAssetLog += $line
                     }

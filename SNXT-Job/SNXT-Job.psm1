@@ -84,7 +84,8 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
 
         $VerbosePreference = 'Continue'
         $DebugPreference = 'Continue'
-        while ($RunningJobs.Count -lt $Global:SNXT.MaxJobs -and $JobQueue.Count -gt 0)
+        
+        while ($RunningJobs.Count -lt $Global:SNXT.Config.Performance.MaxThreads -and $JobQueue.Count -gt 0)
         {
             #Write-Host "Starting job"
             $task = $JobQueue.DeQueue()

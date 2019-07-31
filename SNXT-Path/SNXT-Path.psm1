@@ -48,7 +48,7 @@ function Open-LogTree([array] $assets)
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
-        Trace-Verbose ('Open-LogTree-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Verbose ('Open-LogTree-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Open-LogTree") $Global:SNXT.Logfile -1
     }
 }
@@ -154,7 +154,7 @@ function Convert-Textures([array] $textures)
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
-        Trace-Verbose ('Convert-DDSs-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Verbose ('Convert-DDSs-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Convert-DDS") $Global:SNXT.Logfile -1
     }
 }
@@ -268,7 +268,7 @@ function Convert-HKXs([array] $assets)
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
-        Trace-Verbose ('Convert-HKXs-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Verbose ('Convert-HKXs-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Convert-HKXs") $Global:SNXT.Logfile -1
     }
 }
@@ -363,7 +363,7 @@ function Convert-NIFs([array] $assets)
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
-        Trace-Verbose ('Convert-NIFs-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Verbose ('Convert-NIFs-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Convert-NIFs") $Global:SNXT.Logfile -1
     }
 }

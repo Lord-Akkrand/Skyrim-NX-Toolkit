@@ -11,6 +11,7 @@ function Read-HKX([string] $fullpath, [hashtable] $info)
         $relativeFilename = Get-RelativeFilename $fullpath
         $LogTreeFilename = Get-LogTreeFilename $fullpath
         Trace-Debug ('Read-HKX RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1 
+        $startTime = Get-Date
     }
     
     Process
@@ -53,6 +54,10 @@ function Read-HKX([string] $fullpath, [hashtable] $info)
     End
     {
         Trace-Debug ('Determine HKXType="{0}"' -f $info.Type) $LogTreeFilename
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Read-HKX-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug 'Read-HKX' $LogTreeFilename -1
     }
 }
@@ -65,6 +70,7 @@ function Convert-HKX32([string] $fullpath, [hashtable] $info)
         $relativeFilename = Get-RelativeFilename $fullpath
         $LogTreeFilename = Get-LogTreeFilename $fullpath
         Trace-Debug ('Convert-HKX32 RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        $startTime = Get-Date
     }
     
     Process
@@ -88,6 +94,10 @@ function Convert-HKX32([string] $fullpath, [hashtable] $info)
     
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Convert-HKX32-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug 'Convert-HKX32' $LogTreeFilename -1
     }
 }
@@ -99,6 +109,7 @@ function Convert-HKX64([string] $fullpath, [hashtable] $info)
         $relativeFilename = Get-RelativeFilename $fullpath
         $LogTreeFilename = Get-LogTreeFilename $fullpath
         Trace-Debug ('Convert-HKX64 RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        $startTime = Get-Date
     }
     
     
@@ -165,6 +176,10 @@ function Convert-HKX64([string] $fullpath, [hashtable] $info)
     
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Convert-HKX64-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug 'Convert-HKX64' $LogTreeFilename -1
     }
 }

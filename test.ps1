@@ -12,7 +12,7 @@ Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Util\
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-BSA\SNXT-BSA.psm1") -Force -WarningAction SilentlyContinue
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Job\SNXT-Job.psm1") -Force -WarningAction SilentlyContinue
 
-$UnitTest = "Unit Test NIF"
+$UnitTest = "Unit Test DDS"
 
 $UnitTests = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Unit Tests"
 $UnitTestPath = Join-Path -Path $UnitTests -ChildPath $UnitTest
@@ -30,11 +30,29 @@ if (Test-Path $Global:SNXT.Logfile)
 }
 function Process-Mod
 {
-    Trace-Debug ("Process-Mod") $Global:SNXT.Logfile
-    Unpack-Mod $Global:SNXT.BasePath
-    Convert-Path
-    Trace-Debug ("Process-Mod") $Global:SNXT.Logfile -1
+    Begin
+    {
+        Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile
+        $startTime = Get-Date
+    }
+
+    Process
+    {
+        Unpack-Mod $Global:SNXT.BasePath
+        Convert-Path
+    }
+    
+    End
+    {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Process-Mod-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile -1
+    }
 }
 
-$time = Measure-Command { Process-Mod } | Select-Object -Property TotalSeconds
-Write-Host ('Process-Mod Time = {0} seconds' -f $time.TotalSeconds)
+
+$timeInfo = Measure-Command { Process-Mod }
+$timeString = Get-FormattedTime $timeInfo
+Write-Host ('Process-Mod Time {0}' -f $timeString)

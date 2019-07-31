@@ -8,6 +8,7 @@ function Convert-NIF([string] $fullpath, [hashtable] $info)
         $relativeFilename = Get-RelativeFilename $fullpath
         $LogTreeFilename = Get-LogTreeFilename $fullpath
         Trace-Debug ('Convert-NIF RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        $startTime = Get-Date
     }
     
     Process
@@ -39,6 +40,10 @@ function Convert-NIF([string] $fullpath, [hashtable] $info)
     
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Convert-NIF-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug 'Convert-NIF' $LogTreeFilename -1
     }
 }

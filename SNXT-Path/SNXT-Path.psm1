@@ -11,6 +11,7 @@ function Open-LogTree([array] $assets)
     {
         Trace-Verbose ("Open-LogTree") $Global:SNXT.Logfile 1
         $MyProgressId = $ProgressId++
+        $startTime = Get-Date
     }
 
     Process
@@ -44,6 +45,10 @@ function Open-LogTree([array] $assets)
 
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Open-LogTree-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Verbose ("Open-LogTree") $Global:SNXT.Logfile -1
     }
 }
@@ -100,9 +105,10 @@ function Convert-Textures([array] $textures)
 {
     Begin
     {
-        Trace-Verbose ("Convert-Textures") $Global:SNXT.Logfile 1
+        Trace-Verbose ("Convert-DDSs") $Global:SNXT.Logfile 1
         $MyProgressId = $ProgressId++
         $JobName = "Convert-DDS"
+        $startTime = Get-Date
     }
 
     Process
@@ -112,16 +118,8 @@ function Convert-Textures([array] $textures)
         $Task = ""
         $texturesLength = $textures.length
         $textureNumber = 0
-        $batchSize = $Global:SNXT.Config.Performance.BatchSize
-        
-        if ($texturesLength -le -$batchSize)
-        {
-            $batchSize = $texturesLength
-        }
-        else
-        {
-            $batchSize = [int]($texturesLength / (-$batchSize))
-        }
+        $batchSize = Get-BatchSize $texturesLength
+
         $batchInProgress = [System.Collections.ArrayList]@()
         $batchCount = 0
         foreach ($texture in $textures)
@@ -153,7 +151,11 @@ function Convert-Textures([array] $textures)
 
     End
     {
-        Trace-Verbose ("Convert-Textures") $Global:SNXT.Logfile -1
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Convert-DDSs-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Verbose ("Convert-DDS") $Global:SNXT.Logfile -1
     }
 }
 
@@ -219,6 +221,7 @@ function Convert-HKXs([array] $assets)
         Trace-Verbose ("Convert-HKXs") $Global:SNXT.Logfile 1
         $MyProgressId = $ProgressId++
         $JobName = "Convert-HKX"
+        $startTime = Get-Date
     }
 
     Process
@@ -228,18 +231,8 @@ function Convert-HKXs([array] $assets)
         $Task = ""
         $assetsLength = $assets.length
         $assetNumber = 0
-        $batchSize = $Global:SNXT.Config.Performance.BatchSize
-        if ($batchSize -le 0)
-        {
-            if ($assetsLength -le -$batchSize)
-            {
-                $batchSize = $assetsLength
-            }
-            else
-            {
-                $batchSize = [int]($assetsLength / (-$batchSize))
-            }
-        }
+        $batchSize = Get-BatchSize $assetsLength
+
         $batchInProgress = [System.Collections.ArrayList]@()
         $batchCount = 0
         foreach ($asset in $assets)
@@ -272,6 +265,10 @@ function Convert-HKXs([array] $assets)
 
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Convert-HKXs-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Verbose ("Convert-HKXs") $Global:SNXT.Logfile -1
     }
 }
@@ -319,6 +316,7 @@ function Convert-NIFs([array] $assets)
         Trace-Verbose ("Convert-NIFs") $Global:SNXT.Logfile 1
         $MyProgressId = $ProgressId++
         $JobName = "Convert-NIF"
+        $startTime = Get-Date
     }
 
     Process
@@ -328,18 +326,8 @@ function Convert-NIFs([array] $assets)
         $Task = ""
         $assetsLength = $assets.length
         $assetNumber = 0
-        $batchSize = $Global:SNXT.Config.Performance.BatchSize
-        if ($batchSize -le 0)
-        {
-            if ($assetsLength -le -$batchSize)
-            {
-                $batchSize = $assetsLength
-            }
-            else
-            {
-                $batchSize = [int]($assetsLength / (-$batchSize))
-            }
-        }
+        $batchSize = Get-BatchSize $assetsLength
+        
         $batchInProgress = [System.Collections.ArrayList]@()
         $batchCount = 0
         foreach ($asset in $assets)
@@ -372,6 +360,10 @@ function Convert-NIFs([array] $assets)
 
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Convert-NIFs-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Verbose ("Convert-NIFs") $Global:SNXT.Logfile -1
     }
 }
@@ -384,7 +376,7 @@ function Convert-Path
 
     Begin
     {
-        Trace-Debug "Convert-Path" $Global:SNXT.Logfile 1
+        Trace-Verbose "Convert-Path" $Global:SNXT.Logfile 1
     }
 
     Process
@@ -401,17 +393,17 @@ function Convert-Path
         $nifs = $AllTheFiles | Where-Object { $_.Extension -eq ".nif" } | Select-Object -ExpandProperty FullName
         $allAssets += $nifs
         
-        Report-Measure { Open-LogTree $allAssets } "Open-LogTreeTime"
+        Open-LogTree $allAssets
 
-        Report-Measure { Convert-Textures $textures } "Convert-TexturesTime"
+        Convert-Textures $textures
 
-        Report-Measure { Convert-HKXs $hkxs } "Convert-HKXsTime"
+        Convert-HKXs $hkxs
 
-        Report-Measure { Convert-NIFs $nifs } "Convert-NIFsTime"
+        Convert-NIFs $nifs
     }
 
     End
     {
-        Trace-Debug ("Convert-Path") $Global:SNXT.Logfile -1
+        Trace-Verbose ("Convert-Path") $Global:SNXT.Logfile -1
     }
 }

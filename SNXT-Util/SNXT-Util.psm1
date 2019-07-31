@@ -36,10 +36,38 @@ function Get-LogTreeFilename([string] $fullPath)
     return $logFilename
 }
 
+function Get-FormattedTime($timeInfo)
+{
+    $timeString = ""
+    $needMilliseconds = $True
+    if ([int]$timeInfo.Hours -gt 0)
+    {
+        $timeString = (' Hours="{0}"' -f $timeInfo.Hours)
+        $needMilliseconds = $False
+    }
+    if ([int]$timeInfo.Minutes -gt 0)
+    {
+        $timeString += (' Minutes="{0}"' -f $timeInfo.Minutes)
+        $needMilliseconds = $False
+    }
+    if ([int]$timeInfo.Seconds -gt 0)
+    {
+        $timeString += (' Seconds="{0}"' -f $timeInfo.Seconds)
+    }
+    if ($needMilliseconds)
+    {
+        $timeString += (' Milliseconds="{0}"' -f $timeInfo.Milliseconds)
+    }
+    return $timeString
+}
+
 function Report-Measure([scriptblock] $script, [string] $title)
 {
-    $time = Measure-Command { Invoke-Command -ScriptBlock $script } | Select-Object -Property TotalSeconds
-    Trace-Verbose ('{0} Time="{1}"' -f $title, $time.TotalSeconds) $Global:SNXT.Logfile
+    $timeInfo = Measure-Command { Invoke-Command -ScriptBlock $script }
+    #$timeInfo | Select-Object -Property Hours, Minutes, Seconds
+    $timeString = Get-FormattedTime $timeInfo
+    Trace-Verbose ('{0}{1}' -f $title, $timeString) $Global:SNXT.Logfile
+    return $timeString
 }
 
 function Test-SDK
@@ -170,15 +198,6 @@ function Trace-Warn([string] $oMsg, [string] $logFile, [int] $opt_Begin)
     $msg | Out-File $logfile -Append -NoNewLine
     #Wait-Command {Add-Content -Path $logfile -Value $msg -NoNewLine}
 }
-
-# Trace Error is for problems that cannot be rectified.  They are essentially fatal.
-function Trace-Error([string] $oMsg, [string] $logFile, [int] $opt_Begin)
-{
-    $msg = Resolve-Message $oMsg "SNXTError_" $opt_Begin
-    $msg | Out-File $logfile -Append -NoNewLine
-    #Wait-Command {Add-Content -Path $logfile -Value $msg -NoNewLine}
-}
-
 function Get-ConfigPath
 {
     $configPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Config.xml"

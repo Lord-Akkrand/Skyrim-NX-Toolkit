@@ -36,6 +36,7 @@ function Read-DDS([string] $fullpath, [hashtable] $textureInfo)
         $relativeFilename = Get-RelativeFilename $fullpath
         $LogTreeFilename = Get-LogTreeFilename $fullpath
         Trace-Debug ('Read-DDS RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1 
+        $startTime = Get-Date
     }
     
     Process
@@ -92,6 +93,10 @@ function Read-DDS([string] $fullpath, [hashtable] $textureInfo)
 
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Read-DDS-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug 'Read-DDS' $LogTreeFilename -1
     }
 }
@@ -103,6 +108,7 @@ function Compress-DDS([string] $fullpath, [hashtable] $textureInfo, [int] $passN
         $relativeFilename = Get-RelativeFilename $fullpath
         $LogTreeFilename = Get-LogTreeFilename $fullpath
         Trace-Debug ('Compress-DDS Pass="{0}" RelativeFilename="{1}"' -f $passNumber, $relativeFilename) $LogTreeFilename 1
+        $startTime = Get-Date
     }
     
     Process
@@ -268,6 +274,10 @@ function Compress-DDS([string] $fullpath, [hashtable] $textureInfo, [int] $passN
     
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Compress-DDS-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug 'Compress-DDS' $LogTreeFilename -1
     }
     
@@ -280,6 +290,7 @@ function Convert-DDS([string] $fullpath, [hashtable] $textureInfo)
         $relativeFilename = Get-RelativeFilename $fullpath
         $LogTreeFilename = Get-LogTreeFilename $fullpath
         Trace-Debug ('Convert-DDS RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        $startTime = Get-Date
     }
     
     Process
@@ -334,6 +345,10 @@ function Convert-DDS([string] $fullpath, [hashtable] $textureInfo)
     
     End
     {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Convert-DDS-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug 'Convert-DDS' $LogTreeFilename -1
     }
     

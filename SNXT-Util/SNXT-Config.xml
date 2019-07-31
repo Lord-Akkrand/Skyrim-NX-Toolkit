@@ -5,6 +5,9 @@
   <Performance>
     <MaxThreads Value="24" Type="Integer" />
     <BatchSize Value="-96" Type="Integer" />
+    <MaxBatchSize Value="100" Type="Integer" />
+    <MinBatchSize Value="10" Type="Integer" />
+    <BatchesPerThread Value="4" Type="Integer" />
   </Performance>
   <BSA>
     <FullRules Value="True" Type="Boolean" />

@@ -9,9 +9,20 @@ function Add-JobToQueue($task)
     $JobQueue.Enqueue($task)
 }
 
+function Get-BatchSize($assetCount)
+{
+    $numberThreads = $Global:SNXT.Config.Performance.MaxThreads
+    
+    $spreadOut = $assetCount / $numberThreads
+    $multipleThreads = $spreadOut / $Global:SNXT.Config.Performance.BatchesPerThread
+    $batchSize = [Math]::max($Global:SNXT.Config.Performance.MinBatchSize, $multipleThreads)
+    $batchSize = [Math]::min($Global:SNXT.Config.Performance.MaxBatchSize, $batchSize)
+    
+    return [int]$batchSize
+}
 function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
 {
-    Trace-Debug ('Submit-JobQueue Count="{0}"' -f $JobQueue.Count) $Global:SNXT.Logfile 1
+    Trace-Verbose ('Submit-JobQueue Count="{0}"' -f $JobQueue.Count) $Global:SNXT.Logfile 1
 
     $started = 0
     $finished = 0
@@ -113,7 +124,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
         $changed = $False
     }
     Write-Host ('JobsComplete Job="{0}" Count="{1}" Success="{2}" Errors="{3}" Skipped="{4}"' -f $BatchName, $total, $successCount, $errorCount, $skippedCount)
-    Trace-Debug 'Submit-JobQueue' $Global:SNXT.Logfile -1
+    Trace-Verbose 'Submit-JobQueue' $Global:SNXT.Logfile -1
 }
 
 function Submit-Jobs([string] $progressTitle, [string]$BatchName, $Id)

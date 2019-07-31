@@ -4,6 +4,7 @@ import os
 import util
 import time
 import toolkit_config
+from io import BytesIO
 
 def GetVGAudioCli():
 	utilities_path = util.GetUtilitiesPath()
@@ -20,18 +21,13 @@ def GetSndFileConvert():
 	SndFileConvert = os.path.join(utilities_path, "Sound", "sndfile-convert.exe")
 	return SndFileConvert
 
-def XWM2WAV(filename_xwm, filename_wav, isVoice):
+def XWM2WAV(filename_xwm, filename_wav, isNxOpus):
 	""" converts the XWM file to WAV and prepare the WAV file to be a proper PCM16 for VGAudioCli """
 
 	xWMAEncode = GetxWMAEncode()
 	commandLine = [xWMAEncode, filename_xwm, filename_wav]
 
-	# trying to mitigate conversion errors with high level multitasking
-	try:
-		util.RunCommandLine(commandLine)
-	except:
-		time.sleep(5)
-		util.RunCommandLine(commandLine)
+	util.RunCommandLine(commandLine)
 
 	with open(filename_wav, "rb") as wav_file:
 		wav_header = wav_file.read(0xFF)
@@ -52,6 +48,7 @@ def XWM2WAV(filename_xwm, filename_wav, isVoice):
 			wav_format = wav_header[0x08:0x0C].decode()
 
 	wav_audio_format = int.from_bytes(wav_header[0x14:0x16], byteorder = 'little', signed = False)
+	wav_channel_count = int.from_bytes(wav_header[0x16:0x18], byteorder = 'little', signed = False)
 	wav_sample_rate = int.from_bytes(wav_header[0x18:0x1C], byteorder = 'little', signed = False)
 	wav_bits_per_sample = int.from_bytes(wav_header[0x22:0x24], byteorder = 'little', signed = False)
 
@@ -60,7 +57,7 @@ def XWM2WAV(filename_xwm, filename_wav, isVoice):
 	#
 
 	# get the closest ressampling RATE
-	RATES = [24000, 48000] if isVoice else [22050, 44100]
+	RATES = [24000, 48000] if isNxOpus else [22050, 44100]
 	try:
 		i = 0
 		while wav_sample_rate >= RATES[i]:
@@ -69,7 +66,10 @@ def XWM2WAV(filename_xwm, filename_wav, isVoice):
 		i = 1
 	override_sample_rate = str(RATES[i])
 
-	if isVoice or wav_audio_format != 1 or wav_bits_per_sample != 16:
+	#
+	# Possible temporary fix for issues with Faye Mod which has voices in stereo
+	#
+	if (isNxOpus and wav_channel_count == 1) or wav_audio_format != 1 or wav_bits_per_sample != 16:
 		filename_temp = filename_wav + "temp.wav"
 		util.RemoveFile(filename_temp)
 		util.RenameFile(filename_wav, filename_temp)
@@ -99,11 +99,11 @@ def XWM2WAV(filename_xwm, filename_wav, isVoice):
 
 	return (wav_channel_count, wav_duration_ms)
 
-def WAV2LOPUS(filename_wav, filename_lopus):
-	""" creates LOPUS from WAVE """
+def WAV2NXOPUS(filename_wav, filename_nxopus):
+	""" creates NXOPUS from WAVE """
 
 	VGAudioCli = GetVGAudioCli()
-	commandLine = [VGAudioCli, "-c", "--opusheader",  "Standard", filename_wav, filename_lopus]
+	commandLine = [VGAudioCli, "-c", "--opusheader",  "Standard", filename_wav, filename_nxopus]
 	util.RunCommandLine(commandLine)
 
 def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1, wav_channel_count = 1):
@@ -125,11 +125,11 @@ def ConvertDSP(dsp_data, base):
 	dsp_data[base+0x1C:base+0x5F:2], dsp_data[base+0x1D:base+0x60:2] = \
 	dsp_data[base+0x1D:base+0x60:2], dsp_data[base+0x1C:base+0x5F:2]
 
-def LOPUS2FUZ(filename_lopus, channel_count, sound_duration, sound_file):
-	""" adds required NX SSE header to a lopus sound """
+def NXOPUS2FUZ(filename_nxopus, channel_count, sound_duration, sound_file):
+	""" adds required NX SSE header to a nxopus sound """
 
-	with open(filename_lopus, "rb") as lopus_file: lopus_data = bytearray(lopus_file.read())
-	lopus_size = len(lopus_data)
+	with open(filename_nxopus, "rb") as nxopus_file: nxopus_data = bytearray(nxopus_file.read())
+	nxopus_size = len(nxopus_data)
 
 	nx_sse_opus_header_size = b'\x14\x00\x00\x00'
 	nx_sse_opus_signature = b'\x0A\x8D\xD5\xFF'
@@ -138,8 +138,8 @@ def LOPUS2FUZ(filename_lopus, channel_count, sound_duration, sound_file):
 	sound_file.write(sound_duration.to_bytes(4, byteorder = 'little', signed = False))
 	sound_file.write(channel_count.to_bytes(4, byteorder = 'little', signed = False))
 	sound_file.write(nx_sse_opus_header_size)
-	sound_file.write(lopus_size.to_bytes(4, byteorder = 'little', signed = False))
-	sound_file.write(lopus_data)
+	sound_file.write(nxopus_size.to_bytes(4, byteorder = 'little', signed = False))
+	sound_file.write(nxopus_data)
 
 def DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, sound_file):
 	""" creates a MCADPCM file from DSPADPCM ones """
@@ -172,7 +172,7 @@ def ConvertSound_Internal(filepath_without_extension):
 	""" Converts PC SSE sound files to be compatible with NX SSE supported codecs """
 
 	filename_mcadpcm = filepath_without_extension + ".mcadpcm"
-	filename_lopus = filepath_without_extension + ".lopus"
+	filename_nxopus = filepath_without_extension + ".lopus"
 	filename_dsp0 = filepath_without_extension + "_CH0_.dsp"
 	filename_dsp1 = filepath_without_extension + "_CH1_.dsp"
 	filename_wav = filepath_without_extension + ".wav"
@@ -223,45 +223,59 @@ def ConvertSound_Internal(filepath_without_extension):
 	# Convert the XWM to WAV
 	(channel_count, sound_duration) = XWM2WAV(filename_xwm, filename_wav, is_nxopus)
 
-	#
-	# NX Skyrim vanilla uses MCADPCM for music and fx, OPUS for voice
-	#
-	if is_nxopus:
-		WAV2LOPUS(filename_wav, filename_lopus)
+	# Converte the WAV to NXOPUS or MCADPCM
+	if is_nxopus and channel_count == 1:
+		WAV2NXOPUS(filename_wav, filename_nxopus)
 	else:
 		WAV2DSP(filename_wav, filename_dsp0, filename_dsp1, channel_count)
 
-	# this might sound redundant as there shouldn't be LIPs under FX but...
-	if is_nxopus or lip_size > 0:
+	# write a FUZ container
+	if lip_size > 0 or is_nxopus and channel_count == 1:
 		lip_padding = lip_size % 4
 		if lip_padding != 0: lip_padding = 4 - lip_padding
 		voice_offset = 0x10 + lip_size + lip_padding
 
-		with open(filename_fuz, "wb") as fuz_nx_file:
-			header_fuz = b'\x46\x55\x5A\x45\x01\x00\x00\x00'
-			fuz_nx_file.write(header_fuz)
-			fuz_nx_file.write(lip_size.to_bytes(4, byteorder = 'little', signed = False))
-			fuz_nx_file.write(voice_offset.to_bytes(4, byteorder = 'little', signed = False))
-			if lip_size > 0: fuz_nx_file.write(lip_data)
-			fuz_nx_file.write(b'\x00' * lip_padding)
+		fuz_nx_payload = BytesIO()
+		header_fuz = b'\x46\x55\x5A\x45\x01\x00\x00\x00'
+		fuz_nx_payload.write(header_fuz)
+		fuz_nx_payload.write(lip_size.to_bytes(4, byteorder = 'little', signed = False))
+		fuz_nx_payload.write(voice_offset.to_bytes(4, byteorder = 'little', signed = False))
+		if lip_size > 0: fuz_nx_payload.write(lip_data)
+		fuz_nx_payload.write(b'\x00' * lip_padding)
 
-			# write the SOUND content
-			if is_nxopus:
-				LOPUS2FUZ(filename_lopus, channel_count, sound_duration, fuz_nx_file)
-			else:
-				DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, fuz_nx_file)
+		# write the SOUND content and force stereo to MCADPCM
+		if is_nxopus and channel_count == 1:
+			NXOPUS2FUZ(filename_nxopus, channel_count, sound_duration, fuz_nx_payload)
+		else:
+			DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, fuz_nx_payload)
+
+		# pad the FUZ content to the closest uint32
+		fuz_padding = fuz_nx_payload.getbuffer().nbytes % 4
+		if fuz_padding != 0: fuz_padding = 4 - fuz_padding
+		fuz_nx_payload.write(b'\x00' * fuz_padding)
+
+		with open(filename_fuz, "wb") as fuz_nx_file:
+			fuz_nx_file.write(fuz_nx_payload.getbuffer())
+
+	# write a MCADPCM container
 	else:
 		with open(filename_mcadpcm, "wb") as mcadpcm_file:
 			DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, mcadpcm_file)
 
 	# clean up temporary files
 	util.RemoveFile(filename_wav)
-	if is_nxopus: util.RemoveFile(filename_lopus)
-	if channel_count > 0 and not is_nxopus: util.RemoveFile(filename_dsp0)
-	if channel_count > 1 and not is_nxopus: util.RemoveFile(filename_dsp1)
-	if has_xwm: util.RemoveFile(filename_xwm)
-	if has_lip: util.RemoveFile(filename_lip)
-	if lip_size == 0 and not is_nxopus: util.RemoveFile(filename_fuz)
+	if has_xwm:
+		util.RemoveFile(filename_xwm)
+	if has_lip:
+		util.RemoveFile(filename_lip)
+	if (is_nxopus and channel_count == 1):
+		util.RemoveFile(filename_nxopus)
+	else:
+		util.RemoveFile(filename_dsp0)
+		if channel_count > 1:
+			util.RemoveFile(filename_dsp1)
+		if has_fuz and lip_size == 0:
+			util.RemoveFile(filename_fuz)
 
 	return (channel_count > 0)
 

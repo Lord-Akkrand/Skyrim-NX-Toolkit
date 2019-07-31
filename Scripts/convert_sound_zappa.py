@@ -14,61 +14,124 @@ def GetxWMAEncode():
 	xWMAEncode = os.path.join(utilities_path, "Sound", "xWMAEncode.exe")
 	return xWMAEncode
 
-def XWM2WAV(filename_xwm, filename_wav):
+def GetSndFileConvert():
+	utilities_path = util.GetUtilitiesPath()
+	SndFileConvert = os.path.join(utilities_path, "Sound", "sndfile-convert.exe")
+	return SndFileConvert
+
+def XWM2WAV(filename_xwm, filename_wav, isVoice):
+	""" converts the XWM file to WAV and prepare the WAV file to be a proper PCM16 for VGAudioCli """
+
 	xWMAEncode = GetxWMAEncode()
 	commandLine = [xWMAEncode, filename_xwm, filename_wav]
 	util.RunCommandLine(commandLine)
 
-def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1):
 	with open(filename_wav, "rb") as wav_file:
-		wav_header = wav_file.read(0x25)
+		wav_header = wav_file.read(0x2C)
 		wav_format = wav_header[0x08:0x0C].decode()
-		wav_audio_format = int.from_bytes(wav_header[0x14:0x16], byteorder = 'little', signed = False)
-		wav_channel_count = int.from_bytes(wav_header[0x16:0x18], byteorder = 'little', signed = False)
-		wav_bits_per_sample = int.from_bytes(wav_header[0x22:0x24], byteorder = 'little', signed = False)
 
-	# checking for a collateral case where Mod Authors save XWM with WAV extension
+	# check for a collateral case where Mod Authors save XWM with WAV extension
 	if wav_format == "XWMA":
-		util.LogInfo("Warning, <{}> has WAV extension but is a XWMA. Fixing.".format(filename_wav))
-		filename_temp = filename_wav + ".TEMP"
+		util.LogInfo("Zappa says, <{}> has WAV extension but is a XWMA. Fixing.".format(filename_wav))
+		filename_temp = "TEMP" + filename_wav
 		util.RenameFile(filename_wav, filename_temp)
-		XWM2WAV(filename_temp, filename_wav)
+		commandLine = [xWMAEncode, filename_temp, filename_wav]
+		util.RunCommandLine(commandLine)
 		util.RemoveFile(filename_temp)
 
-	# make the WAV file compatible with VGAudioCLi whenever required
-	elif wav_audio_format != 1 or not (wav_bits_per_sample == 8 or wav_bits_per_sample == 16):
-		util.LogInfo("Warning, <{}> isn't compatible with VGAudioCLi. Fixing.".format(filename_wav))
-		wav_data, wav_samplerate = soundfile.read(filename_wav)
-		soundfile.write(filename_wav, wav_data, wav_samplerate, subtype='PCM_16')
+		with open(filename_wav, "rb") as wav_file:
+			wav_header = wav_file.read(0x2C)
+			wav_format = wav_header[0x08:0x0C].decode()
 
-	# relying on VGAudioCli to create the DSP streams
+	wav_audio_format = int.from_bytes(wav_header[0x14:0x16], byteorder = 'little', signed = False)
+	wav_channel_count = int.from_bytes(wav_header[0x16:0x18], byteorder = 'little', signed = False)
+	wav_sample_rate = int.from_bytes(wav_header[0x18:0x1C], byteorder = 'little', signed = False)
+	wav_bits_per_sample = int.from_bytes(wav_header[0x22:0x24], byteorder = 'little', signed = False)
+	wav_data_size = int.from_bytes(wav_header[0x28:0x2C], byteorder = 'little', signed = False)
+
+	try:
+		wav_duration = float(wav_data_size) / float(wav_sample_rate * wav_channel_count * wav_bits_per_sample / 8)
+	except:
+		wav_duration = 0
+
+	#
+	# make the WAV file compatible with VGAudioCLi
+	#
+
+	if isVoice:
+		# OPUS must be PCM16 and 8/12/16/24/48 Khz
+		RATES = [24000, 48000]
+	else:
+		# MCADPCM must be PCM16 and 22/44 Khz
+		RATES = [22050, 44100]
+
+	# get the closest ressampling RATE
+	i = 0
+	while wav_sample_rate >= RATES[i] and i < 2:
+		i += 1
+	i = 1 if i == 2 else i
+	override_sample_rate = RATES[i]
+
+	if isVoice or wav_audio_format != 1 or wav_bits_per_sample != 16:
+		filename_temp = "TEMP" + filename_wav
+		util.RenameFile(filename_wav, filename_temp)
+		SndFileConvert = GetSndFileConvert()
+		commandLine = [SndFileConvert, "-override-sample-rate=" + override_sample_rate, "-pcm16", filename_temp, filename_wav]
+		util.RunCommandLine(commandLine)
+		util.RemoveFile(filename_temp)
+
+		# really need to open one last time...
+		with open(filename_wav, "rb") as wav_file:
+			wav_header = wav_file.read(0x2C)
+			wav_channel_count = int.from_bytes(wav_header[0x16:0x18], byteorder = 'little', signed = False)
+			wav_sample_rate = int.from_bytes(wav_header[0x18:0x1C], byteorder = 'little', signed = False)
+			wav_bits_per_sample = int.from_bytes(wav_header[0x22:0x24], byteorder = 'little', signed = False)
+			wav_data_size = int.from_bytes(wav_header[0x28:0x2C], byteorder = 'little', signed = False)
+
+	try:
+		wav_duration = float(wav_data_size) / float(wav_sample_rate * wav_channel_count * wav_bits_per_sample / 8)
+	except:
+		wav_duration = 0
+
+	return (wav_channel_count, wav_duration)
+
+def WAV2LOPUS(filename_wav, filename_lopus):
+	""" creates LOPUS from WAVE """
+
+	VGAudioCli = GetVGAudioCli()
+	commandLine = [VGAudioCli, "-c", "--opusheader Standard", filename_wav, filename_lopus]
+	util.RunCommandLine(commandLine)
+
+def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1, wav_channel_count = 1):
+	""" creates DSPMCADPCM from WAVE (2 files if stereo) but unfortunately in big-endian """
+
 	VGAudioCli = GetVGAudioCli()
 	commandLine = [VGAudioCli, "-i:0", filename_wav, filename_dsp0]
 	util.RunCommandLine(commandLine)
-	if not os.path.exists(filename_dsp0):
-		util.LogInfo("Warning, <{}> isn't compatible with VGAudioCLi. Fixing for SushiSquid.".format(filename_wav))
-		wav_data, wav_samplerate = soundfile.read(filename_wav)
-		soundfile.write(filename_wav, wav_data, wav_samplerate, subtype='PCM_16')
-		util.RunCommandLine(commandLine)
 
 	if wav_channel_count > 1:
 		commandLine = [VGAudioCli, "-i:1", filename_wav, filename_dsp1]
 		util.RunCommandLine(commandLine)
-		wav_channel_count = 2
-	return wav_channel_count
 
 def ConvertDSP(dsp_data, base):
+	""" fix from big-endian to little-endian. not 100% correct as there are some 16 bit fields on the header but as far as I found all 0x00 """
+
 	dsp_data[base+0x00:base+0x19:4], dsp_data[base+0x01:base+0x1A:4], dsp_data[base+0x02:base+0x1B:4], dsp_data[base+0x03:base+0x1C:4] = \
 	dsp_data[base+0x03:base+0x1C:4], dsp_data[base+0x02:base+0x1B:4], dsp_data[base+0x01:base+0x1A:4], dsp_data[base+0x00:base+0x19:4]
 	dsp_data[base+0x1C:base+0x5F:2], dsp_data[base+0x1D:base+0x60:2] = \
 	dsp_data[base+0x1D:base+0x60:2], dsp_data[base+0x1C:base+0x5F:2]
 
-def DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, sound_file):
+def LOPUS2FUZ(filename_lopus, sound_duration, fuz_nx_file):
+	pass
+
+def DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, sound_file):
+	""" creates a MCADPCM file from DSPADPCM ones """
+
 	with open(filename_dsp0, "rb") as dsp0_file: dsp0_data = bytearray(dsp0_file.read())
 	dsp0_size = len(dsp0_data)
 	ConvertDSP(dsp0_data, 0x00)
 
-	if channels == 2:
+	if channel_count > 1:
 		with open(filename_dsp1, "rb") as dsp1_file: dsp1_data = bytearray(dsp1_file.read())
 		dsp1_size = len(dsp1_data)
 		dsp1_offset = 0x14 + dsp0_size
@@ -82,14 +145,17 @@ def DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, sound_file):
 		sound_file.write(dsp0_data)
 		sound_file.write(dsp1_data)
 
-	elif channels == 1:
+	else:
 		header_single = b'\x01\x00\x00\x00\x0C\x00\x00\x00'
 		sound_file.write(header_single)
 		sound_file.write(dsp0_size.to_bytes(4, byteorder = 'little', signed = False))
 		sound_file.write(dsp0_data)
 
 def ConvertSound_Internal(filepath_without_extension):
+	""" Converts PC SSE sound files to be compatible with NX SSE supported codecs """
+
 	filename_mcadpcm = filepath_without_extension + ".mcadpcm"
+	filename_lopus = filepath_without_extension + ".lopus"
 	filename_dsp0 = filepath_without_extension + "_CH0_.dsp"
 	filename_dsp1 = filepath_without_extension + "_CH1_.dsp"
 	filename_wav = filepath_without_extension + ".wav"
@@ -101,41 +167,45 @@ def ConvertSound_Internal(filepath_without_extension):
 	has_xwm = os.path.exists(filename_xwm)
 	has_lip = os.path.exists(filename_lip)
 	has_fuz = os.path.exists(filename_fuz)
+	is_voice = "sound\\voice" in filepath_without_extension
 
-	util.LogDebug("Convert Sound <{}> WAV:{} XWM:{} LIP:{} FUZ:{}".format(filepath_without_extension, has_wav, has_xwm, has_lip, has_fuz))
+	util.LogDebug("Convert Sound <{}> WAV:{} XWM:{} LIP:{} FUZ:{} VOICE:{}".format(filepath_without_extension, has_wav, has_xwm, has_lip, has_fuz, is_voice))
 
-	# if there is a loose LIP load into memory
-	if has_lip:
-		with open(filename_lip, "rb") as lip_file:
-			lip_data = lip_file.read()
-			lip_size = len(lip_data)
-	else:
-		lip_size = 0
-
-	#  - loose WAV files take precedence over FUZ or XWM
-	#  - loose XWM files take precedence over FUZ
-	#  - loose LIP files take precedence over FUZ
-	if has_fuz and (lip_size == 0 or not (has_wav or has_xwm)):
+	# FUZ files always have precedence over loose WAV, XWM or LIP
+	lip_size = 0
+	if has_fuz:
 		with open(filename_fuz, "rb") as fuz_file:
-			# if lip_size == 0:
 			fuz_file.seek(0x08)
 			lip_size = int.from_bytes(fuz_file.read(0x04), byteorder = 'little', signed = False)
 			lip_data = fuz_file.read(lip_size)
-			# else:
-			#	fuz_file.seek(0x12)
-			if not (has_wav or has_xwm):
-				with open(filename_xwm, "wb") as xwm_file:
-					xwm_file.write(fuz_file.read())
-					has_xwm = True
 
-	# try to reuse existing WAV whenever possible to avoid too many conversions
-	if not has_wav:
-		XWM2WAV(filename_xwm, filename_wav)
+		util.LogDebug("FUZ {} has a 0 bytes LIP data.".format(filename_fuz))
 
-	# it returns -1 on a failed conversion
-	channels = WAV2DSP(filename_wav, filename_dsp0, filename_dsp1)
+		with open(filename_xwm, "wb") as xwm_file:
+			xwm_file.write(fuz_file.read())
+			has_xwm = True
 
-	if lip_size > 0:
+		util.LogDebug("XWM created on disk from FUZ {}.".format(filename_fuz))
+
+	# Load LIP from disk in the rare case the LIP in FUZ is empty
+	if lip_size == 0 and has_lip:
+		with open(filename_lip, "rb") as lip_file:
+			lip_data = lip_file.read()
+			lip_size = len(lip_data)
+
+	# Convert the XWM to WAV
+	(channel_count, sound_duration) = XWM2WAV(filename_xwm, filename_wav, is_voice)
+
+	#
+	# NX Skyrim vanilla uses MCADPCM for music and fx, OPUS for voice
+	#
+	if is_voice:
+		WAV2LOPUS(filename_wav, filename_lopus)
+	else:
+		WAV2DSP(filename_wav, filename_dsp0, filename_dsp1, channel_count)
+
+	# this might sound redundant as there shouldn't be LIPs under FX but...
+	if is_voice or lip_size > 0:
 		lip_padding = lip_size % 4
 		if lip_padding != 0: lip_padding = 4 - lip_padding
 		voice_offset = 0x10 + lip_size + lip_padding
@@ -147,20 +217,26 @@ def ConvertSound_Internal(filepath_without_extension):
 			fuz_nx_file.write(voice_offset.to_bytes(4, byteorder = 'little', signed = False))
 			fuz_nx_file.write(lip_data)
 			fuz_nx_file.write(b'\x00' * lip_padding)
-			DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, fuz_nx_file)
+
+			# write the SOUND content
+			if is_voice:
+				LOPUS2FUZ(filename_lopus, sound_duration, fuz_nx_file)
+			else:
+				DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, fuz_nx_file)
 	else:
 		with open(filename_mcadpcm, "wb") as mcadpcm_file:
-			DSP2MCADPCM(filename_dsp0, filename_dsp1, channels, mcadpcm_file)
+			DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, mcadpcm_file)
 
-	# clean up temporary files
-	util.RemoveFile(filename_wav)
-	if channels > 0: util.RemoveFile(filename_dsp0)
-	if channels > 1: util.RemoveFile(filename_dsp1)
-	if has_xwm: util.RemoveFile(filename_xwm)
-	if has_lip: util.RemoveFile(filename_lip)
-	if lip_size == 0: util.RemoveFile(filename_fuz)
+		# clean up temporary files
+		util.RemoveFile(filename_wav)
+		if is_voice: util.RemoveFile(filename_lopus)
+		if channel_count > 0 and not is_voice: util.RemoveFile(filename_dsp0)
+		if channel_count > 1 and not is_voice: util.RemoveFile(filename_dsp1)
+		if has_xwm: util.RemoveFile(filename_xwm)
+		if has_lip: util.RemoveFile(filename_lip)
+		if lip_size == 0 and not is_voice: util.RemoveFile(filename_fuz)
 
-	return (channels > 0)
+		return (channel_count > 0)
 
 def ConvertSound(target, filepath_without_extension):
 	return ConvertSound_Internal(filepath_without_extension)

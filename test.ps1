@@ -47,7 +47,7 @@ function Process-Mod
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
-        Trace-Verbose ('Process-Mod-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Verbose ('Process-Mod-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile -1
     }
 }

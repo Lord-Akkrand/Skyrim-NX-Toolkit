@@ -21,13 +21,15 @@ def GetSndFileConvert():
 	SndFileConvert = os.path.join(utilities_path, "Sound", "sndfile-convert.exe")
 	return SndFileConvert
 
-def XWM2WAV(filename_xwm, filename_wav, isNxOpus):
-	""" converts the XWM file to WAV and prepare the WAV file to be a proper PCM16 for VGAudioCli """
+def XWM2WAV(filename_xwm, filename_wav):
+	""" converts the XWM file to WAV """
 
 	xWMAEncode = GetxWMAEncode()
-
 	commandLine = [xWMAEncode, filename_xwm, filename_wav]
 	util.RunCommandLine(commandLine)
+
+def WAV2PCM16WAV(filename_xwm, filename_wav, isNxOpus):
+	""" Normalizes the WAV file to be a proper PCM16 with correct sample rate for VGAudioCli """
 
 	try:
 		with open(filename_wav, "rb") as wav_file:
@@ -43,6 +45,7 @@ def XWM2WAV(filename_xwm, filename_wav, isNxOpus):
 		filename_temp = filename_wav + "temp.wav"
 		util.RemoveFile(filename_temp)
 		util.RenameFile(filename_wav, filename_temp)
+		xWMAEncode = GetxWMAEncode()
 		commandLine = [xWMAEncode, filename_temp, filename_wav]
 		util.RunCommandLine(commandLine)
 		util.RemoveFile(filename_temp)
@@ -127,12 +130,12 @@ def WAV2DSP(filename_wav, filename_dsp0, filename_dsp1, channel_count = 1):
 
 	if channel_count > 1:
 		commandLine = [VGAudioCli, "-c", "-i:1", filename_wav, filename_dsp1]
-		util.RunCommandLine(commandLine) 
+		util.RunCommandLine(commandLine)
 
 def DSP2LITTLE_ENDIAN(dsp_data, base):
 	""" swaps DSPMCADPM header data from big-endian to little-endian
 
-		typedef struct 
+		typedef struct
 		{
 			uint32_t num_samples;
 			uint32_t num_nibbles;
@@ -278,8 +281,11 @@ def ConvertSound_Internal(filepath_without_extension):
 			return False
 
 	# Convert the XWM to WAV
-	(err, channel_count, sound_duration) = XWM2WAV(filename_xwm, filename_wav, is_nxopus)
+	if has_xwm:
+		XWM2WAV(filename_xwm, filename_wav)
 
+	# Normalizes the WAV format
+	(err, channel_count, sound_duration) = WAV2PCM16WAV(filename_xwm, filename_wav, is_nxopus)
 	if err:
 		return False
 

@@ -17,21 +17,23 @@ function Convert-NIF([string] $fullpath, [hashtable] $info)
         $nswnifoptexe = Get-Utility "nswnifopt.exe"
         
         $removeEditorMarker = ""
-        if ($Global:SNXT.Settings.Meshes.RemoveEditorMarker -eq $True) {$removeEditorMarker = "--remove-editor-marker" }
+        if ($Global:SNXT.Config.Meshes.RemoveEditorMarker -eq $True) {$removeEditorMarker = "--remove-editor-marker" }
 
 	    $prettySortBlocks = ""
-        if ($Global:SNXT.Settings.Meshes.PrettySortBlocks -eq $True) {$prettySortBlocks = "--pretty-sort-blocks" }
+        if ($Global:SNXT.Config.Meshes.PrettySortBlocks -eq $True) {$prettySortBlocks = "--pretty-sort-blocks" }
 
 	    $trimTexturesPath = ""
-        if ($Global:SNXT.Settings.Meshes.TrimTexturesPath -eq $True) {$trimTexturesPath = "--trim-textures-path" }
+        if ($Global:SNXT.Config.Meshes.TrimTexturesPath -eq $True) {$trimTexturesPath = "--trim-textures-path" }
 
 	    $optimizeForSSE = ""
-        if ($Global:SNXT.Settings.Meshes.OptimizeForSSE -eq $True) {$optimizeForSSE = "--optimize-for-sse" }
+        if ($Global:SNXT.Config.Meshes.OptimizeForSSE -eq $True) {$optimizeForSSE = "--optimize-for-sse" }
     
+        Trace-Verbose ('nswnifopt CommandLine="{0}"' -f ("{0} -i {1} -o {1} {2} {3} {4} {5}" -f $nswnifoptexe, $fullpath, $removeEditorMarker, $prettySortBlocks, $trimTexturesPath, $optimizeForSSE)) $LogTreeFilename
         $nswnifopt = [string] (& $nswnifoptexe -i $fullpath -o $fullpath $removeEditorMarker $prettySortBlocks $trimTexturesPath $optimizeForSSE 2>&1)
 
         Trace-Verbose ('nswnifopt Output="{0}"' -f $nswnifopt) $LogTreeFilename
         $retValue.Success = $True
+        Trace-Debug ('Success Value="{0}"' -f $retValue.Success) $LogTreeFilename
         return $retValue
     }
     

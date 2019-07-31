@@ -135,7 +135,7 @@ function Resolve-Message([string] $msg, [string] $level, [int] $opt_Begin)
             Break 
         }
         0 { 
-            $retMsg = ("<{0}{1}/>`n" -f $level, $msg)
+            $retMsg = ("<{0}{1} />`n" -f $level, $msg)
             Break 
         }
         1 { 
@@ -177,6 +177,48 @@ function Trace-Error([string] $oMsg, [string] $logFile, [int] $opt_Begin)
     $msg = Resolve-Message $oMsg "SNXTError_" $opt_Begin
     $msg | Out-File $logfile -Append -NoNewLine
     #Wait-Command {Add-Content -Path $logfile -Value $msg -NoNewLine}
+}
+
+function Get-ConfigPath
+{
+    $configPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Config.xml"
+    return $configPath
+}
+
+function Set-Config
+{
+    $configPath = Get-ConfigPath
+    [xml]$configXML = $null
+    if (Test-Path $configPath -PathType Leaf)
+    {
+         $configXML = Get-Content -Path $configPath
+    }
+    else
+    {
+        $defaultConfigPath = Join-Path -Path $HomeLocation -ChildPath "SNXT-Config.xml"
+        $configXML = Get-Content -Path $defaultConfigPath
+        $configXML.Save($configPath)
+    }
+    $Global:SNXT.Config = @{}
+    foreach ($category in $configXML.Config.ChildNodes)
+    {
+        #Write-Host ('Config Category [{0}]' -f $category.Name)
+        $Global:SNXT.Config.Add($category.Name, @{})
+        foreach ($item in $category.ChildNodes)
+        {
+            $itemValue = $item.Value
+            if ($item.Type -eq "Integer")
+            {
+                $itemValue = $itemValue -as [Int]
+            }
+            elseif ($item.Type -eq "Boolean")
+            {
+                $itemValue = [System.Convert]::ToBoolean($itemValue)
+            }
+            $Global:SNXT.Config[$category.Name].Add($item.Name, $itemValue)
+            #Write-Host ('Config Item [{0}] is [{1}]' -f $item.Name, $itemValue)
+        }
+    }
 }
 
 function Start-Executable {

@@ -20,7 +20,7 @@ function Open-LogTree([array] $assets)
         $Task = ""
         $assetsLength = $assets.length
         $assetNumber = 0
-            
+        
         foreach ($asset in $assets)
         {
             $LogTreeFilename = Get-LogTreeFilename $asset
@@ -36,6 +36,7 @@ function Open-LogTree([array] $assets)
                 $created = $(New-Item $logPath -ItemType Directory)
             }
             $relativeFilename = Get-RelativeFilename $asset
+            
             $created = $(New-Item -Path $logPath -Name $logFilename -Value "" -Force)
             Trace-Verbose ('Create Logfile="{0}"' -f $LogTreeFilename) $Global:SNXT.Logfile
         }
@@ -70,6 +71,8 @@ $ProcessDDSScriptBlock = {
 
         Trace-Debug ('Process-Texture RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
         
+        Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
+
         $textureRet = @{}
         # Read the texture information
         $textureRet.Read = Read-DDS $texture $textureInfo 1
@@ -109,7 +112,7 @@ function Convert-Textures([array] $textures)
         $Task = ""
         $texturesLength = $textures.length
         $textureNumber = 0
-        $batchSize = $Global:SNXT.BatchSize
+        $batchSize = $Global:SNXT.Config.Performance.BatchSize
         
         if ($texturesLength -le -$batchSize)
         {
@@ -177,6 +180,8 @@ $ProcessHKXScriptBlock = {
 
         Trace-Debug ('Process-HKX RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
         
+        Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
+
         $assetRet = @{}
         # Read the asset information
         $assetRet.Read = Read-HKX $asset $assetInfo
@@ -223,7 +228,7 @@ function Convert-HKXs([array] $assets)
         $Task = ""
         $assetsLength = $assets.length
         $assetNumber = 0
-        $batchSize = $Global:SNXT.BatchSize
+        $batchSize = $Global:SNXT.Config.Performance.BatchSize
         if ($batchSize -le 0)
         {
             if ($assetsLength -le -$batchSize)
@@ -294,6 +299,8 @@ $ProcessNIFScriptBlock = {
 
         Trace-Debug ('Process-NIF RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
         
+        Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
+
         $assetRet = @{}
         # Read the asset information
         $assetRet.Convert = Convert-NIF $asset $assetInfo
@@ -321,7 +328,7 @@ function Convert-NIFs([array] $assets)
         $Task = ""
         $assetsLength = $assets.length
         $assetNumber = 0
-        $batchSize = $Global:SNXT.BatchSize
+        $batchSize = $Global:SNXT.Config.Performance.BatchSize
         if ($batchSize -le 0)
         {
             if ($assetsLength -le -$batchSize)

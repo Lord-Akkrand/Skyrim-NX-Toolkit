@@ -5,18 +5,21 @@ There are several external tools that are used by my scripts to get things done.
 - `bsarch.exe` is included in the repository directly, as it was developed under MPL.  
   It is available on Nexus here  
   <https://www.nexusmods.com/newvegas/mods/64745> and the source code is available here  
-  <https://github.com/TES5Edit/TES5Edit/tree/dev/Tools/BSArchive>
+  <https://github.com/TES5Edit/TES5Edit/tree/dev/Tools/BSArchive> 
 - `VGAudioCli.exe` was created by Thealexbarney  
   <https://github.com/Thealexbarney> and is available here  
   <https://github.com/Thealexbarney/VGAudio>
+- `sndfile-convert.exe.exe` was created by erikd  
+  <https://github.com/erikd> and is available here  
+  <https://github.com/erikd/libsndfile>
 - `XTX-Extractor` was created by AboodXD  
   <https://github.com/aboood40091> and is available here  
   <https://github.com/aboood40091/XTX-Extractor>
-- `convert_sound_zappa.py` was written by Zappastuff <https://github.com/thywoof>
-- `convert_hkx64.py` was written by Zappastuff <https://github.com/thywoof>
-- `nswnifopt.exe` was created by Zappastuff  
-  <http://github.com/thywoof> and is available here  
-  <https://github.com/thywoof/nswnifopt>
+- Skyrim Sound Format (FUZ, MCADPCM and OPUS) reverse engineered by Zappastuff <https://github.com/thywoof>
+    - `convert_sound_zappa.py`
+- Skyrim Animations conversion and NIF Models optimizations written by Zappastuff <https://github.com/thywoof>
+    - `convert_hkx64.py`
+    - `nswnifopt.exe` was created by Zappastuff and is available here <https://github.com/thywoof/nswnifopt>
 - `AdPDDS.exe` was created by apipino on Nexus <https://www.nexusmods.com/skyrim/users/1522687> and is distributed as a part of his texture opimizer `Ordenador` <https://www.nexusmods.com/skyrim/mods/12801/>
 
 There are further external tools that the toolkit will attempt to download if you don't have them in the `Utilities` directory, or that you must source yourself.

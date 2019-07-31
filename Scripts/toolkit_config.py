@@ -16,7 +16,7 @@ DefaultValues = {
 		"MaxAnimationThreads" : 5,
 		"MaxSoundThreads" : 5,
 		"MaxOtherThreads" : 5,
-		"MaxMeshThreads" : 5, 
+		"MaxMeshThreads" : 5,
 		"Multiprocessing" : False
 	},
 	"BSA":{
@@ -32,6 +32,11 @@ DefaultValues = {
 		"TrimTexturesPath": True,
 		"OptimizeForSSE": False
 	},
+	"Sounds":{
+		"fx": "MCADPCM",
+		"music": "MCADPCM",
+		"voice": "NXOPUS"
+	},
 	"Version":{
 		"ToolkitVersion" : util.GetToolkitVersion(),
 	}
@@ -42,10 +47,10 @@ def create_config(path):
 	Create a config file
 	"""
 	config = configparser.ConfigParser()
-	
+
 	for name, section in DefaultValues.items():
 		config[name] = section
-	
+
 	write_config(config)
 
 def get_config():
@@ -56,11 +61,11 @@ def get_config():
 	path = os.path.join(toolkit_path, "settings.ini")
 	if not os.path.exists(path):
 		create_config(path)
- 
+
 	config = configparser.ConfigParser()
 	config.read(path)
 
-	return config	
+	return config
 
 def check_clear():
 	config = get_config()
@@ -78,12 +83,12 @@ def check_clear():
 		clearOldConfig = True
 	if clearOldConfig:
 		util.LogInfo("Clearing settings.ini")
-		
+
 		toolkit_path = util.GetToolKitPath()
 		path = os.path.join(toolkit_path, "settings.ini")
 		create_config(path)
 		config.read(path)
-	
+
 def get_setting(section, setting):
 	"""
 	Print out a setting
@@ -95,17 +100,17 @@ def get_setting(section, setting):
 		value = DefaultValues[section][setting]
 		util.LogInfo("Added default setting {}/{} as {}".format(section, setting, value))
 		update_setting(section, setting, str(value))
-		
+
 	return value
 
 def get_int_setting(section, setting):
 	value = get_setting(section, setting)
 	return int(value)
- 
+
 def get_bool_setting(section, setting):
 	value = get_setting(section, setting)
 	return (value == "True")
- 
+
 def update_setting(section, setting, value):
 	"""
 	Update a setting
@@ -113,10 +118,10 @@ def update_setting(section, setting, value):
 	config = get_config()
 	if not config.has_section(section):
 		config.add_section(section)
-		
+
 	config.set(section, setting, value)
 	write_config(config)
- 
+
 def delete_setting(section, setting):
 	"""
 	Delete a setting
@@ -124,7 +129,7 @@ def delete_setting(section, setting):
 	config = get_config()
 	config.remove_option(section, setting)
 	write_config(config)
-	
+
 def write_config(config):
 	toolkit_path = util.GetToolKitPath()
 	path = os.path.join(toolkit_path, "settings.ini")

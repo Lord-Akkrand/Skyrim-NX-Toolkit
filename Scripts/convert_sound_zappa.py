@@ -3,6 +3,7 @@
 import os
 import util
 import time
+import toolkit_config
 
 def GetVGAudioCli():
 	utilities_path = util.GetUtilitiesPath()
@@ -183,9 +184,19 @@ def ConvertSound_Internal(filepath_without_extension):
 	has_xwm = os.path.exists(filename_xwm)
 	has_lip = os.path.exists(filename_lip)
 	has_fuz = os.path.exists(filename_fuz)
-	is_voice = "sound\\voice" in filepath_without_extension.lower()
 
-	util.LogDebug("Convert Sound <{}> WAV:{} XWM:{} LIP:{} FUZ:{} VOICE:{}".format(filepath_without_extension, has_wav, has_xwm, has_lip, has_fuz, is_voice))
+	# get the desired CODEC
+	if "\\music\\" in filepath_without_extension.lower():
+		codec = toolkit_config.get_setting("Sounds", "music")
+	elif "\\sound\\fx\\" in filepath_without_extension.lower():
+		codec = toolkit_config.get_setting("Sounds", "fx")
+	elif "\\sound\\voice\\" in filepath_without_extension.lower():
+		codec = toolkit_config.get_setting("Sounds", "voice")
+	else:
+		codec = "nxopus"
+	is_nxopus = codec.lower() == "nxopus"
+
+	util.LogDebug("Convert Sound <{}> WAV:{} XWM:{} LIP:{} FUZ:{} CODEC:{}".format(filepath_without_extension, has_wav, has_xwm, has_lip, has_fuz, codec))
 
 	# FUZ files always have precedence over loose WAV, XWM or LIP
 	lip_size = 0
@@ -210,18 +221,18 @@ def ConvertSound_Internal(filepath_without_extension):
 			lip_size = len(lip_data)
 
 	# Convert the XWM to WAV
-	(channel_count, sound_duration) = XWM2WAV(filename_xwm, filename_wav, is_voice)
+	(channel_count, sound_duration) = XWM2WAV(filename_xwm, filename_wav, is_nxopus)
 
 	#
 	# NX Skyrim vanilla uses MCADPCM for music and fx, OPUS for voice
 	#
-	if is_voice:
+	if is_nxopus:
 		WAV2LOPUS(filename_wav, filename_lopus)
 	else:
 		WAV2DSP(filename_wav, filename_dsp0, filename_dsp1, channel_count)
 
 	# this might sound redundant as there shouldn't be LIPs under FX but...
-	if is_voice or lip_size > 0:
+	if is_nxopus or lip_size > 0:
 		lip_padding = lip_size % 4
 		if lip_padding != 0: lip_padding = 4 - lip_padding
 		voice_offset = 0x10 + lip_size + lip_padding
@@ -231,11 +242,11 @@ def ConvertSound_Internal(filepath_without_extension):
 			fuz_nx_file.write(header_fuz)
 			fuz_nx_file.write(lip_size.to_bytes(4, byteorder = 'little', signed = False))
 			fuz_nx_file.write(voice_offset.to_bytes(4, byteorder = 'little', signed = False))
-			fuz_nx_file.write(lip_data)
+			if lip_size > 0: fuz_nx_file.write(lip_data)
 			fuz_nx_file.write(b'\x00' * lip_padding)
 
 			# write the SOUND content
-			if is_voice:
+			if is_nxopus:
 				LOPUS2FUZ(filename_lopus, channel_count, sound_duration, fuz_nx_file)
 			else:
 				DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, fuz_nx_file)
@@ -245,12 +256,12 @@ def ConvertSound_Internal(filepath_without_extension):
 
 	# clean up temporary files
 	util.RemoveFile(filename_wav)
-	if is_voice: util.RemoveFile(filename_lopus)
-	if channel_count > 0 and not is_voice: util.RemoveFile(filename_dsp0)
-	if channel_count > 1 and not is_voice: util.RemoveFile(filename_dsp1)
+	if is_nxopus: util.RemoveFile(filename_lopus)
+	if channel_count > 0 and not is_nxopus: util.RemoveFile(filename_dsp0)
+	if channel_count > 1 and not is_nxopus: util.RemoveFile(filename_dsp1)
 	if has_xwm: util.RemoveFile(filename_xwm)
 	if has_lip: util.RemoveFile(filename_lip)
-	if lip_size == 0 and not is_voice: util.RemoveFile(filename_fuz)
+	if lip_size == 0 and not is_nxopus: util.RemoveFile(filename_fuz)
 
 	return (channel_count > 0)
 

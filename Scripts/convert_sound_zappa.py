@@ -55,7 +55,7 @@ def WAV2PCM16WAV(filename_xwm, filename_wav, isNxOpus):
 				wav_header = wav_file.read(0xFF)
 				wav_format = wav_header[0x08:0x0C].decode()
 		except:
-			util.LogInfo("ERROR: failed to create intermediate WAV <{}>.".format(filename_wav))
+			util.LogInfo("ERROR: failed to fix collateral case on WAV <{}>.".format(filename_wav))
 			return (True, None, None)
 
 	wav_audio_format = int.from_bytes(wav_header[0x14:0x16], byteorder = 'little', signed = False)
@@ -65,21 +65,22 @@ def WAV2PCM16WAV(filename_xwm, filename_wav, isNxOpus):
 	#
 	# make the WAV file compatible with VGAudioCLi
 	#
+	# OPUS CODEC requires 24000 or 48000 sample rates from a PCM16 stream
+	# DSPADPCM CODEC requires 22050 or 44100 sample rates from a PCM16 stream
+	#
 
 	# get the closest ressampling RATE
-	RATES = [24000, 48000] if isNxOpus else [22050, 44100]
+	DESIRED_RATES = [24000, 48000] if isNxOpus else [22050, 44100]
 	try:
 		i = 0
-		while wav_sample_rate >= RATES[i]:
+		while wav_sample_rate >= DESIRED_RATES[i]:
 			i += 1
 	except:
 		i = 1
-	override_sample_rate = str(RATES[i])
+	override_sample_rate = str(DESIRED_RATES[i])
 
-	#
-	# Possible temporary fix for issues with Faye Mod which has voices in stereo
-	#
-	if isNxOpus or wav_audio_format != 1 or wav_bits_per_sample != 16:
+	# ressample if required
+	if (isNxOpus and not wav_sample_rate in DESIRED_RATES) or wav_audio_format != 1 or wav_bits_per_sample != 16:
 		filename_temp = filename_wav + "temp.wav"
 		util.RemoveFile(filename_temp)
 		util.RenameFile(filename_wav, filename_temp)
@@ -107,7 +108,7 @@ def WAV2PCM16WAV(filename_xwm, filename_wav, isNxOpus):
 		wav_duration_ms = 0
 
 	util.LogDebug(
-		"Converted WAVE <{}>:\n  DURATION:{} FORMAT:{} CHANNELS:{} SAMPLE_RATE:{} BITS_PER_SAMPLE:{} DATA_SIZE:{}".format(
+		"Converted WAV <{}>:\n  DURATION:{} FORMAT:{} CHANNELS:{} SAMPLE_RATE:{} BITS_PER_SAMPLE:{} DATA_SIZE:{}".format(
 			filename_wav, wav_duration_ms, wav_audio_format, wav_channel_count, wav_sample_rate, wav_bits_per_sample, wav_data_size)
 	)
 
@@ -173,37 +174,51 @@ def DSP2LITTLE_ENDIAN(dsp_data, base):
 	dsp_data[base+0x1C:base+0x5F:2], dsp_data[base+0x1D:base+0x60:2] = \
 	dsp_data[base+0x1D:base+0x60:2], dsp_data[base+0x1C:base+0x5F:2]
 
-def NXOPUS2FUZ(filename_nxopus, channel_count, sound_duration, sound_file):
+def NXOPUS2FUZ(filename_nxopus, channel_count, sound_duration_ms, sound_file):
 	""" adds required NX SSE header to a nxopus sound """
 
-	with open(filename_nxopus, "rb") as nxopus_file:
-		nxopus_data = bytearray(nxopus_file.read())
-		nxopus_size = len(nxopus_data)
+	try:
+		with open(filename_nxopus, "rb") as nxopus_file:
+			nxopus_data = bytearray(nxopus_file.read())
+			nxopus_size = len(nxopus_data)
+	except:
+		util.LogInfo("ERROR: failed to open intermediate NXOPUS <{}>.".format(filename_nxopus))
+		return True
 
 	nx_sse_opus_header_size = b'\x14\x00\x00\x00'
 	nx_sse_opus_signature = b'\x0A\x8D\xD5\xFF'
 
 	sound_file.write(nx_sse_opus_signature)
-	sound_file.write(sound_duration.to_bytes(4, byteorder = 'little', signed = False))
+	sound_file.write(sound_duration_ms.to_bytes(4, byteorder = 'little', signed = False))
 	sound_file.write(channel_count.to_bytes(4, byteorder = 'little', signed = False))
 	sound_file.write(nx_sse_opus_header_size)
 	sound_file.write(nxopus_size.to_bytes(4, byteorder = 'little', signed = False))
 	sound_file.write(nxopus_data)
 
+	return False
+
 def DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, sound_file):
 	""" creates a MCADPCM file from DSPADPCM ones """
 
-	with open(filename_dsp0, "rb") as dsp0_file:
-		dsp0_data = bytearray(dsp0_file.read())
-		dsp0_size = len(dsp0_data)
-		DSP2LITTLE_ENDIAN(dsp0_data, 0x00)
+	try:
+		with open(filename_dsp0, "rb") as dsp0_file:
+			dsp0_data = bytearray(dsp0_file.read())
+			dsp0_size = len(dsp0_data)
+			DSP2LITTLE_ENDIAN(dsp0_data, 0x00)
+	except:
+		util.LogInfo("ERROR: failed to open intermediate DSP <{}>.".format(filename_dsp0))
+		return True
 
 	if channel_count > 1:
-		with open(filename_dsp1, "rb") as dsp1_file:
-			dsp1_data = bytearray(dsp1_file.read())
-			dsp1_size = len(dsp1_data)
-			dsp1_offset = 0x14 + dsp0_size
-			DSP2LITTLE_ENDIAN(dsp1_data, 0x00)
+		try:
+			with open(filename_dsp1, "rb") as dsp1_file:
+				dsp1_data = bytearray(dsp1_file.read())
+				dsp1_size = len(dsp1_data)
+				dsp1_offset = 0x14 + dsp0_size
+				DSP2LITTLE_ENDIAN(dsp1_data, 0x00)
+		except:
+			util.LogInfo("ERROR: failed to open intermediate DSP <{}>.".format(filename_dsp1))
+			return True
 
 		header_stereo = b'\x02\x00\x00\x00\x14\x00\x00\x00'
 		sound_file.write(header_stereo)
@@ -218,6 +233,8 @@ def DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, sound_file):
 		sound_file.write(header_single)
 		sound_file.write(dsp0_size.to_bytes(4, byteorder = 'little', signed = False))
 		sound_file.write(dsp0_data)
+
+	return False
 
 def ConvertSound_Internal(filepath_without_extension):
 	""" Converts PC SSE sound files to be compatible with NX SSE supported codecs """
@@ -252,23 +269,27 @@ def ConvertSound_Internal(filepath_without_extension):
 	# FUZ files always have precedence over loose WAV, XWM or LIP
 	lip_size = 0
 	if has_fuz:
-		with open(filename_fuz, "rb") as fuz_file:
-			fuz_file.seek(0x08)
-			lip_size = int.from_bytes(fuz_file.read(0x04), byteorder = 'little', signed = False)
-			lip_data = fuz_file.read(lip_size)
+		try:
+			with open(filename_fuz, "rb") as fuz_file:
+				fuz_file.seek(0x08)
+				lip_size = int.from_bytes(fuz_file.read(0x04), byteorder = 'little', signed = False)
+				lip_data = fuz_file.read(lip_size)
 
-			if lip_size == 0:
-				util.LogDebug("INFO: FUZ {} has a 0 bytes LIP data.".format(filename_fuz))
+				if lip_size == 0:
+					util.LogDebug("INFO: FUZ {} has a 0 bytes LIP data.".format(filename_fuz))
 
-			try:
-				with open(filename_xwm, "wb") as xwm_file:
-					xwm_file.write(fuz_file.read())
-					has_xwm = True
-			except:
-				util.LogInfo("ERROR: failed to create intermediate WMV <{}>.".format(filename_xwm))
-				return False
+				try:
+					with open(filename_xwm, "wb") as xwm_file:
+						xwm_file.write(fuz_file.read())
+						has_xwm = True
+				except:
+					util.LogInfo("ERROR: failed to create intermediate WMV <{}>.".format(filename_xwm))
+					return False
 
-			util.LogDebug("INFO: XWM created on disk from FUZ {}.".format(filename_fuz))
+				util.LogDebug("INFO: XWM created on disk from FUZ {}.".format(filename_fuz))
+		except:
+			util.LogInfo("ERROR: failed to open FUZ <{}>.".format(filename_lip))
+			return False
 
 	# Load LIP from disk in the rare case the LIP in FUZ is empty
 	if lip_size == 0 and has_lip:
@@ -277,7 +298,7 @@ def ConvertSound_Internal(filepath_without_extension):
 				lip_data = lip_file.read()
 				lip_size = len(lip_data)
 		except:
-			util.LogInfo("ERROR: failed to read LIP <{}>.".format(filename_lip))
+			util.LogInfo("ERROR: failed to open LIP <{}>.".format(filename_lip))
 			return False
 
 	# Convert the XWM to WAV
@@ -285,7 +306,7 @@ def ConvertSound_Internal(filepath_without_extension):
 		XWM2WAV(filename_xwm, filename_wav)
 
 	# Normalizes the WAV format
-	(err, channel_count, sound_duration) = WAV2PCM16WAV(filename_xwm, filename_wav, is_nxopus)
+	(err, channel_count, sound_duration_ms) = WAV2PCM16WAV(filename_xwm, filename_wav, is_nxopus)
 	if err:
 		return False
 
@@ -301,19 +322,28 @@ def ConvertSound_Internal(filepath_without_extension):
 		if lip_padding != 0: lip_padding = 4 - lip_padding
 		voice_offset = 0x10 + lip_size + lip_padding
 
+		# write the FUZ header
+		#
+		# on PC a FUZ header has 0x0A bytes. NX adds an additional uint32_t to header end
+		# it represents the offset where the SOUND content starts as NX pads LIP content
+		#
 		fuz_nx_payload = BytesIO()
 		header_fuz = b'\x46\x55\x5A\x45\x01\x00\x00\x00'
 		fuz_nx_payload.write(header_fuz)
 		fuz_nx_payload.write(lip_size.to_bytes(4, byteorder = 'little', signed = False))
 		fuz_nx_payload.write(voice_offset.to_bytes(4, byteorder = 'little', signed = False))
+
+		# write the LIP content
 		if lip_size > 0: fuz_nx_payload.write(lip_data)
 		fuz_nx_payload.write(b'\x00' * lip_padding)
 
-		# write the SOUND content and force stereo to MCADPCM
+		# write the SOUND content
 		if is_nxopus:
-			NXOPUS2FUZ(filename_nxopus, channel_count, sound_duration, fuz_nx_payload)
+			err = NXOPUS2FUZ(filename_nxopus, channel_count, sound_duration_ms, fuz_nx_payload)
 		else:
-			DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, fuz_nx_payload)
+			err = DSP2MCADPCM(filename_dsp0, filename_dsp1, channel_count, fuz_nx_payload)
+		if err:
+			return False
 
 		# pad the FUZ content to the closest uint32
 		fuz_padding = fuz_nx_payload.getbuffer().nbytes % 4

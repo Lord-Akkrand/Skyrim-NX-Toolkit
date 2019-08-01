@@ -150,6 +150,21 @@ function Slice-ArrayPython([byte []] $data, [int]$startSlice, [int]$endSlice)
     return $data[$startSlice..$endSlice]
 }
 
+function Slice-StringPython([string] $data, [int]$startSlice, [int]$endSlice)
+{
+    if ($startSlice -lt 0)
+    {
+        $startSlice = $data.Length + $startSlice + 1
+    }
+    if ($endSlice -lt 0)
+    {
+        $endSlice = $data.Length + $endSlice + 1
+    }
+    #python slicing doesn't include the last entry in a slice
+    $endSlice -= 1
+    return $data[$startSlice..$endSlice]
+}
+
 function Resolve-Message([string] $msg, [string] $level, [int] $opt_Begin)
 {
     #Write-Host ("[{0}] {1}" -f $msg, $opt_Begin)

@@ -12,7 +12,7 @@ Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Util\
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-BSA\SNXT-BSA.psm1") -Force -WarningAction SilentlyContinue
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Job\SNXT-Job.psm1") -Force -WarningAction SilentlyContinue
 
-$UnitTest = "Unit Test DDS"
+$UnitTest = "Akkrandrim"
 
 $UnitTests = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Unit Tests"
 $UnitTestPath = Join-Path -Path $UnitTests -ChildPath $UnitTest
@@ -55,4 +55,4 @@ function Process-Mod
 
 $timeInfo = Measure-Command { Process-Mod }
 $timeString = Get-FormattedTime $timeInfo
-Write-Host ('Process-Mod Time {0}' -f $timeString)
+Write-Host ('Process-Mod Time{0}' -f $timeString)

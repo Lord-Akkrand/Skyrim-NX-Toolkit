@@ -70,11 +70,12 @@ $ProcessDDSScriptBlock = {
     # Read the texture information
     foreach ($texture in $jobBatch)
     {
+        $startTime = Get-Date
         $textureInfo = @{}
         $relativeFilename = Get-RelativeFilename $texture
         $LogTreeFilename = Get-LogTreeFilename $texture
 
-        Trace-Debug ('Process-Texture RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        Trace-Debug ('Process-DDS RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
         
         Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
 
@@ -97,7 +98,11 @@ $ProcessDDSScriptBlock = {
             $textureRet.Success = $textureRet.Convert.Success
         }
         $outputHash.Add($texture, $textureRet)
-        Trace-Debug ('Process-Texture' -f $relativeFilename) $LogTreeFilename -1
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Debug ('Process-DDS-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Debug ('Process-DDS' -f $relativeFilename) $LogTreeFilename -1
     }
     return $outputHash
 }
@@ -142,7 +147,7 @@ function Convert-Textures([array] $textures)
                 $batchInProgress = [System.Collections.ArrayList]@()
                 Add-JobToQueue $task
                 $batchCount += 1
-                Write-Host ('Batch Queued Job="{0}" Assets="{1}"' -f $JobName, $jobBatch.Count)
+                Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
         Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
@@ -155,7 +160,7 @@ function Convert-Textures([array] $textures)
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
         Trace-Verbose ('Convert-DDSs-Time{0}' -f $timeString) $Global:SNXT.Logfile
-        Trace-Verbose ("Convert-DDS") $Global:SNXT.Logfile -1
+        Trace-Verbose ("Convert-DDSs") $Global:SNXT.Logfile -1
     }
 }
 
@@ -176,6 +181,7 @@ $ProcessHKXScriptBlock = {
     # Read the asset information
     foreach ($asset in $jobBatch)
     {
+        $startTime = Get-Date
         $assetInfo = @{}
         $relativeFilename = Get-RelativeFilename $asset
         $LogTreeFilename = Get-LogTreeFilename $asset
@@ -210,6 +216,10 @@ $ProcessHKXScriptBlock = {
         }
        
         $outputHash.Add($asset, $assetRet)
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Debug ('Process-HKX-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug ('Process-HKX' -f $relativeFilename) $LogTreeFilename -1
     }
     return $outputHash
@@ -256,7 +266,7 @@ function Convert-HKXs([array] $assets)
                 Add-JobToQueue $task
 
                 $batchCount += 1
-                Write-Host ('Batch Queued Job="{0}" Assets="{1}"' -f $JobName, $jobBatch.Count)
+                Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
         Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
@@ -290,6 +300,7 @@ $ProcessNIFScriptBlock = {
     # Read the asset information
     foreach ($asset in $jobBatch)
     {
+        $startTime = Get-Date
         $assetInfo = @{}
         $relativeFilename = Get-RelativeFilename $asset
         $LogTreeFilename = Get-LogTreeFilename $asset
@@ -305,6 +316,10 @@ $ProcessNIFScriptBlock = {
         $assetRet['Success'] = $assetRet.Convert['Success']
        
         $outputHash.Add($asset, $assetRet)
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Debug ('Process-NIF-Time{0}' -f $timeString) $LogTreeFilename
         Trace-Debug ('Process-NIF' -f $relativeFilename) $LogTreeFilename -1
     }
     return $outputHash
@@ -351,7 +366,7 @@ function Convert-NIFs([array] $assets)
                 Add-JobToQueue $task
 
                 $batchCount += 1
-                Write-Host ('Batch Queued Job="{0}" Assets="{1}"' -f $JobName, $jobBatch.Count)
+                Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
         Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
@@ -366,6 +381,130 @@ function Convert-NIFs([array] $assets)
         Trace-Verbose ('Convert-NIFs-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Convert-NIFs") $Global:SNXT.Logfile -1
     }
+}
+
+$ProcessSNDScriptBlock = {
+    param($globals, [System.Collections.ArrayList]$jobBatch)
+    $Global:SNXT = $globals
+
+    $VerbosePreference = 'SilentlyContinue'
+    $DebugPreference = 'SilentlyContinue'
+
+    Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath 'SNXT-SND\SNXT-SND.psm1') -Force -WarningAction SilentlyContinue
+    Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath 'SNXT-Util\SNXT-Util.psm1') -WarningAction SilentlyContinue
+
+    $VerbosePreference = 'Continue'
+    $DebugPreference = 'Continue'
+    
+    $outputHash = @{}
+    # Read the asset information
+    foreach ($asset in $jobBatch)
+    {
+        $startTime = Get-Date
+        $assetInfo = @{}
+        $relativeFilename = Get-RelativeFilename $asset
+        $LogTreeFilename = Get-LogTreeFilename $asset
+
+        Trace-Debug ('Process-SND RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        
+        Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
+
+        $assetRet = @{}
+        # Read the asset information
+        $assetRet.Convert = Convert-SND $asset $assetInfo
+
+        $assetRet['Success'] = $assetRet.Convert['Success']
+       
+        $outputHash.Add($asset, $assetRet)
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Debug ('Process-SND-Time{0}' -f $timeString) $LogTreeFilename
+        Trace-Debug ('Process-SND' -f $relativeFilename) $LogTreeFilename -1
+    }
+    return $outputHash
+}
+function Convert-SNDs([array] $assets)
+{
+    Begin
+    {
+        Trace-Verbose ("Convert-SNDs") $Global:SNXT.Logfile 1
+        $MyProgressId = $ProgressId++
+        $JobName = "Convert-SND"
+        $startTime = Get-Date
+    }
+
+    Process
+    {
+        # Progress Bar information
+        $Activity = "Queuing SND Process"
+        $Task = ""
+        $assetsLength = $assets.length
+        $assetNumber = 0
+        $batchSize = Get-BatchSize $assetsLength
+        
+        $batchInProgress = [System.Collections.ArrayList]@()
+        $batchCount = 0
+        foreach ($asset in $assets)
+        {
+            # Update Progress Bar
+            $filename = Split-Path -Leaf $asset
+            $percentComplete = (++$assetNumber / $assetsLength) * 100
+            Write-Progress -Activity $Activity -Status $filename -Id $MyProgressId -PercentComplete $percentComplete
+
+            $batchInProgress += $asset
+            if ($batchInProgress.Count -ge $batchSize -or $assetNumber -eq $assetsLength)
+            {
+                $jobBatch = [System.Collections.ArrayList]@() + $batchInProgress
+                
+                $task = @{
+                    ScriptBlock = $ProcessSNDScriptBlock
+                    Arguments = @($Global:SNXT, $jobBatch)
+                }
+
+                $batchInProgress = [System.Collections.ArrayList]@()
+                Add-JobToQueue $task
+
+                $batchCount += 1
+                Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
+            }
+        }
+        Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
+        Submit-Jobs "SND Processing" $JobName $MyProgressId
+    }
+
+    End
+    {
+        $endTime = Get-Date
+        $timeSpan = New-TimeSpan -Start $startTime -End $endTime
+        $timeString = Get-FormattedTime $timeSpan
+        Trace-Verbose ('Convert-SNDs-Time{0}' -f $timeString) $Global:SNXT.Logfile
+        Trace-Verbose ("Convert-SNDs") $Global:SNXT.Logfile -1
+    }
+}
+
+function Get-SoundList([array] $allSounds)
+{
+    $sndsHash = @{}
+    $assetNumber = 0
+    $assetsLength = $allSounds.Count
+    $MyProgressId = $ProgressId++
+    $Activity = "Determining Sound List"
+    $count = 0
+    foreach ($sndfile in $allSounds)
+    {
+        $sndFileWExt = $sndFile.Substring(0, ($sndFile.length-4))
+        
+        if ($sndsHash.ContainsKey($sndFileWExt) -eq $False)
+        {
+            $sndsHash.Add($sndFileWExt, $True)
+            $count += 1
+        }
+        $filename = ('Current File [{0}] Sound Files: {1}' -f (Split-Path -Leaf $sndfile), $count)
+        $percentComplete = (++$assetNumber / $assetsLength) * 100
+        Write-Progress -Activity $Activity -Status $filename -Id $MyProgressId -PercentComplete $percentComplete
+    }
+    return $sndsHash.Keys
 }
 
 function Convert-Path
@@ -392,6 +531,9 @@ function Convert-Path
         $allAssets += $hkxs
         $nifs = $AllTheFiles | Where-Object { $_.Extension -eq ".nif" } | Select-Object -ExpandProperty FullName
         $allAssets += $nifs
+        $allSounds = $AllTheFiles | Where-Object { $_.Extension -eq ".xwm" -or $_.Extension -eq ".fuz" -or $_.Extension -eq ".wav" } | Select-Object -ExpandProperty FullName
+        $snds = Get-SoundList $allSounds
+        $allAssets += $snds
         
         Open-LogTree $allAssets
 
@@ -400,6 +542,8 @@ function Convert-Path
         Convert-HKXs $hkxs
 
         Convert-NIFs $nifs
+
+        Convert-SNDs $snds
     }
 
     End

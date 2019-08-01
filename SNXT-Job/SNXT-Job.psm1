@@ -14,7 +14,7 @@ function Get-BatchSize($assetCount)
     $numberThreads = $Global:SNXT.Config.Performance.MaxThreads
     
     $spreadOut = $assetCount / $numberThreads
-    $multipleThreads = $spreadOut / $Global:SNXT.Config.Performance.BatchesPerThread
+    $multipleThreads = [Math]::ceiling($spreadOut / $Global:SNXT.Config.Performance.BatchesPerThread)
     $batchSize = [Math]::max($Global:SNXT.Config.Performance.MinBatchSize, $multipleThreads)
     $batchSize = [Math]::min($Global:SNXT.Config.Performance.MaxBatchSize, $batchSize)
     

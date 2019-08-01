@@ -364,8 +364,12 @@ def ConvertSoundAsync(target, filename, logname, ret):
 if __name__ == '__main__':
 	import sys
 	filepath = sys.argv[1]
-	util.InitialiseLog(filepath + ".log")
-	util.StartTimer()
-	util.LogInfo("Skyrim-NX-Toolkit {} - convert_txt".format(util.GetToolkitVersion()))
-	ConvertSound_Internal(filepath)
-	util.EndTimer()
+	util.SetScriptPath(sys.argv[2])
+	util.LogInfo("Skyrim-NX-Toolkit {} - convert_sound_zappa".format(util.GetToolkitVersion()))
+	retValue = ConvertSound_Internal(filepath)
+	tempLog = util.GetTempLog()
+	for msg in tempLog:
+		print(msg)
+	if not retValue:
+		sys.exit(1)
+	sys.exit(0)

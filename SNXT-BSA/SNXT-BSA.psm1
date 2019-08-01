@@ -34,96 +34,107 @@ function Unpack-BSAs([string[]] $bsaPaths, [string] $targetPath)
     }
 }
 
-function Stash-Loose([string[]] $files, [string[]] $directories, [string] $targetPath)
+function Remove-NoESP([string[]] $espFiles, [string] $targetPath)
 {
     Begin
     {
-        Trace-Verbose ('Stash-Loose FileCount="{0}" DirectoryCount="{1}" TargetPath="{2}"' -f $files.Count, $directories.Count, $targetPath) $Global:SNXT.Logfile 1 
-        $bsaarchexe = Get-Utility "bsarch.exe"
+        Trace-Verbose ('Remove-ESP Count="{0}" TargetPath="{1}"' -f $espFiles.Count, $targetPath) $Global:SNXT.Logfile 1 
     }
     
     Process
     {
-        $stashPath = Join-Path -Path $targetPath -ChildPath "LooseStash"
-        $created = $(New-Item $stashPath -ItemType Directory)
+        
+    }
 
-        $allItems = [array]$files + $directories
-        foreach ($item in $allItems)
+    End
+    {
+        Trace-Verbose 'Remove-ESP' $Global:SNXT.Logfile -1
+    }
+}
+
+function Copy-Loose([string[]] $allTheFiles, [string] $targetPath)
+{
+    Begin
+    {
+        Trace-Verbose ('Copy-Loose FileCount="{0}" TargetPath="{1}"' -f $allTheFiles.Count, $targetPath) $Global:SNXT.Logfile 1 
+    }
+    
+    Process
+    {
+        $copyCandidates = $copyCandidates | Where { $_.Extension -ne ".bsa" -and !($_.PSIsContainer) } | Select-Object -ExpandProperty FullName
+        $pluginFiles = $copyCandidates | Where { $_.Extension -eq ".esp" -or $_.Extension -eq ".esm" -or $_.Extension -eq ".esl" } | Select-Object -ExpandProperty Name
+        $pluginRegexes = [System.Collections.ArrayList]@()
+        foreach ($pluginFile in $pluginFiles)
+        {
+            $pluginRegexes += ('*{0}*' -f $pluginFile)
+        }
+        $pluginRegexes += "*skyrim.esm*"
+        $pluginRegexes += "*dawnguard.esm*"
+        $pluginRegexes += "*hearthfires.esm*"
+        $pluginRegexes += "*dragonborn.esm*"
+        
+        foreach ($item in $copyCandidates)
         {
             $relativeFilename = Get-RelativeFilename $item
-            $target = Join-Path -Path $stashPath -ChildPath $relativeFilename
-            $relativeTarget = Get-RelativeFilename $target
-            Trace-Verbose ('Stash Origin="{0}" Target="{1}"' -f $relativeFilename, $relativeTarget) $Global:SNXT.Logfile
-            Move-Item -Path $item -Destination $target
+            $allowCopy = $True
+            if ($relativeFilename -like "*.esp*" -or $relativeFilename -like "*.esm*" -or $relativeFilename -like "*.esl*")
+            {
+                $allowCopy = $False
+                foreach ($pluginRegex in $pluginRegexes)
+                {
+                    if ($relativeFilename -like $pluginRegex)
+                    {
+                        $allowCopy = $True
+                        break
+                    }
+                }
+            }
+            if ($allowCopy)
+            {
+                $target = Join-Path -Path $targetPath -ChildPath $relativeFilename
+                $relativeTarget = Get-RelativeFilename $target
+                Trace-Verbose ('Copy Origin="{0}" Target="{1}"' -f $relativeFilename, $relativeTarget) $Global:SNXT.Logfile
+                Copy-Item -Path $item -Destination $target -Recurse
+            }
+            else {
+                Write-Host ('Not copying {0} because no plugins are present for it' -f $relativeFilename)
+            }
         }
     }
 
     End
     {
-        Trace-Verbose 'Stash-Loose' $Global:SNXT.Logfile -1
+        Trace-Verbose 'Copy-Loose' $Global:SNXT.Logfile -1
     }
 }
 
-function Restore-Stash([string] $targetPath)
+function Unpack-Mod([string] $pristinePath, [string] $convertedPath)
 {
     Begin
     {
-        Trace-Verbose ('Restore-Stash') $Global:SNXT.Logfile 1 
-    }
-    
-    Process
-    {
-        $stashPath = Join-Path -Path $targetPath -ChildPath "LooseStash"
-        $originPath = ("{0}{1}*" -f $stashPath, [IO.Path]::DirectorySeparatorChar)
-        Trace-Verbose ('Origin Path="{0}"' -f $originPath) $Global:SNXT.Logfile
-        Trace-Verbose ('Target Path="{0}"' -f $targetPath) $Global:SNXT.Logfile
-        $AllTheItems = Get-ChildItem $originPath -Recurse 
-        $allTheFiles = $AllTheItems | Where { !($_.PSIsContainer) } | Select-Object -ExpandProperty FullName
-        foreach ($file in $allTheFiles)
-        {
-            $target = $file.Replace($stashPath, $targetPath)
-            Trace-Verbose ('Move Origin="{0}" Target="{1}"' -f (Get-RelativeFilename $file), (Get-RelativeFilename $target)) $Global:SNXT.Logfile
-            Move-Item -Path $file -Destination $target -Force
-        }
-        Remove-Item $stashPath -Force -Recurse
-    }
-
-    End
-    {
-        Trace-Verbose 'Restore-Stash' $Global:SNXT.Logfile -1
-    }
-}
-
-function Unpack-Mod([string] $modPath)
-{
-    Begin
-    {
-        Trace-Verbose ('Unpack-Mod Path="{0}"' -f $modPath) $Global:SNXT.Logfile 1 
+        Trace-Verbose ('Unpack-Mod Pristine="{0}" Converted="{0}"' -f $pristinePath, $convertedPath) $Global:SNXT.Logfile 1 
     }
     
     Process
     {
         # Get a list of all the files in the path
-        $AllTheFiles = Get-ChildItem $modPath -Recurse 
-        $LocalFiles = Get-ChildItem $modPath
+        $AllTheFiles = Get-ChildItem $convertedPath -Recurse 
+        $LocalFiles = Get-ChildItem $convertedPath
         # Filter it to all the textures
         $looseFiles = $LocalFiles | Where { $_.Extension -ne ".bsa" -and !($_.PSIsContainer) } | Select-Object -ExpandProperty FullName
         $looseDirectories = $LocalFiles | Where { $_.PSIsContainer } | Select-Object -ExpandProperty FullName
-        
-        $bsaFiles = $AllTheFiles | Where { $_.Extension -eq ".bsa" } | Select-Object -ExpandProperty FullName
-        $hasBSAs = $bsaFiles.Count -gt 0
-        Trace-Verbose ('HasBSAs Value="{0}"' -f $hasBSAs) $Global:SNXT.Logfile
-        if ($hasBSAs)
-        {
-            Report-Measure { Stash-Loose $looseFiles $looseDirectories $modPath } "Stash-Loose"
-
-            Report-Measure { Unpack-BSAs $bsaFiles $modPath } "Unpack-BSAs"
-
-            Report-Measure { Restore-Stash $modPath } "Restore-Stash"
-        }
-        
 
         $pluginFiles = $AllTheFiles | Where { $_.Extension -eq ".esp" -or $_.Extension -eq ".esm" -or $_.Extension -eq ".esl" } | Select-Object -ExpandProperty FullName
+        
+        $bsaFiles = $AllTheFiles | Where { $_.Extension -eq ".bsa" } | Select-Object -ExpandProperty FullName
+        Trace-Verbose ('BSAs Count="{0}"' -f $bsaFiles.Count) $Global:SNXT.Logfile
+        if ($bsaFiles.Count -gt 0)
+        {
+            Unpack-BSAs $bsaFiles $pristinePath $convertedPath
+            Remove-NoESP $pluginFiles $convertedPath 
+        }
+
+        Copy-Loose $AllTheFiles $convertedPath
     }
 
     End
@@ -132,4 +143,4 @@ function Unpack-Mod([string] $modPath)
     }
 }
 
-Export-ModuleMember -Function Unpack-BSA, Unpack-Mod
+Export-ModuleMember -Function Unpack-Mod

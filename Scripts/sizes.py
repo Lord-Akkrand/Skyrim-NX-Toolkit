@@ -64,8 +64,6 @@ Rules = {}
 
 BaseRules = []
 
-BaseRules.append({"Name":"Architecture", 'Path':[r'\barchitecture\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"Landscape", 'Path':[r'\blandscape\b'], 'Size':1024*1024})
 BaseRules.append({"Name":"Actors", 'Path':[r'\bactors\b'], 'Size':2048*2048})
 
 Rules['Base'] = BaseRules
@@ -75,9 +73,11 @@ ConvertFromTo = []
 ConvertFromTo.append(('DX10',DXT5))
 ConvertFromTo.append(('BGRA',RGBA))
 ConvertFromTo.append(('BC3_UNORM_SRGB',DXT5))
+ConvertFromTo.append(('BC4U',DXT5))
 
 ConvertFromToSDK = []
 ConvertFromToSDK.append(('R8UN',DXT1))
-ConvertFromToSDK.append(('BC3_UNORM_SRGB',DX10))
+ConvertFromToSDK.append(('BC3_UNORM_SRGB',DXT5))
 ConvertFromToSDK.append(('DX10',DXT5))
+ConvertFromToSDK.append(('BC4U',DXT5))
 

@@ -236,7 +236,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 		commandLine = [adp_dds, str(adp_config), ddsFileName]
 		(output, err) = util.RunCommandLine(commandLine)
 		#subsequent runs, remove the 'Rebuild' mipmaps back to 'Make'
-		adp_config -= 1000000
+		adp_config -= 0
 		numberExtraRuns = numberOfRuns - 1
 		if numberExtraRuns > 0:
 			util.LogDebug("Going to run AdpDDS.exe " + str(numberExtraRuns) + " extra times to get the size down")

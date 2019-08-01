@@ -23,7 +23,7 @@ DefaultValues = {
 		"FullRules" : False
 	},
 	"Textures":{
-		"DefaultSizeLimit" : 512*512,
+		"DefaultSizeLimit" : 1024*1024,
 	"SizeRules" : "Base"
 	},
 	"Meshes":{

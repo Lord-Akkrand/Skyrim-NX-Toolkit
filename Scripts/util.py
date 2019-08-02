@@ -2,7 +2,7 @@
 
 import datetime, inspect, logging, os, subprocess, shutil
 
-g_ToolkitVersion = 'v2.6.1'
+g_ToolkitVersion = 'v2.6.2'
 
 def GetToolkitVersion():
 	return g_ToolkitVersion

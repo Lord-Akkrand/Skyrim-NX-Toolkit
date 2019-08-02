@@ -1,6 +1,6 @@
 ﻿param
 (
-    [String]$ModPath="", 
+    [String]$ModPath="C:\Skyrim Switch\Skyrim-NX-Toolkit\Unit Tests\Akkrandrim"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,7 +16,7 @@ $Global:SNXT.HomeLocation = Split-Path -Parent $MyInvocation.MyCommand.Path | Sp
 Write-Host ("Global:SNXT.HomeLocation [{0}]" -f $Global:SNXT.HomeLocation)
 Write-Host ("ModPath [{0}]" -f $ModPath)
 $ModName = Split-Path -Leaf $ModPath
-Write-Host ("ModPath [{0}]" -f $ModName)
+Write-Host ("ModName [{0}]" -f $ModName)
 
 Push-Location $Global:SNXT.HomeLocation
 $VerbosePreference = 'SilentlyContinue'
@@ -29,9 +29,11 @@ Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Job\S
 
 $Global:SNXT.BasePath = $ModPath + "_Processed"
 
+Write-Host ("BasePath [{0}]" -f $Global:SNXT.BasePath)
+
 Set-Config
 $emptyPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Empty"
-ROBOCOPY $emptyPath $Global:SNXT.BasePath /MIR
+ROBOCOPY $emptyPath $Global:SNXT.BasePath /MIR /XF .gitignore
 
 $Global:SNXT.LogBase = Join-Path -Path $Global:SNXT.BasePath -ChildPath "LogTree"
 $created = $(New-Item $Global:SNXT.LogBase -ItemType Directory)
@@ -41,7 +43,7 @@ function Process-Mod
 {
     Begin
     {
-        Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile
+        Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile 1
         $startTime = Get-Date
     }
 

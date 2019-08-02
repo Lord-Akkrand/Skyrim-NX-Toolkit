@@ -117,7 +117,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id)
 
         if ($changed)
         {
-            $status = ("Batches Started/Complete/Total {0}/{1}/{2} Assets Success/Skipped/Error {3}/{4}/{5}" -f $started, $finished, $total, $total, $successCount, $skippedCount, $errorCount)
+            $status = ("Batches Started/Complete/Total {0}/{1}/{2} Assets Success/Skipped/Error {3}/{4}/{5}" -f $started, $finished, $total, $successCount, $skippedCount, $errorCount)
             $percentComplete = ($finished / $total) * 100
             Write-Progress -Activity $progressTitle -Status $status -Id $Id -PercentComplete $percentComplete
         }

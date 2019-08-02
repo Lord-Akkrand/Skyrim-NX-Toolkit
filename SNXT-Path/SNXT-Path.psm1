@@ -36,11 +36,11 @@ function Open-LogTree([array] $assets)
             {
                 $created = $(New-Item $logPath -ItemType Directory)
             }
-            $relativeFilename = Get-RelativeFilename $asset
-            
+
+            #Trace-Verbose ('Create Logfile="{0}"' -f $LogTreeFilename) $Global:SNXT.Logfile
             $created = $(New-Item -Path $logPath -Name $logFilename -Value "" -Force)
-            Trace-Verbose ('Create Logfile="{0}"' -f $LogTreeFilename) $Global:SNXT.Logfile
         }
+        Trace-Verbose ('Created LogfileCount="{0}"' -f $assetsLength) $Global:SNXT.Logfile
     }
 
     End

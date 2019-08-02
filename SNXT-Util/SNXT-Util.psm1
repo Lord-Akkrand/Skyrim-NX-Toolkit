@@ -23,15 +23,20 @@ function Get-Utility([string] $util)
     return $False
 }
 
-function Get-RelativeFilename([string] $fullPath)
+function Get-RelativeFilename([string] $fullPath, [string]$opt_basePath="")
 {
-    $relativeFilename = $fullPath.Replace($Global:SNXT.BasePath + [IO.Path]::DirectorySeparatorChar, "")
+    $basePath = $Global:SNXT.BasePath
+    if ($opt_basePath -ne "")
+    {
+        $basePath = $opt_basePath
+    }
+    $relativeFilename = $fullPath.Replace($basePath + [IO.Path]::DirectorySeparatorChar, "")
     return $relativeFilename
 }
 
 function Get-LogTreeFilename([string] $fullPath)
 {
-    $relativeFilename = Get-RelativeFilename($fullPath)
+    $relativeFilename = Get-RelativeFilename $fullPath
     $logFilename = Join-Path -Path $Global:SNXT.LogBase -ChildPath ("{0}.xml" -f $relativeFilename)
     return $logFilename
 }

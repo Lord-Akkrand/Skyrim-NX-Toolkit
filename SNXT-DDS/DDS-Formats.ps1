@@ -41,16 +41,6 @@ $BaseRules = @(
     @{
         "Name" = "Default"
         "Path" = @(".*\.dds")
-        "Size" = 512*512
-     },
-    @{
-        "Name" = "Architecture"
-        "Path" = @("\barchitecture\b")
-        "Size" = 1024*1024
-     },
-     @{
-        "Name" = "Landscape"
-        "Path" = @("\blandscape\b")
         "Size" = 1024*1024
      },
      @{

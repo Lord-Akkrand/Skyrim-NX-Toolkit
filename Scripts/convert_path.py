@@ -18,13 +18,19 @@ import bitflag
 def ConvertPath(mod_name, target):
 
 	script_path = util.GetScriptPath()
-	
+
 	util.LogInfo("Convert Path")
 	util.LogDebug("This is the target: " + target)
 	util.LogDebug("This is the mod name " + mod_name)
-	
+
 	has_havoc = util.HasHavokBPP()
-	
+
+	do_meshes = \
+		toolkit_config.get_bool_setting("Meshes", "RemoveEditorMarker") or \
+		toolkit_config.get_bool_setting("Meshes", "PrettySortBlocks") or \
+		toolkit_config.get_bool_setting("Meshes", "TrimTexturesPath") or \
+		toolkit_config.get_bool_setting("Meshes", "OptimizeForSSE")
+
 	NoConversion = {}
 	WarnConversion = {}
 	ConvertListDDS = []
@@ -73,7 +79,7 @@ def ConvertPath(mod_name, target):
 						if 'HKX' not in WarnConversion:
 							WarnConversion['HKX'] = []
 						WarnConversion['HKX'].append( (filename, "Unknown hkx animation format") )
-						
+
 				elif filename.lower().startswith("translate_") and filename.lower().endswith(".txt"):
 					file_path = os.path.join(root, filename)
 					ConvertListTXT.append(file_path)
@@ -91,18 +97,21 @@ def ConvertPath(mod_name, target):
 		fileTypeWarnings = WarnConversion[fileType]
 		for i in range(len(fileTypeWarnings)):
 			util.LogInfo("Warning, cannot convert {} because <{}>".format(fileTypeWarnings[i][0], fileTypeWarnings[i][1]))
-			
+
 	util.LogInfo("Found {} dds files to convert".format(len(ConvertListDDS)))
-	if has_havoc: 
+	if has_havoc:
 		util.LogInfo("Found {} 32-bit hkx files to convert".format(len(ConvertListHKX)))
 	else:
 		util.LogInfo("Found {} 32-bit hkx files that won't convert as Havoc utility wasn't found.".format(len(ConvertListHKX)))
-	util.LogInfo("Found {} 64-bit hkx files to convert".format(len(ConvertListHKX64)))	
+	util.LogInfo("Found {} 64-bit hkx files to convert".format(len(ConvertListHKX64)))
 	util.LogInfo("Found {} txt files to convert".format(len(ConvertListTXT)))
 	util.LogInfo("Found {} sound files to convert".format(len(ConvertListSound)))
-	util.LogInfo("Found {} mesh files to convert".format(len(ConvertListMesh)))
-	
-	
+	if do_meshes:
+		util.LogInfo("Found {} mesh files to convert".format(len(ConvertListMesh)))
+	else:
+		util.LogInfo("Found {} mesh files but won't touch them.".format(len(ConvertListMesh)))
+
+
 	'''
 	def LogProgress(convertList, convertFn, name):
 		if len(convertList) > 0:
@@ -116,12 +125,12 @@ def ConvertPath(mod_name, target):
 				sys.stdout.flush()
 			sys.stdout.write("\n")
 	'''
-	
+
 	def LogProgress(convertList, fnName, convertFn, name, threadSetting):
 		if len(convertList) > 0:
 			failedCount = 0
 			maxThreads = toolkit_config.get_int_setting("Performance", threadSetting)
-			
+
 			jm = job_manager.JobManager(maxThreads)
 			convertedCount = 0
 			processedCount = 0
@@ -146,14 +155,15 @@ def ConvertPath(mod_name, target):
 			if processedCount != totalCount:
 				sys.stdout.write("Not all were processed.\n")
 			sys.stdout.flush()
-			
+
 	LogProgress(ConvertListDDS, "ConvertDDS", convert_dds.ConvertDDS, "DDS", "MaxTextureThreads")
 	if has_havoc:
 		LogProgress(ConvertListHKX, "ConvertHKX", convert_hkx.ConvertHKX, "HKX 32-bit", "MaxAnimationThreads")
 	LogProgress(ConvertListHKX64, "ConvertHKX64", convert_hkx64.ConvertHKX64, "HKX 64-bit", "MaxAnimationThreads")
 	LogProgress(ConvertListTXT, "ConvertTXT", convert_txt.ConvertTXT, "TXT", "MaxOtherThreads")
 	LogProgress(ConvertListSound, "ConvertSound", convert_sound.ConvertSound, "Sounds", "MaxSoundThreads")
-	LogProgress(ConvertListMesh, "ConvertMesh", convert_nif.ConvertNIF, "Meshes", "MaxMeshThreads")
+	if do_meshes:
+		LogProgress(ConvertListMesh, "ConvertMesh", convert_nif.ConvertNIF, "Meshes", "MaxMeshThreads")
 
 def ConvertPath_External(mod_name, target):
 	util.InitialiseLog(target + ".log")
@@ -161,7 +171,7 @@ def ConvertPath_External(mod_name, target):
 	util.LogInfo("Skyrim-NX-Toolkit {} - convert_path".format(util.GetToolkitVersion()))
 	ConvertPath(mod_name, target)
 	util.EndTimer()
-	
+
 if __name__ == '__main__':
 	mod_name = sys.argv[1]
 	target = sys.argv[2]

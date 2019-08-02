@@ -28,8 +28,8 @@ DefaultValues = {
 	},
 	"Meshes":{
 		"RemoveEditorMarker" : True,
-		"PrettySortBlocks": True,
-		"TrimTexturesPath": True,
+		"PrettySortBlocks": False,
+		"TrimTexturesPath": False,
 		"OptimizeForSSE": False
 	},
 	"Sounds":{

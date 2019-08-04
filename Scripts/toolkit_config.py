@@ -32,11 +32,6 @@ DefaultValues = {
 		"TrimTexturesPath": False,
 		"OptimizeForSSE": False
 	},
-	"Sounds":{
-		"fx": "MCADPCM",
-		"music": "MCADPCM",
-		"voice": "NXOPUS"
-	},
 	"Version":{
 		"ToolkitVersion" : util.GetToolkitVersion(),
 	}

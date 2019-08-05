@@ -1,6 +1,6 @@
 ﻿param
 (
-    [String]$ModPath="C:\Skyrim Switch\Skyrim-NX-Toolkit\Unit Tests\Akkrandrim"
+    [String]$ModPath="C:\Skyrim Switch\Skyrim-NX-Toolkit\Unit Tests\Unit Test DDS"
 )
 
 $ErrorActionPreference = 'Stop'

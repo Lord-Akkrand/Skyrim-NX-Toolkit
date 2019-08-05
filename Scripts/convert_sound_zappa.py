@@ -113,41 +113,38 @@ def ConvertSound_Internal(filepath_without_extension):
 				lip_size = int.from_bytes(fuz_file.read(0x04), byteorder = 'little', signed = False)
 				lip_data = fuz_file.read(lip_size)
 				audio_data = fuz_file.read()
-
-				# save LIP contents
-				try:
-					if lip_size == 0:
-						util.LogDebug("INFO: FUZ {} has no LIP data.".format(filename_fuz))
-					else:
-						with open(filename_lip, "wb") as lip_file:
-							lip_file.write(lip_data)
-							has_lip = True
-							util.LogDebug("INFO: LIP created on disk from FUZ {}.".format(filename_fuz))
-
-				except:
-					util.LogInfo("ERROR: failed to create intermediate LIP <{}>.".format(filename_xwm))
-					return False
-
-				# save AUDIO contents
-				try:
-					audio_format = audio_data[0x08:0x0C].decode()
-					if audio_format == "WAVE":
-						has_wav = True
-						filename_audio = filename_wav
-					elif audio_format == "XWMA":
-						has_xwm = True
-						filename_audio = filename_xwm
-					with open(filename_audio, "wb") as audio_file:
-						audio_file.write(audio_data)
-						util.LogDebug("INFO: XWM created on disk from FUZ {}.".format(filename_fuz))
-
-				except:
-					util.LogInfo("ERROR: failed to create intermediate WMV <{}>.".format(filename_xwm))
-					return False
-
 		except:
 			util.LogInfo("ERROR: failed to open FUZ <{}>.".format(filename_lip))
 			return False
+
+		# determine AUDIO format
+		audio_format = audio_data[0x08:0x0C]
+		if audio_format == b'WAVE':
+			has_wav = True
+			filename_audio = filename_wav
+		elif audio_format == b'XWMA':
+			has_xwm = True
+			filename_audio = filename_xwm
+
+		# save LIP contents
+		if lip_size > 0:
+			try:
+				with open(filename_lip, "wb") as lip_file:
+					lip_file.write(lip_data)
+					has_lip = True
+					util.LogDebug("INFO: LIP created on disk from FUZ {}.".format(filename_fuz))
+			except:
+				util.LogInfo("ERROR: failed to create intermediate LIP <{}>.".format(filename_xwm))
+				return False
+
+		# save AUDIO contents
+		try:
+			with open(filename_audio, "wb") as audio_file:
+				audio_file.write(audio_data)
+				util.LogDebug("INFO: XWM created on disk from FUZ {}.".format(filename_fuz))
+		except:
+		 	util.LogInfo("ERROR: failed to create intermediate WMV <{}>.".format(filename_xwm))
+		 	return False
 
 	# Convert the XWM to WAV
 	if has_xwm:

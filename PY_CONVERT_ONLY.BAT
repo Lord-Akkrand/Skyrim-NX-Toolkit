@@ -26,12 +26,17 @@ SET ORIGINAL=%~f1
 SET MOD_NAME=%~n1
 SET TARGET=%~f1_Converted
 
+SET startTime=%time%
+
 >CON ECHO Making "%TARGET%"
 ROBOCOPY "%ORIGINAL%" "%TARGET%" /MIR
 
 >CON ECHO Converting "%TARGET%"
 "%PYTHON3%" %CONVERT_PATH_PY% "%MOD_NAME%" "%TARGET%"
 >CON ECHO Done
+
+>CON ECHO Start Time: %startTime%
+>CON ECHO Finish Time: %time%
 
 GOTO :EOF
 

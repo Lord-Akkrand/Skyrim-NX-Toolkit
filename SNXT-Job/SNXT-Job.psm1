@@ -1,4 +1,4 @@
-﻿Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Util\SNXT-Util.psm1") -Force
+﻿Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Util\SNXT-Util.psm1") -Force -WarningAction SilentlyContinue
 
 $RunningJobs = @{}
 $JobQueue = New-Object System.Collections.Queue 
@@ -24,6 +24,7 @@ function Get-BatchSize($assetCount)
 function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $assetsLength)
 {
     Trace-Verbose ('Submit-JobQueue Count="{0}"' -f $JobQueue.Count) $Global:SNXT.Logfile 1
+    Write-Host ('Jobs Queued Job="{0}" Batches="{1}" Assets="{2}"' -f $BatchName, $JobQueue.Count, $assetsLength)
 
     $started = 0
     $finished = 0
@@ -34,7 +35,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
 
     function Update-Progress
     {
-        $status = ("Batches Started/Complete/Total {0}/{1}/{2} Assets Success/Skipped/Error {3}/{4}/{5}" -f $started, $finished, $total, $successCount, $skippedCount, $errorCount)
+        $status = ("Batches Started/Complete [Total] {0}/{1} [{2}] Assets Success/Skipped/Error [Total] {3}/{4}/{5} [{6}]" -f $started, $finished, $total, $successCount, $skippedCount, $errorCount, $assetsLength)
         $percentComplete = (($successCount+$skippedCount+$errorCount) / $assetsLength) * 100
         Write-Progress -Activity $progressTitle -Status $status -Id $Id -PercentComplete $percentComplete
     }
@@ -51,6 +52,14 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
             
             $arrayOutput = Receive-Job $job
             
+            if ($job.State -eq "Completed")
+            {
+                Remove-Job -Job $job
+                $jobsToRemove += $jobName
+                $finished++
+                Update-Progress
+            }
+
             foreach ($assetReturn in $arrayOutput)
             {
                 $assetName = $assetReturn.AssetName
@@ -92,13 +101,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
                 }
                 Update-Progress
             }
-            if ($job.State -eq "Completed")
-            {
-                Remove-Job -Job $job
-                $jobsToRemove += $jobName
-                $finished++
-                Update-Progress
-            }
+            
         }
         $sleepTime = 0.25
         foreach ($jobName in $jobsToRemove)
@@ -107,7 +110,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
             $sleepTime = 0.125
         }
         
-        while ($RunningJobs.Count -lt $Global:SNXT.Config.Performance.MaxThreads -and $JobQueue.Count -gt 0)
+        if ($RunningJobs.Count -lt $Global:SNXT.Config.Performance.MaxThreads -and $JobQueue.Count -gt 0)
         {
             #Write-Host "Starting job"
             $task = $JobQueue.DeQueue()

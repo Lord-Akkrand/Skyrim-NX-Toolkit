@@ -150,7 +150,6 @@ function Convert-Textures([array] $textures)
                 #Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
-        Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
         Submit-Jobs "Textures Processing" $JobName $MyProgressId $texturesLength
     }
 
@@ -269,7 +268,6 @@ function Convert-HKXs([array] $assets)
                 #Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
-        Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
         Submit-Jobs "HKX Processing" $JobName $MyProgressId $assetsLength
     }
 
@@ -369,7 +367,6 @@ function Convert-NIFs([array] $assets)
                 #Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
-        Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
         Submit-Jobs "NIF Processing" $JobName $MyProgressId $assetsLength
     }
 
@@ -469,7 +466,6 @@ function Convert-SNDs([array] $assets)
                 #Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
-        Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
         Submit-Jobs "SND Processing" $JobName $MyProgressId $assetsLength
     }
 

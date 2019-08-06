@@ -35,7 +35,10 @@ Write-Host ("BasePath [{0}]" -f $Global:SNXT.BasePath)
 
 Set-Config
 $emptyPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Empty"
-Remove-Item -Recurse -Force $Global:SNXT.BasePath
+if (Test-Path $Global:SNXT.BasePath -PathType Container)
+{
+    Remove-Item -Recurse -Force $Global:SNXT.BasePath
+}
 ROBOCOPY $emptyPath $Global:SNXT.BasePath /MIR /XF .gitignore
 
 $Global:SNXT.LogBase = Join-Path -Path $Global:SNXT.BasePath -ChildPath "LogTree"

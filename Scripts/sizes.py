@@ -43,6 +43,7 @@ BGRA = ('BGRA', 'B8G8R8A8_UNORM')
 R8UN = ('R8UN', 'R8_UNORM')
 DX10 = ('DX10','BC7_UNORM')
 DX10_SRGB = ('BC3_UNORM_SRGB', 'BC3_UNORM_SRGB')
+R8G8UN = ('R8G8_UNORM', 'R8G8_UNORM')
 
 Formats = []
 Formats.append(DXT1)
@@ -53,6 +54,7 @@ Formats.append(BGRA)
 Formats.append(R8UN)
 Formats.append(DX10)
 Formats.append(DX10_SRGB)
+Formats.append(R8G8UN)
 
 Rules = {}
 
@@ -65,6 +67,7 @@ Rules = {}
 BaseRules = []
 
 BaseRules.append({"Name":"Actors", 'Path':[r'\bactors\b'], 'Size':2048*2048})
+BaseRules.append({"Name":"Pandorable", 'Path':[r'\bPandorable\b'], 'Size':2048*2048})
 
 Rules['Base'] = BaseRules
 # If you come across a texture that is the following type, convert it to the other type
@@ -74,10 +77,14 @@ ConvertFromTo.append(('DX10',DXT5))
 ConvertFromTo.append(('BGRA',RGBA))
 ConvertFromTo.append(('BC3_UNORM_SRGB',DXT5))
 ConvertFromTo.append(('BC4U',DXT5))
+ConvertFromTo.append(('R8G8_UNORM',DXT5))
+
 
 ConvertFromToSDK = []
 ConvertFromToSDK.append(('R8UN',DXT1))
 ConvertFromToSDK.append(('BC3_UNORM_SRGB',DXT5))
 ConvertFromToSDK.append(('DX10',DXT5))
 ConvertFromToSDK.append(('BC4U',DXT5))
+ConvertFromToSDK.append(('R8G8_UNORM',DXT5))
+
 

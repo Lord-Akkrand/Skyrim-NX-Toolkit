@@ -26,14 +26,14 @@ def XWM2WAV(filename_xwm, filename_wav):
 	commandLine = [xWMAEncode, filename_xwm, filename_wav]
 	util.RunCommandLine(commandLine)
 
-def WAV2PCM16WAV(filename_xwm, filename_wav, isNxOpus):
+def WAV2PCM16WAV(filename_xwm, filename_wav, is_nxopus):
 	""" Normalizes the WAV file to be a proper PCM16 with correct sample rate for VGAudioCli """
 
 	try:
 		with open(filename_wav, "rb") as wav_file:
 			wav_header = wav_file.read(0x24)
 	except:
-		util.LogInfo("ERROR: failed to create intermediate WAV <{}>.".format(filename_wav))
+		util.LogDebug("ERROR: failed to normalize WAV <{}>.".format(filename_wav))
 		return False
 
 	wav_audio_format = int.from_bytes(wav_header[0x14:0x16], byteorder = 'little', signed = False)
@@ -47,7 +47,7 @@ def WAV2PCM16WAV(filename_xwm, filename_wav, isNxOpus):
 	# DSPADPCM CODEC requires 22050 or 44100 sample rates from a mono or stereo PCM16 stream
 
 	# get the closest ressampling RATE
-	DESIRED_RATES = [24000, 48000] if isNxOpus else [22050, 44100]
+	DESIRED_RATES = [24000, 48000] if is_nxopus else [22050, 44100]
 	try:
 		i = 0
 		while wav_sample_rate >= DESIRED_RATES[i]:
@@ -65,7 +65,7 @@ def WAV2PCM16WAV(filename_xwm, filename_wav, isNxOpus):
 		commandLine = [SndFileConvert, "-override-sample-rate=" + override_sample_rate, "-pcm16", filename_temp, filename_wav]
 		util.RunCommandLine(commandLine)
 		util.RemoveFile(filename_temp)
-		util.LogDebug("Converted WAV <{}>:\n FORMAT:{} CHANNELS:{} SAMPLE_RATE:{} BITS_PER_SAMPLE:{}".format(
+		util.LogDebug("INFO: Normalized WAV <{}>: FORMAT:{} CHANNELS:{} SAMPLE_RATE:{} BITS_PER_SAMPLE:{}".format(
 			filename_wav, wav_audio_format, wav_channel_count, wav_sample_rate, wav_bits_per_sample
 		)
 	)
@@ -103,7 +103,7 @@ def ConvertSound_Internal(filepath_without_extension):
 
 	is_nxopus = "\\sound\\voice\\" in filepath_without_extension.lower()
 
-	util.LogDebug("Convert Sound <{}> WAV:{} XWM:{} LIP:{} FUZ:{}".format(filepath_without_extension, has_wav, has_xwm, has_lip, has_fuz))
+	util.LogDebug("INFO: Convert Sound <{}> WAV:{} XWM:{} LIP:{} FUZ:{}".format(filepath_without_extension, has_wav, has_xwm, has_lip, has_fuz))
 
 	# FUZ files always have precedence over loose WAV, XWM, LIP
 	if has_fuz:
@@ -134,16 +134,16 @@ def ConvertSound_Internal(filepath_without_extension):
 					has_lip = True
 					util.LogDebug("INFO: LIP created on disk from FUZ {}.".format(filename_fuz))
 			except:
-				util.LogInfo("ERROR: failed to create intermediate LIP <{}>.".format(filename_xwm))
+				util.LogDebug("ERROR: failed to create intermediate LIP <{}>.".format(filename_lip))
 				return False
 
 		# save AUDIO contents
 		try:
 			with open(filename_audio, "wb") as audio_file:
 				audio_file.write(audio_data)
-				util.LogDebug("INFO: XWM created on disk from FUZ {}.".format(filename_fuz))
+				util.LogDebug("INFO: AUDIO created on disk from FUZ {}.".format(filename_fuz))
 		except:
-		 	util.LogInfo("ERROR: failed to create intermediate WMV <{}>.".format(filename_xwm))
+		 	util.LogDebug("ERROR: failed to create intermediate AUDIO <{}>.".format(filename_audio))
 		 	return False
 
 	# Convert the XWM to WAV

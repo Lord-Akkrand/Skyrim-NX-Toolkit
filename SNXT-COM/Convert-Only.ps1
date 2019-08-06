@@ -1,6 +1,6 @@
 ﻿param
 (
-    [String]$ModPath="C:\Skyrim Switch\Skyrim-NX-Toolkit\Unit Tests\Unit Test SND"
+    [String]$ModPath="C:\Skyrim Switch\Skyrim-NX-Toolkit\Unit Tests\Akkrandrim"
 )
 
 Clear-Host

@@ -66,15 +66,6 @@ function Get-FormattedTime($timeInfo)
     return $timeString
 }
 
-function Report-Measure([scriptblock] $script, [string] $title)
-{
-    $timeInfo = Measure-Command { Invoke-Command -ScriptBlock $script }
-    #$timeInfo | Select-Object -Property Hours, Minutes, Seconds
-    $timeString = Get-FormattedTime $timeInfo
-    Trace-Verbose ('{0}{1}' -f $title, $timeString) $Global:SNXT.Logfile
-    return $timeString
-}
-
 function Test-SDK
 {
     $sdkPath = Get-Utility "NvnTexpkg.exe"
@@ -140,6 +131,57 @@ function Find-FirstMatch([byte[]] $source, [byte []]$target)
     return -1
 }
 
+function Toggle-Endian
+{
+    ################################################################
+    #.Synopsis
+    # Swaps the ordering of bytes in an array where each swappable
+    # unit can be one or more bytes, and, if more than one, the
+    # ordering of the bytes within that unit is NOT swapped. Can
+    # be used to toggle between little- and big-endian formats.
+    # Cannot be used to swap nibbles or bits within a single byte.
+    #.Parameter ByteArray
+    # System.Byte[] array of bytes to be rearranged. If you
+    # pipe this array in, you must pipe the [Ref] to the array, but
+    # a new array will be returned (originally array untouched).
+    #.Parameter SubWidthInBytes
+    # Defaults to 1 byte. Defines the number of bytes in each unit
+    # (or atomic element) which is swapped, but no swapping occurs
+    # within that unit. The number of bytes in the ByteArray must
+    # be evenly divisible by SubWidthInBytes.
+    #.Example
+    # $bytearray = toggle-endian $bytearray
+    #.Example
+    # [Ref] $bytearray | toggle-endian -SubWidthInBytes 2
+    ################################################################
+    [CmdletBinding()] Param (
+    [Parameter(Mandatory = $True, ValueFromPipeline = $True)] [System.Byte[]] $ByteArray,
+    [Parameter()] [Int] $SubWidthInBytes = 1 )
+    
+    if ($ByteArray.count -eq 1 -or $ByteArray.count -eq 0)
+    { $ByteArray ; return }
+    
+    if ($SubWidthInBytes -eq 1)
+    { [System.Array]::Reverse($ByteArray); $ByteArray ; return }
+    
+    if ($ByteArray.count % $SubWidthInBytes -ne 0)
+    { throw "ByteArray size must be an even multiple of SubWidthInBytes!" ; return }
+    
+    $newarray = new-object System.Byte[] $ByteArray.count
+    
+    # $i tracks ByteArray from head, $j tracks NewArray from end.
+    for ($($i = 0; $j = $newarray.count - 1) ;
+    $i -lt $ByteArray.count ;
+    $($i += $SubWidthInBytes; $j -= $SubWidthInBytes))
+    {
+        for ($k = 0 ; $k -lt $SubWidthInBytes ; $k++)
+        { 
+            $newarray[$j - ($SubWidthInBytes - 1) + $k] = $ByteArray[$i + $k] 
+        }
+    }
+    $newarray
+}
+
 function Slice-ArrayPython([byte []] $data, [int]$startSlice, [int]$endSlice)
 {
     if ($startSlice -lt 0)
@@ -153,6 +195,24 @@ function Slice-ArrayPython([byte []] $data, [int]$startSlice, [int]$endSlice)
     #python slicing doesn't include the last entry in a slice
     $endSlice -= 1
     return $data[$startSlice..$endSlice]
+}
+
+function Read-Bytes-LittleEndianUnsigned([byte []] $data, [int]$startSlice, [int]$byteCount)
+{
+    $bytes = Slice-ArrayPython $data $startSlice ($startSlice + $byteCount)
+    if ([BitConverter]::IsLittleEndian -ne $True)
+    {
+        $bytes = Toggle-Endian $bytes
+    }
+    
+    if ($byteCount -eq 2)
+    {
+        return [bitconverter]::ToUInt16($bytes, 0)
+    }
+    if ($byteCount -eq 4)
+    {
+        return [bitconverter]::ToUInt32($bytes, 0)
+    }
 }
 
 function Slice-StringPython([string] $data, [int]$startSlice, [int]$endSlice)

@@ -6,7 +6,8 @@ $JobQueue = New-Object System.Collections.Queue
 function Add-JobToQueue($task)
 {
     #Write-Host "Task added to queue"
-    $JobQueue.Enqueue($task)
+    #$JobQueue.Enqueue($task)
+    Invoke-Command -ScriptBlock $task.ScriptBlock -ArgumentList $task.Arguments
 }
 
 function Get-BatchSize($assetCount)
@@ -106,8 +107,9 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
             $sleepTime = 0.125
         }
         
-        if ($RunningJobs.Count -lt $Global:SNXT.Config.Performance.MaxThreads -and $JobQueue.Count -gt 0)
+        while ($RunningJobs.Count -lt $Global:SNXT.Config.Performance.MaxThreads -and $JobQueue.Count -gt 0)
         {
+            #Write-Host "Starting job"
             $task = $JobQueue.DeQueue()
             $job = Start-Job -ScriptBlock $task.ScriptBlock -ArgumentList $task.Arguments
             $jobName = $job.Name
@@ -117,13 +119,9 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
             $started++
             
             Update-Progress
-            $sleepTime = 0
         }
 
-        if ($sleepTime -gt 0)
-        {
-            Start-Sleep -Seconds $sleepTime
-        }
+        Start-Sleep -Seconds $sleepTime
     }
 
     Write-Host ('JobsComplete Job="{0}" Count="{1}" Success="{2}" Errors="{3}" Skipped="{4}"' -f $BatchName, $total, $successCount, $errorCount, $skippedCount)

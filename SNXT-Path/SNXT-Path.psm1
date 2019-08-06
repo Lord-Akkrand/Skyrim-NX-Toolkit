@@ -50,6 +50,7 @@ function Open-LogTree([array] $assets)
         $timeString = Get-FormattedTime $timeSpan
         Trace-Verbose ('Open-LogTree-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Open-LogTree") $Global:SNXT.Logfile -1
+        Write-Host ('Open-LogTree Time{0}' -f $timeString)
     }
 }
 
@@ -146,7 +147,7 @@ function Convert-Textures([array] $textures)
                 $batchInProgress = [System.Collections.ArrayList]@()
                 Add-JobToQueue $task
                 $batchCount += 1
-                Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
+                #Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
         Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
@@ -160,6 +161,7 @@ function Convert-Textures([array] $textures)
         $timeString = Get-FormattedTime $timeSpan
         Trace-Verbose ('Convert-DDSs-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Convert-DDSs") $Global:SNXT.Logfile -1
+        Write-Host ('Convert-DDSs Time{0}' -f $timeString)
     }
 }
 
@@ -189,7 +191,7 @@ $ProcessHKXScriptBlock = {
         Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
 
         $assetRet = @{}
-        $assetRet.Name = $asset
+        $assetRet.AssetName = $asset
         # Read the asset information
         $assetRet.Read = Read-HKX $asset $assetInfo
 
@@ -264,7 +266,7 @@ function Convert-HKXs([array] $assets)
                 Add-JobToQueue $task
 
                 $batchCount += 1
-                Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
+                #Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
         Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
@@ -278,6 +280,7 @@ function Convert-HKXs([array] $assets)
         $timeString = Get-FormattedTime $timeSpan
         Trace-Verbose ('Convert-HKXs-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Convert-HKXs") $Global:SNXT.Logfile -1
+        Write-Host ('Convert-HKXs Time{0}' -f $timeString)
     }
 }
 
@@ -363,7 +366,7 @@ function Convert-NIFs([array] $assets)
                 Add-JobToQueue $task
 
                 $batchCount += 1
-                Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
+                #Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
         Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
@@ -377,6 +380,7 @@ function Convert-NIFs([array] $assets)
         $timeString = Get-FormattedTime $timeSpan
         Trace-Verbose ('Convert-NIFs-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Convert-NIFs") $Global:SNXT.Logfile -1
+        Write-Host ('Convert-NIFs Time{0}' -f $timeString)
     }
 }
 
@@ -462,7 +466,7 @@ function Convert-SNDs([array] $assets)
                 Add-JobToQueue $task
 
                 $batchCount += 1
-                Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
+                #Write-Host ('Batch {0} Queued Job="{1}" Assets="{2}"' -f $batchCount, $JobName, $jobBatch.Count)
             }
         }
         Write-Host ('Jobs Queued Job="{0}" Batches="{1}"' -f $JobName, $batchCount)
@@ -476,6 +480,7 @@ function Convert-SNDs([array] $assets)
         $timeString = Get-FormattedTime $timeSpan
         Trace-Verbose ('Convert-SNDs-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Convert-SNDs") $Global:SNXT.Logfile -1
+        Write-Host ('Convert-SNDs Time{0}' -f $timeString)
     }
 }
 

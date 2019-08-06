@@ -1,7 +1,9 @@
 ﻿param
 (
-    [String]$ModPath="C:\Skyrim Switch\Skyrim-NX-Toolkit\Unit Tests\Unit Test DDS"
+    [String]$ModPath="C:\Skyrim Switch\Skyrim-NX-Toolkit\Unit Tests\Unit Test SND"
 )
+
+Clear-Host
 
 $ErrorActionPreference = 'Stop'
 
@@ -33,6 +35,7 @@ Write-Host ("BasePath [{0}]" -f $Global:SNXT.BasePath)
 
 Set-Config
 $emptyPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Empty"
+Remove-Item -Recurse -Force $Global:SNXT.BasePath
 ROBOCOPY $emptyPath $Global:SNXT.BasePath /MIR /XF .gitignore
 
 $Global:SNXT.LogBase = Join-Path -Path $Global:SNXT.BasePath -ChildPath "LogTree"
@@ -60,10 +63,8 @@ function Process-Mod
         $timeString = Get-FormattedTime $timeSpan
         Trace-Verbose ('Process-Mod-Time{0}' -f $timeString) $Global:SNXT.Logfile
         Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile -1
+        Write-Host ('Process-Mod Time{0}' -f $timeString)
     }
 }
 
-
-$timeInfo = Measure-Command { Process-Mod }
-$timeString = Get-FormattedTime $timeInfo
-Write-Host ('Process-Mod Time{0}' -f $timeString)
+Process-Mod

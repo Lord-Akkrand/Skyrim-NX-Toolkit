@@ -197,6 +197,23 @@ function Slice-ArrayPython([byte []] $data, [int]$startSlice, [int]$endSlice)
     return $data[$startSlice..$endSlice]
 }
 
+function Create-Empty([string] $path)
+{
+    if (Test-Path $path -PathType Container)
+    {
+        Remove-Item -Recurse -Force $path
+    }
+    $emptyPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Empty"
+    ROBOCOPY $emptyPath $path /MIR /XF .gitignore
+}
+
+function Create-LogTree([string] $ModName)
+{
+    $Global:SNXT.LogBase = Join-Path -Path $Global:SNXT.BasePath -ChildPath "LogTree"
+    $created = $(New-Item $Global:SNXT.LogBase -ItemType Directory)
+    $Global:SNXT.Logfile = Join-Path -Path $Global:SNXT.LogBase -ChildPath ($ModName + ".xml")
+}
+
 function Read-Bytes-LittleEndianUnsigned([byte []] $data, [int]$startSlice, [int]$byteCount)
 {
     $bytes = Slice-ArrayPython $data $startSlice ($startSlice + $byteCount)

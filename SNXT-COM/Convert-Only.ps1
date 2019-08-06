@@ -34,23 +34,15 @@ $Global:SNXT.BasePath = $ModPath + "_Processed"
 Write-Host ("BasePath [{0}]" -f $Global:SNXT.BasePath)
 
 Set-Config
-$emptyPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Empty"
-if (Test-Path $Global:SNXT.BasePath -PathType Container)
-{
-    Remove-Item -Recurse -Force $Global:SNXT.BasePath
-}
-ROBOCOPY $emptyPath $Global:SNXT.BasePath /MIR /XF .gitignore
-
-$Global:SNXT.LogBase = Join-Path -Path $Global:SNXT.BasePath -ChildPath "LogTree"
-$created = $(New-Item $Global:SNXT.LogBase -ItemType Directory)
-$Global:SNXT.Logfile = Join-Path -Path $Global:SNXT.LogBase -ChildPath ($ModName + ".xml")
 
 function Process-Mod
 {
     Begin
     {
-        Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile 1
         $startTime = Get-Date
+        Create-Empty $Global:SNXT.BasePath
+        Create-LogTree $ModName
+        Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile 1
     }
 
     Process

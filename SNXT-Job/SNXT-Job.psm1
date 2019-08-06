@@ -6,8 +6,8 @@ $JobQueue = New-Object System.Collections.Queue
 function Add-JobToQueue($task)
 {
     #Write-Host "Task added to queue"
-    #$JobQueue.Enqueue($task)
-    Invoke-Command -ScriptBlock $task.ScriptBlock -ArgumentList $task.Arguments
+    $JobQueue.Enqueue($task)
+    #Invoke-Command -ScriptBlock $task.ScriptBlock -ArgumentList $task.Arguments
 }
 
 function Get-BatchSize($assetCount)

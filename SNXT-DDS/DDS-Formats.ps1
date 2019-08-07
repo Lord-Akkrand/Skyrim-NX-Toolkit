@@ -10,9 +10,9 @@ $BGRA = ('BGRA', 'B8G8R8A8_UNORM')
 $R8UN = ('R8UN', 'R8_UNORM')
 $DX10 = ('DX10','BC7_UNORM')
 $DX10_SRGB = ('SRGB', 'BC3_UNORM_SRGB')
+$R8G8_UNORM = ('R8G8_UNORM', 'R8G8_UNORM')
 
-$Formats = @($DXT1, $DXT5, $BC4U, $RGBA, $BGRA, $R8UN, $DX10, $DX10_SRGB)
-
+$Formats = @($DXT1, $DXT5, $BC4U, $RGBA, $BGRA, $R8UN, $DX10, $DX10_SRGB, $R8G8_UNORM)
 
 # Depending on whether the user has the SDK, convert textures from some formats to others.
 $ConvertFromTo = @{
@@ -20,6 +20,7 @@ $ConvertFromTo = @{
     "BGRA"= $RGBA
     "BC3_UNORM_SRGB" = $DXT5
     "BC4U" = $DXT5
+    "R8G8_UNORM" = $DXT5
 }
 
 $ConvertFromToSDK = @{
@@ -27,6 +28,7 @@ $ConvertFromToSDK = @{
     "R8UN"= $DXT1
     "BC3_UNORM_SRGB" = $DXT5
     "BC4U" = $DXT5
+    "R8G8_UNORM" = $DXT5
 }
 
 # RuleSets for resizing textures
@@ -46,6 +48,11 @@ $BaseRules = @(
      @{
         "Name" = "Actors"
         "Path" = @("\bactors\b")
+        "Size" = 2048*2048
+     },
+     @{
+        "Name" = "Pandorable"
+        "Path" = @("\bPandorable\b")
         "Size" = 2048*2048
      }
 )

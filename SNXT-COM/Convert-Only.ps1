@@ -1,6 +1,6 @@
 ﻿param
 (
-    [String]$ModPath="C:\Skyrim Switch\Skyrim-NX-Toolkit\Unit Tests\Unit Test DDS"
+    [String]$ModPath="C:\Skyrim Switch\Unit Tests\Unit Test DDS"
 )
 
 Clear-Host
@@ -35,14 +35,14 @@ Write-Host ("BasePath [{0}]" -f $Global:SNXT.BasePath)
 
 Set-Config
 
-function Process-Mod
+function Convert-Mod
 {
     Begin
     {
         $startTime = Get-Date
         Create-Empty $Global:SNXT.BasePath
         Create-LogTree $ModName
-        Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile 1
+        Trace-Verbose ("Convert-Mod") $Global:SNXT.Logfile 1
     }
 
     Process
@@ -56,10 +56,10 @@ function Process-Mod
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
-        Trace-Verbose ('Process-Mod-Time{0}' -f $timeString) $Global:SNXT.Logfile
-        Trace-Verbose ("Process-Mod") $Global:SNXT.Logfile -1
-        Write-Host ('Process-Mod Time{0}' -f $timeString)
+        Trace-Verbose ('Convert-Mod-Time{0}' -f $timeString) $Global:SNXT.Logfile
+        Trace-Verbose ("Convert-Mod") $Global:SNXT.Logfile -1
+        Write-Host ('Convert-Mod Time{0}' -f $timeString)
     }
 }
 
-Process-Mod
+Convert-Mod

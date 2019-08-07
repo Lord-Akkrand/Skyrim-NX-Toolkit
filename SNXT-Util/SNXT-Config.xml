@@ -1,0 +1,23 @@
+﻿<Config>
+  <Version>
+    <ToolkitVersion Value="3.0.0" Type="String" />
+  </Version>
+  <Performance>
+    <MaxThreads Value="24" Type="Integer" />
+    <MaxBatchSize Value="1000" Type="Integer" />
+    <MinBatchSize Value="10" Type="Integer" />
+    <BatchesPerThread Value="2" Type="Integer" />
+  </Performance>
+  <BSA>
+    <FullRules Value="True" Type="Boolean" />
+  </BSA>
+  <Textures>
+    <SizeRules Value="Base" Type="String" />
+  </Textures>
+  <Meshes>
+    <RemoveEditorMarker Value="True" Type="Boolean" />
+    <PrettySortBlocks Value="False" Type="Boolean" />
+    <TrimTexturesPath Value="False" Type="Boolean" />
+    <OptimizeForSSE Value="False" Type="Boolean" />
+  </Meshes>
+</Config>

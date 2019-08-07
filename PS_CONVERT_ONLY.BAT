@@ -1,0 +1,1 @@
+@POWERSHELL -NoProfile -ExecutionPolicy ByPass -File SNXT-COM/Convert-Only.ps1 "%~f1"

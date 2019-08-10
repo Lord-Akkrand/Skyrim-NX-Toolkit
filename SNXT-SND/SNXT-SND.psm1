@@ -196,7 +196,7 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
         } elseif ($has_wav) {
             $filename_audio = $filename_wav
         } else {
-            Trace-Warn ('Error this logic branch should be unreachable ="{0}"' -f $filepath_without_extension) $LogTreeFilename
+            Trace-Warn ('Error UnreachableCodeBranch="{0}"' -f $filepath_without_extension) $LogTreeFilename
             $retValue['Success'] = $False
             return $retValue
         }

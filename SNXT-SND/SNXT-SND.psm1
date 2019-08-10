@@ -16,16 +16,16 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
     {
         $FFMpegExe = Get-Utility "ffmpeg.exe"
         $FFMpeg = ""
-        $filename_temp = $filename_input_audio.Split(".")[0] + ".TEMP" + $filename_input_audio.Split(".")[-1]
+        $filename_temp = $filepath_without_extension + ".temp.wav"
         $filename_output = $filepath_without_extension + ".wav"
-        Move-Item -Path $filename_input_audio -Destination $filename_temp -Force
         if ($isNxOpus)
         {
-            $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_temp "-ac" "1" "-ar" "48000" $filename_output 2>&1)
+            $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_input_audio "-ac" "1" "-ar" "48000" $filename_temp 2>&1)
         } else {
-            $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_temp "-ar" "44100" $filename_output 2>&1)
+            $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_input_audio "-ar" "44100" $filename_temp 2>&1)
         }
-        Remove-Item -Path $filename_temp
+        Remove-Item -Path $filename_input_audio
+        Rename-Item -Path $filename_normal -NewName $filename_output
         Trace-Verbose ('FFMpeg Output="{0}"' -f $FFMpeg) $LogTreeFilename
     }
 

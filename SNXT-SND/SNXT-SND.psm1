@@ -21,7 +21,9 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
         if ($isNxOpus)
         {
             $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_input_audio "-ac" "1" "-ar" "48000" $filename_temp 2>&1)
-        } else {
+        }
+        else
+        {
             $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_input_audio "-ar" "44100" $filename_temp 2>&1)
         }
         Trace-Verbose ('FFMpeg Output="{0}"' -f $FFMpeg) $LogTreeFilename
@@ -68,7 +70,9 @@ function ConvertAudio([string] $filename_input_audio, [string] $filepath_without
             $filename_temp = $filepath_without_extension + ".temp.fuz"
             $filename_output = $filepath_without_extension + ".fuz"
             $VGAudioCli =  [string] (& $VGAudioCliExe -c --opusheader Skyrim -i:0 $filename_input_audio $filename_temp 2>&1)
-        } else {
+        }
+        else
+        {
             $filename_temp = $filepath_without_extension + ".temp.mcadpcm"
             $filename_output = $filepath_without_extension + ".mcadpcm"
             $VGAudioCli =  [string] (& $VGAudioCliExe -c $filename_input_audio $filename_temp 2>&1)
@@ -159,17 +163,19 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
                 $retValue['Success'] = $False
                 return $retValue
             }
+
             # determine AUDIO format
             $audio_format = Slice-ArrayPython $audio_data 0x08 0x0C
             $wave = [System.Text.Encoding]::ASCII.GetBytes('WAVE')
             Trace-Verbose ('Test WAVE="{0}"' -f [string]$wave) $LogTreeFilename
             $findWAVE = Find-FirstMatch $audio_format $wave
-            if($findWAVE -ge 0)
+            if ($findWAVE -ge 0)
             {
                 $has_wav = $True
                 $filename_audio = $filename_wav
             }
-            else {
+            else
+            {
                 $xwma = [System.Text.Encoding]::ASCII.GetBytes('XWMA')
                 Trace-Verbose ('Test XWMA="{0}"' -f [string]$xwma) $LogTreeFilename
                 $findXWMA = Find-FirstMatch $audio_format $xwma
@@ -208,7 +214,6 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
 
             # get rid of PC FUZ
             Remove-Item -Path $filename_fuz
-
         }
         elseif ($has_xwm)
         {
@@ -226,17 +231,14 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
         }
 
         $ok = NormalizeAudio $filename_audio $filepath_without_extension $is_nxopus
-        if ($ok) {
+        if ($ok)
+        {
             $ok = ConvertAudio $filename_wav $filepath_without_extension $is_nxopus
         }
-        if (!$ok) {
-            Trace-Warn ('Error FailedToConvertAudio="{0}"' -f $filepath_without_extension) $LogTreeFilename
-        }
-        if ($has_lip)
+        if ($ok && $has_lip && $is_nxopus)
         {
             Remove-Item -Path $filename_lip
         }
-
         $retValue['Success'] = $ok
 	    return $retValue
     }

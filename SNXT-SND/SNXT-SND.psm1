@@ -6,8 +6,8 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
 {
     Begin
     {
-        $relativeFilename = Get-RelativeFilename $filename_input_audio
-        $LogTreeFilename = Get-LogTreeFilename $filename_input_audio
+        $relativeFilename = Get-RelativeFilename $filepath_without_extension
+        $LogTreeFilename = Get-LogTreeFilename $filepath_without_extension
         Trace-Debug ('NormalizeAudio RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
         $startTime = Get-Date
     }
@@ -21,9 +21,9 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
         Move-Item -Path $filename_input_audio -Destination $filename_temp -Force
         if ($isNxOpus)
         {
-            $FFMpeg =  [string] (& "-hide_banner" "-y" "-i" $filename_temp "-ac" "1" "-ar" "48000" $filename_output 2>&1)
+            $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_temp "-ac" "1" "-ar" "48000" $filename_output 2>&1)
         } else {
-            $FFMpeg =  [string] (& "-hide_banner" "-y" "-i" $filename_temp "-ar" "44100" $filename_output 2>&1)
+            $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_temp "-ar" "44100" $filename_output 2>&1)
         }
         Remove-Item -Path $filename_temp
         Trace-Verbose ('FFMpeg Output="{0}"' -f $FFMpeg) $LogTreeFilename
@@ -44,8 +44,8 @@ function ConvertAudio([string] $filename_input_audio, [string] $filepath_without
 {
     Begin
     {
-        $relativeFilename = Get-RelativeFilename $filename_input_audio
-        $LogTreeFilename = Get-LogTreeFilename $filename_input_audio
+        $relativeFilename = Get-RelativeFilename $filepath_without_extension
+        $LogTreeFilename = Get-LogTreeFilename $filepath_without_extension
         Trace-Debug ('ConvertAudio RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
         $startTime = Get-Date
     }
@@ -190,10 +190,10 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
             # get rid of PC FUZ
             Remove-Item -Path $filename_fuz
 
-        } else if ($has_xwm)
+        } elseif ($has_xwm)
         {
             $filename_audio = $filename_xwm
-        } else if ($has_wav) {
+        } elseif ($has_wav) {
             $filename_audio = $filename_wav
         } else {
             Trace-Warn ('Error this logic branch should be unreachable ="{0}"' -f $filepath_without_extension) $LogTreeFilename
@@ -208,6 +208,7 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
             ConvertAudio $filename_wav $filepath_without_extension $is_nxopus
             $retValue['Success'] = $True
         } else {
+            Trace-Warn ('Error FailedToConvertAudio="{0}"' -f $filepath_without_extension) $LogTreeFilename
             $retValue['Success'] = $False
         }
 

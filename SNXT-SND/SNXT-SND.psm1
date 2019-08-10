@@ -19,7 +19,7 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
         $filename_temp = $filename_input_audio.Split(".")[0] + ".TEMP" + $filename_input_audio.Split(".")[-1]
         $filename_output = $filepath_without_extension + ".wav"
         Move-Item -Path $filename_input_audio -Destination $filename_temp -Force
-        if ($isNxOpus)\
+        if ($isNxOpus)
         {
             $FFMpeg =  [string] (& "-hide_banner" "-y" "-i" $filename_temp "-ac" "1" "-ar" "48000" $filename_output 2>&1)
         } else {
@@ -54,7 +54,7 @@ function ConvertAudio([string] $filename_input_audio, [string] $filepath_without
     {
         $VGAudioCliExe = Get-Utility "VGAudioCli.exe"
         $VGAudioCLi = ""
-        if ($isNxOpus)\
+        if ($isNxOpus)
         {
             $filename_output = $filepath_without_extension + ".fuz"
             $VGAudioCli =  [string] (& $VGAudioCliExe -c --opusheader Skyrim -i:0 $filename_input_audio $filename_output 2>&1)
@@ -202,14 +202,20 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
         }
 
         NormalizeAudio $filename_audio $filepath_without_extension $is_nxopus
-        ConverAudio $filename_audio $filepath_without_extension $is_nxopus
+
+        $has_wav = Test-Path -Path $filename_wav -PathType Leaf
+        if ($has_wav) {
+            ConvertAudio $filename_wav $filepath_without_extension $is_nxopus
+            $retValue['Success'] = $True
+        } else {
+            $retValue['Success'] = $False
+        }
 
         if ($has_lip)
         {
             Remove-Item -Path $filename_lip
         }
 
-        $retValue['Success'] = $True
 	    return $retValue
     }
 

@@ -24,9 +24,16 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
         } else {
             $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_input_audio "-ar" "44100" $filename_temp 2>&1)
         }
-        Remove-Item -Path $filename_input_audio
-        Rename-Item -Path $filename_normal -NewName $filename_output
         Trace-Verbose ('FFMpeg Output="{0}"' -f $FFMpeg) $LogTreeFilename
+        Remove-Item -Path $filename_input_audio
+        try {
+            Rename-Item -Path $filename_temp -NewName $filename_output
+            return $True
+        }
+        catch {
+            Trace-Warn ('Error FailedToNormalize="{0}"' -f $filepath_without_extension) $LogTreeFilename
+            return $False
+        }
     }
 
     End
@@ -54,16 +61,28 @@ function ConvertAudio([string] $filename_input_audio, [string] $filepath_without
     {
         $VGAudioCliExe = Get-Utility "VGAudioCli.exe"
         $VGAudioCLi = ""
+        $filename_temp = ""
+        $filename_output = ""
         if ($isNxOpus)
         {
+            $filename_temp = $filepath_without_extension + ".temp.fuz"
             $filename_output = $filepath_without_extension + ".fuz"
-            $VGAudioCli =  [string] (& $VGAudioCliExe -c --opusheader Skyrim -i:0 $filename_input_audio $filename_output 2>&1)
+            $VGAudioCli =  [string] (& $VGAudioCliExe -c --opusheader Skyrim -i:0 $filename_input_audio $filename_temp 2>&1)
         } else {
+            $filename_temp = $filepath_without_extension + ".temp.mcadpcm"
             $filename_output = $filepath_without_extension + ".mcadpcm"
-            $VGAudioCli =  [string] (& $VGAudioCliExe -c $filename_input_audio $filename_output 2>&1)
+            $VGAudioCli =  [string] (& $VGAudioCliExe -c $filename_input_audio $filename_temp 2>&1)
         }
-        Remove-Item -Path $filename_input_audio
         Trace-Verbose ('VGAudioCLi Output="{0}"' -f $VGAudioCli) $LogTreeFilename
+        Remove-Item -Path $filename_input_audio
+        try {
+            Rename-Item -Path $filename_temp -NewName $filename_output
+            return $True
+        }
+        catch {
+            Trace-Warn ('Error FailedToConvert="{0}"' -f $filepath_without_extension) $LogTreeFilename
+            return $False
+        }
     }
 
     End
@@ -190,33 +209,35 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
             # get rid of PC FUZ
             Remove-Item -Path $filename_fuz
 
-        } elseif ($has_xwm)
+        }
+        elseif ($has_xwm)
         {
             $filename_audio = $filename_xwm
-        } elseif ($has_wav) {
+        }
+        elseif ($has_wav)
+        {
             $filename_audio = $filename_wav
-        } else {
+        }
+        else
+        {
             Trace-Warn ('Error UnreachableCodeBranch="{0}"' -f $filepath_without_extension) $LogTreeFilename
             $retValue['Success'] = $False
             return $retValue
         }
 
-        NormalizeAudio $filename_audio $filepath_without_extension $is_nxopus
-
-        $has_wav = Test-Path -Path $filename_wav -PathType Leaf
-        if ($has_wav) {
-            ConvertAudio $filename_wav $filepath_without_extension $is_nxopus
-            $retValue['Success'] = $True
-        } else {
-            Trace-Warn ('Error FailedToConvertAudio="{0}"' -f $filepath_without_extension) $LogTreeFilename
-            $retValue['Success'] = $False
+        $ok = NormalizeAudio $filename_audio $filepath_without_extension $is_nxopus
+        if ($ok) {
+            $ok = ConvertAudio $filename_wav $filepath_without_extension $is_nxopus
         }
-
+        if (!$ok) {
+            Trace-Warn ('Error FailedToConvertAudio="{0}"' -f $filepath_without_extension) $LogTreeFilename
+        }
         if ($has_lip)
         {
             Remove-Item -Path $filename_lip
         }
 
+        $retValue['Success'] = $ok
 	    return $retValue
     }
 

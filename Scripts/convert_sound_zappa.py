@@ -6,91 +6,44 @@ import time
 
 def GetVGAudioCli():
 	utilities_path = util.GetUtilitiesPath()
-	VGAudioCli = os.path.join(utilities_path, "Sound", "VGAudioCli.exe")
+	VGAudioCli = os.path.join(utilities_path, "VGAudioCli.exe")
 	return VGAudioCli
 
-def GetxWMAEncode():
+def GetFFMpeg():
 	utilities_path = util.GetUtilitiesPath()
-	xWMAEncode = os.path.join(utilities_path, "Sound", "xWMAEncode.exe")
-	return xWMAEncode
+	FFMpeg = os.path.join(utilities_path, "ffmpeg.exe")
+	return FFMpeg
 
-def GetSndFileConvert():
-	utilities_path = util.GetUtilitiesPath()
-	SndFileConvert = os.path.join(utilities_path, "Sound", "sndfile-convert.exe")
-	return SndFileConvert
+def NormalizeAudio(filename_input_audio, filename_output_wav, is_nxopus):
+	""" Normalizes the WAV file to be a proper PCM16 with a correct sample rate for VGAudioCli """
 
-def XWM2WAV(filename_xwm, filename_wav):
-	""" converts the XWM file to WAV """
-
-	xWMAEncode = GetxWMAEncode()
-	commandLine = [xWMAEncode, filename_xwm, filename_wav]
+	FFMpeg = GetFFMpeg()
+	filename_temp = filename_input_audio[:-4] + "TEMP" + filename_input_audio[-4:]
+	if is_nxopus:
+		commandLine = [FFMpeg, "-hide_banner", "-y", "-i", filename_temp, "-ac", "1", "-ar", "48000", filename_output_wav]
+	else:
+		commandLine = [FFMpeg, "-hide_banner", "-y", "-i", filename_temp, "-ar", "44100", filename_output_wav]
+	util.RenameFile(filename_input_audio, filename_temp)
 	util.RunCommandLine(commandLine)
+	util.RemoveFile(filename_temp)
+	util.LogDebug("INFO: Normalized WAV <{}>".format(filename_output_wav))
 
-def WAV2PCM16WAV(filename_xwm, filename_wav, is_nxopus):
-	""" Normalizes the WAV file to be a proper PCM16 with correct sample rate for VGAudioCli """
-
-	try:
-		with open(filename_wav, "rb") as wav_file:
-			wav_header = wav_file.read(0x24)
-	except:
-		util.LogDebug("ERROR: failed to normalize WAV <{}>.".format(filename_wav))
-		return False
-
-	wav_audio_format = int.from_bytes(wav_header[0x14:0x16], byteorder = 'little', signed = False)
-	wav_channel_count = int.from_bytes(wav_header[0x16:0x18], byteorder = 'little', signed = False)
-	wav_sample_rate = int.from_bytes(wav_header[0x18:0x1C], byteorder = 'little', signed = False)
-	wav_bits_per_sample = int.from_bytes(wav_header[0x22:0x24], byteorder = 'little', signed = False)
-
-	# make the WAV file compatible with VGAudioCLi
-	#
-	# OPUS CODEC requires 24000 or 48000 sample rates from a mono PCM16 stream
-	# DSPADPCM CODEC requires 22050 or 44100 sample rates from a mono or stereo PCM16 stream
-
-	# get the closest ressampling RATE
-	DESIRED_RATES = [24000, 48000] if is_nxopus else [22050, 44100]
-	try:
-		i = 0
-		while wav_sample_rate >= DESIRED_RATES[i]:
-			i += 1
-	except:
-		i = 1
-	override_sample_rate = str(DESIRED_RATES[i])
-
-	# ressample if required
-	if not wav_sample_rate in DESIRED_RATES or wav_audio_format != 1 or wav_bits_per_sample != 16:
-		filename_temp = filename_wav + "temp.wav"
-		util.RemoveFile(filename_temp)
-		util.RenameFile(filename_wav, filename_temp)
-		SndFileConvert = GetSndFileConvert()
-		commandLine = [SndFileConvert, "-override-sample-rate=" + override_sample_rate, "-pcm16", filename_temp, filename_wav]
-		util.RunCommandLine(commandLine)
-		util.RemoveFile(filename_temp)
-		util.LogDebug("INFO: Normalized WAV <{}>: FORMAT:{} CHANNELS:{} SAMPLE_RATE:{} BITS_PER_SAMPLE:{}".format(
-			filename_wav, wav_audio_format, wav_channel_count, wav_sample_rate, wav_bits_per_sample
-		)
-	)
-
-	return True
-
-def WAV2MCADPCM(filename_wav, filename_mcadpcm):
+def ConvertAudio(filename_wav, is_nxopus):
 	""" creates MCADPCM from WAVE """
 
 	VGAudioCli = GetVGAudioCli()
-	commandLine = [VGAudioCli, "-c", filename_wav, filename_mcadpcm]
+	filename_temp = filename_wav[:-4]
+	if is_nxopus:
+		commandLine = [VGAudioCli, "-c", "--opusheader",  "Skyrim", "-i:0", filename_wav, filename_temp + '.fuz']
+	else:
+		commandLine = [VGAudioCli, "-c", filename_wav, filename_temp + '.mcadpcm']
 	util.RunCommandLine(commandLine)
-
-def WAV2FUZ(filename_wav, filename_fuz):
-	""" creates FUZ from WAVE """
-
-	# Only getting channel 0 from WAVE when creating OPUS
-	VGAudioCli = GetVGAudioCli()
-	commandLine = [VGAudioCli, "-c", "--opusheader",  "Skyrim", "-i:0", filename_wav, filename_fuz]
-	util.RunCommandLine(commandLine)
+	util.RemoveFile(filename_wav)
+	util.LogDebug("INFO: Converted WAV <{}>".format(filename_wav))
 
 def ConvertSound_Internal(filepath_without_extension):
 	""" Converts PC SSE sound files to be compatible with NX SSE supported codecs """
 
-	filename_mcadpcm = filepath_without_extension + ".mcadpcm"
 	filename_wav = filepath_without_extension + ".wav"
 	filename_xwm = filepath_without_extension + ".xwm"
 	filename_lip = filepath_without_extension + ".lip"
@@ -101,11 +54,9 @@ def ConvertSound_Internal(filepath_without_extension):
 	has_lip = os.path.exists(filename_lip)
 	has_fuz = os.path.exists(filename_fuz)
 
-	is_nxopus = "\\sound\\voice\\" in filepath_without_extension.lower()
-
 	util.LogDebug("INFO: Convert Sound <{}> WAV:{} XWM:{} LIP:{} FUZ:{}".format(filepath_without_extension, has_wav, has_xwm, has_lip, has_fuz))
 
-	# FUZ files always have precedence over loose WAV, XWM, LIP
+	# UNFUZ Audio
 	if has_fuz:
 		try:
 			with open(filename_fuz, "rb") as fuz_file:
@@ -125,6 +76,9 @@ def ConvertSound_Internal(filepath_without_extension):
 		elif audio_format == b'XWMA':
 			has_xwm = True
 			filename_audio = filename_xwm
+		else:
+			util.LogInfo("ERROR: unknown audio format {} on FUZ <{}>.".format(audio_format, filename_fuz))
+			return False
 
 		# save LIP contents
 		if lip_size > 0:
@@ -146,28 +100,31 @@ def ConvertSound_Internal(filepath_without_extension):
 		 	util.LogDebug("ERROR: failed to create intermediate AUDIO <{}>.".format(filename_audio))
 		 	return False
 
-	# Convert the XWM to WAV
-	if has_xwm:
-		XWM2WAV(filename_xwm, filename_wav)
+		# get rid of the source PC FUZ file
+		util.RemoveFile(filename_fuz)
 
-	# Normalize the WAV format
-	if not WAV2PCM16WAV(filename_xwm, filename_wav, is_nxopus):
+	elif has_xwm:
+		filename_audio = filename_xwm
+
+	elif has_wav:
+		filename_audio = filename_wav
+
+	else:
+		util.LogDebug("PANIC: IT SHOULD NEVER REACH THIS BRANCH...")
 		return False
 
-	# Convert the normalized WAV to final format
-	if is_nxopus:
-		WAV2FUZ(filename_wav, filename_fuz)
-	else:
-		WAV2MCADPCM(filename_wav, filename_mcadpcm)
+	# Force anything VOICE to use OPUS codec
+	is_nxopus = "\\sound\\voice\\" in filepath_without_extension.lower()
 
-	# clean up temporary files
-	util.RemoveFile(filename_wav)
-	if has_xwm:
-		util.RemoveFile(filename_xwm)
+	# Normalize Audio
+	NormalizeAudio(filename_audio, filename_wav, is_nxopus)
+
+	# Convert Audio
+	ConvertAudio(filename_wav, is_nxopus)
+
+	# clean up LIP file if any
 	if has_lip:
 		util.RemoveFile(filename_lip)
-	if has_fuz and not is_nxopus:
-		util.RemoveFile(filename_fuz)
 
 	return True
 

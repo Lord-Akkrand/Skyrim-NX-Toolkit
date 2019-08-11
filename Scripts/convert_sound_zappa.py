@@ -134,7 +134,7 @@ def ConvertSound_Internal(filepath_without_extension):
 
 	# Convert Audio
 	if ok:
-		ok = ConvertAudio(filename_audio, filepath_without_extension, is_nxopus)
+		ok = ConvertAudio(filename_wav, filepath_without_extension, is_nxopus)
 
 	# clean up LIP file
 	if ok and has_lip and is_nxopus:

@@ -235,7 +235,7 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
         {
             $ok = ConvertAudio $filename_wav $filepath_without_extension $is_nxopus
         }
-        if ($ok && $has_lip && $is_nxopus)
+        if ($ok -and $has_lip -and $is_nxopus)
         {
             Remove-Item -Path $filename_lip
         }

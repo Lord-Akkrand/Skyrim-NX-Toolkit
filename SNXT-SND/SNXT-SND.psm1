@@ -27,8 +27,8 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
             $FFMpeg =  [string] (& $FFMpegExe "-hide_banner" "-y" "-i" $filename_input_audio "-ar" "44100" $filename_temp 2>&1)
         }
         Trace-Verbose ('FFMpeg Output="{0}"' -f $FFMpeg) $LogTreeFilename
-        Remove-Item -Path $filename_input_audio
         try {
+            Remove-Item -Path $filename_input_audio
             Rename-Item -Path $filename_temp -NewName $filename_output
             return $True
         }
@@ -78,8 +78,8 @@ function ConvertAudio([string] $filename_input_audio, [string] $filepath_without
             $VGAudioCli =  [string] (& $VGAudioCliExe -c $filename_input_audio $filename_temp 2>&1)
         }
         Trace-Verbose ('VGAudioCLi Output="{0}"' -f $VGAudioCli) $LogTreeFilename
-        Remove-Item -Path $filename_input_audio
         try {
+            Remove-Item -Path $filename_input_audio
             Rename-Item -Path $filename_temp -NewName $filename_output
             return $True
         }

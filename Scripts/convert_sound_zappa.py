@@ -14,32 +14,45 @@ def GetFFMpeg():
 	FFMpeg = os.path.join(utilities_path, "ffmpeg.exe")
 	return FFMpeg
 
-def NormalizeAudio(filename_input_audio, filename_output_wav, is_nxopus):
-	""" Normalizes the WAV file to be a proper PCM16 with a correct sample rate for VGAudioCli """
+def NormalizeAudio(filename_input_audio, filepath_without_extension, is_nxopus):
+	""" Normalizes the audio file to be a proper PCM16 with a correct sample rate for VGAudioCli """
 
 	FFMpeg = GetFFMpeg()
-	filename_temp = filename_input_audio[:-4] + "TEMP" + filename_input_audio[-4:]
+	filename_temp = filepath_without_extension + ".temp.wav"
+	filename_output = filepath_without_extension + ".wav"
 	if is_nxopus:
-		commandLine = [FFMpeg, "-hide_banner", "-y", "-i", filename_temp, "-ac", "1", "-ar", "48000", filename_output_wav]
+		commandLine = [FFMpeg, "-hide_banner", "-y", "-i", filename_input_audio, "-ac", "1", "-ar", "48000", filename_temp]
 	else:
-		commandLine = [FFMpeg, "-hide_banner", "-y", "-i", filename_temp, "-ar", "44100", filename_output_wav]
-	util.RenameFile(filename_input_audio, filename_temp)
+		commandLine = [FFMpeg, "-hide_banner", "-y", "-i", filename_input_audio, "-ar", "44100", filename_temp]
 	util.RunCommandLine(commandLine)
-	util.RemoveFile(filename_temp)
-	util.LogDebug("INFO: Normalized WAV <{}>".format(filename_output_wav))
+	try:
+		util.RemoveFile(filename_input_audio)
+		util.RenameFile(filename_temp, filename_output)
+		util.LogDebug("INFO: Normalized AUDIO <{}>".format(filename_output))
+		return True
+	except:
+		return False
 
-def ConvertAudio(filename_wav, is_nxopus):
-	""" creates MCADPCM from WAVE """
+def ConvertAudio(filename_input_audio, filepath_without_extension, is_nxopus):
+	""" converts the audio file to final sse nx format """
 
 	VGAudioCli = GetVGAudioCli()
-	filename_temp = filename_wav[:-4]
 	if is_nxopus:
-		commandLine = [VGAudioCli, "-c", "--opusheader",  "Skyrim", "-i:0", filename_wav, filename_temp + '.fuz']
+		filename_temp = filepath_without_extension + ".temp.fuz"
+		filename_output = filepath_without_extension + ".fuz"
+		commandLine = [VGAudioCli, "-c", "--opusheader",  "Skyrim", "-i:0", filename_input_audio, filename_temp]
 	else:
-		commandLine = [VGAudioCli, "-c", filename_wav, filename_temp + '.mcadpcm']
+		filename_temp = filepath_without_extension + ".temp.mcadpcm"
+		filename_output = filepath_without_extension + ".mcadpcm"
+		commandLine = [VGAudioCli, "-c", filename_input_audio, filename_temp]
 	util.RunCommandLine(commandLine)
-	util.RemoveFile(filename_wav)
-	util.LogDebug("INFO: Converted WAV <{}>".format(filename_wav))
+	try:
+		util.RemoveFile(filename_input_audio)
+		util.RenameFile(filename_temp, filename_output)
+		util.LogDebug("INFO: Converted AUDIO <{}>".format(filename_output))
+		return True
+	except:
+		return False
 
 def ConvertSound_Internal(filepath_without_extension):
 	""" Converts PC SSE sound files to be compatible with NX SSE supported codecs """
@@ -117,16 +130,17 @@ def ConvertSound_Internal(filepath_without_extension):
 	is_nxopus = "\\sound\\voice\\" in filepath_without_extension.lower()
 
 	# Normalize Audio
-	NormalizeAudio(filename_audio, filename_wav, is_nxopus)
+	ok = NormalizeAudio(filename_audio, filepath_without_extension, is_nxopus)
 
 	# Convert Audio
-	ConvertAudio(filename_wav, is_nxopus)
+	if ok:
+		ok = ConvertAudio(filename_audio, filepath_without_extension, is_nxopus)
 
-	# clean up LIP file if any
-	if has_lip:
+	# clean up LIP file
+	if ok and has_lip and is_nxopus:
 		util.RemoveFile(filename_lip)
 
-	return True
+	return ok
 
 def ConvertSound(target, filepath_without_extension):
 	return ConvertSound_Internal(filepath_without_extension)

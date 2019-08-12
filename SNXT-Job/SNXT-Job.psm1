@@ -10,10 +10,20 @@ function Add-JobToQueue($task)
     #Invoke-Command -ScriptBlock $task.ScriptBlock -ArgumentList $task.Arguments
 }
 
+function Get-ThreadCount
+{
+    $maxOverride = $Global:SNXT.Config.Performance.MaxThreadsOverride
+    if ($maxOverride -gt 0)
+    {
+        return $maxOverride
+    }
+    return Get-CPUCount
+}
+
 function Get-BatchSize($assetCount)
 {
-    $numberThreads = $Global:SNXT.Config.Performance.MaxThreads
-    
+    $numberThreads = Get-ThreadCount
+
     $spreadOut = $assetCount / $numberThreads
     $multipleThreads = [Math]::ceiling($spreadOut / $Global:SNXT.Config.Performance.BatchesPerThread)
     $batchSize = [Math]::max($Global:SNXT.Config.Performance.MinBatchSize, $multipleThreads)
@@ -32,7 +42,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
     $skippedCount = 0
     $errorCount = 0
     $total = $JobQueue.Count
-
+    $threadCount = Get-ThreadCount
     function Update-Progress
     {
         $status = ("Batches Started/Complete [Total] {0}/{1} [{2}] Assets Success/Skipped/Error [Total] {3}/{4}/{5} [{6}]" -f $started, $finished, $total, $successCount, $skippedCount, $errorCount, $assetsLength)
@@ -110,7 +120,7 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
             $sleepTime = 0.125
         }
         
-        if ($RunningJobs.Count -lt $Global:SNXT.Config.Performance.MaxThreads -and $JobQueue.Count -gt 0)
+        if ($RunningJobs.Count -lt $threadCount -and $JobQueue.Count -gt 0)
         {
             #Write-Host "Starting job"
             $task = $JobQueue.DeQueue()

@@ -1,6 +1,6 @@
 ﻿param
 (
-    [String]$ModPath="C:\Skyrim Switch\Unit Tests\Unit Test DDS"
+    [String]$ModPath=""
 )
 
 Clear-Host
@@ -9,7 +9,10 @@ $ErrorActionPreference = 'Stop'
 
 if ($ModPath -eq "")
 {
-    Write-Host ('Usage`n`rPS_CONVERT_ONLY <ModPath>')
+    Write-Host ('Usage')
+    Write-Host ('PS_CONVERT_ONLY "<ModPath>"')
+    Write-Host ('Example:')
+    Write-Host ('PS_CONVERT_ONLY "C:\Skyrim Switch\Skyrim-NX-Toolkit\Inigo"')
     return
 }
 

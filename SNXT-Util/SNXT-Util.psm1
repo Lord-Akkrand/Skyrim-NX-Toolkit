@@ -66,6 +66,23 @@ function Get-FormattedTime($timeInfo)
     return $timeString
 }
 
+function Get-CPUCount
+{
+    $LogicalCPU = 0
+    $PhysicalCPU = 0
+    $Core = 0
+ 
+    # Get the Processor information from the WMI object
+    $Proc = [object[]]$(Get-WMIObject Win32_Processor)
+ 
+    #Perform the calculations
+    $Core = $Proc.count
+    $LogicalCPU = $($Proc | Measure-Object -Property NumberOfLogicalProcessors -sum).Sum
+    $PhysicalCPU = $($Proc | Measure-Object -Property NumberOfCores -sum).Sum
+
+    return [math]::max($LogicalCPU, $PhysicalCPU)
+}
+
 function Test-SDK
 {
     $sdkPath = Get-Utility "NvnTexpkg.exe"

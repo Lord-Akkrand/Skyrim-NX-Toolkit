@@ -10,6 +10,7 @@ HavokBehaviorPostProcess.exe
 ffmpeg.exe
 
 settings.ini
+SNXT-Config.xml
 
 # Compiled Python
 *.pyc

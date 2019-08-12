@@ -3,7 +3,7 @@
     <ToolkitVersion Value="3.0.0" Type="String" />
   </Version>
   <Performance>
-    <MaxThreads Value="24" Type="Integer" />
+    <MaxThreadsOverride Value="-1" Type="Integer" />
     <MaxBatchSize Value="1000" Type="Integer" />
     <MinBatchSize Value="10" Type="Integer" />
     <BatchesPerThread Value="2" Type="Integer" />

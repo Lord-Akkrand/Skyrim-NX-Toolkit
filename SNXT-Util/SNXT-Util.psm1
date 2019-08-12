@@ -12,12 +12,14 @@ $ToolsPaths = $Utilities, $Sound, $GraphicsTools, $NvnTools
 
 function Get-ExternalUtility([string] $url, [string]$filename)
 {
-    Create-Empty $DownloadPath
+    Create-Empty $DownloadPath $True
     Import-Module BitsTransfer
     $urlFilename = [System.IO.Path]::GetFileName($url)
     $targetPath = Join-Path -Path $DownloadPath -ChildPath $urlFilename
     $tempPath = Join-Path -Path $DownloadPath -ChildPath $filename
     #Start-BitsTransfer -Source $url -Destination $targetPath
+
+    Write-Host('Download {0} from {1}' -f $filename, $url)
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $wc = New-Object System.Net.WebClient
@@ -25,7 +27,8 @@ function Get-ExternalUtility([string] $url, [string]$filename)
     
     if ($urlFilename.EndsWith("zip"))
     {
-        Create-Empty $UnzipPath
+        Write-Host('Unzip {0}' -f $targetPath)
+        Create-Empty $UnzipPath $True
         #extract the specific file out of the zip
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         $zip = [System.IO.Compression.ZipFile]::OpenRead($targetPath)
@@ -33,11 +36,13 @@ function Get-ExternalUtility([string] $url, [string]$filename)
         $zip.Dispose()
         $myfile = Get-ChildItem -Path $UnzipPath -Filter $filename -Recurse -ErrorAction SilentlyContinue -Force | Select-Object -ExpandProperty FullName
         
+        Write-Host('Move {0} to {1}' -f $myfile, $tempPath)
         Move-Item $myfile $tempPath
         
         Remove-Item $targetPath
     }
     $finalPath = Join-Path -Path $Utilities -ChildPath $filename
+    Write-Host('Move {0} to {1}' -f $tempPath, $finalPath)
     Move-Item -Path $tempPath $finalPath
 }
 
@@ -52,7 +57,12 @@ function Get-ExternalUtilites
         $hasUtility = Get-Utility $utility.Filename
         if ($hasUtility -eq $False)
         {
+            Write-Host('{0} was NOT found, attempt to download' -f $utility.Filename)
             Get-ExternalUtility $utility.Url $utility.Filename
+        }
+        else
+        {
+            Write-Host('{0} was found' -f $utility.Filename)
         }
     }
 }
@@ -263,14 +273,21 @@ function Slice-ArrayPython([byte []] $data, [int]$startSlice, [int]$endSlice)
     return $data[$startSlice..$endSlice]
 }
 
-function Create-Empty([string] $path)
+function Create-Empty([string] $path, [boolean] $optionalQuiet)
 {
     if (Test-Path $path -PathType Container)
     {
         Remove-Item -Recurse -Force $path
     }
     $emptyPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Empty"
-    ROBOCOPY $emptyPath $path /MIR /XF .gitignore
+    if ($optionalQuiet -eq $True)
+    {
+        ROBOCOPY $emptyPath $path /MIR /XF .gitignore | Out-Null
+    }
+    else
+    {
+        ROBOCOPY $emptyPath $path /MIR /XF .gitignore
+    }
 }
 
 function Create-LogTree([string] $ModName)

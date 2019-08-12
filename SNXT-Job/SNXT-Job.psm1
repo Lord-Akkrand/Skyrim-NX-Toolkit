@@ -60,9 +60,11 @@ function Submit-JobQueue([string] $progressTitle, [string]$BatchName, $Id, $asse
             $task = $jobInfo.value
             $job = $task.Job
             
+            $jobCompleted = $job.State -eq "Completed"
+
             $arrayOutput = Receive-Job $job
             
-            if ($job.State -eq "Completed")
+            if ($jobCompleted)
             {
                 Remove-Job -Job $job
                 $jobsToRemove += $jobName

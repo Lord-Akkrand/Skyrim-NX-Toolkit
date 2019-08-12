@@ -32,6 +32,8 @@ Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Util\
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-BSA\SNXT-BSA.psm1") -Force -WarningAction SilentlyContinue
 Import-Module $(Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "SNXT-Job\SNXT-Job.psm1") -Force -WarningAction SilentlyContinue
 
+Get-ExternalUtilites
+
 $Global:SNXT.BasePath = $ModPath + "_Processed"
 
 Write-Host ("BasePath [{0}]" -f $Global:SNXT.BasePath)

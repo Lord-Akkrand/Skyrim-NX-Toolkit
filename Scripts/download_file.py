@@ -1,12 +1,13 @@
 #! python3
-
+'''
 import sys
 import requests
 import shutil
 import zipfile
+'''
 
 def DownloadFile(origin, target):
-
+	'''
 	print("Downloading from : " + origin)
 	print("Downloading to: " + target)
 
@@ -16,6 +17,8 @@ def DownloadFile(origin, target):
 		out_file.write(response.content)
 
 	print("Download Complete")
+	'''
+	print("Deprecated.  Use the powershell downloader.")
 
 if __name__ == '__main__':
 	origin = sys.argv[1]

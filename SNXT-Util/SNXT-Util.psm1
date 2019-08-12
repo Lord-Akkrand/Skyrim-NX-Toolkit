@@ -2,11 +2,60 @@
 $BaseLocation = Split-Path -Parent $HomeLocation
 
 $Utilities = Join-Path -Path $BaseLocation -ChildPath "Utilities"
+$DownloadPath = Join-Path -Path $Utilities -ChildPath "Download"
+$UnzipPath = Join-Path -Path $DownloadPath -ChildPath "Temp"
 $Sound = Join-Path -Path $Utilities -ChildPath "Sound"
 $GraphicsTools = Join-Path -Path $BaseLocation -ChildPath "GraphicsTools"
 $NvnTools = Join-Path -Path $BaseLocation -ChildPath "NvnTools"
 
 $ToolsPaths = $Utilities, $Sound, $GraphicsTools, $NvnTools
+
+function Get-ExternalUtility([string] $url, [string]$filename)
+{
+    Create-Empty $DownloadPath
+    Import-Module BitsTransfer
+    $urlFilename = [System.IO.Path]::GetFileName($url)
+    $targetPath = Join-Path -Path $DownloadPath -ChildPath $urlFilename
+    $tempPath = Join-Path -Path $DownloadPath -ChildPath $filename
+    #Start-BitsTransfer -Source $url -Destination $targetPath
+
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile($url, $targetPath)
+    
+    if ($urlFilename.EndsWith("zip"))
+    {
+        Create-Empty $UnzipPath
+        #extract the specific file out of the zip
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $zip = [System.IO.Compression.ZipFile]::OpenRead($targetPath)
+        [System.IO.Compression.ZipFileExtensions]::ExtractToDirectory($zip, $UnzipPath)
+        $zip.Dispose()
+        $myfile = Get-ChildItem -Path $UnzipPath -Filter $filename -Recurse -ErrorAction SilentlyContinue -Force | Select-Object -ExpandProperty FullName
+        
+        Move-Item $myfile $tempPath
+        
+        Remove-Item $targetPath
+    }
+    $finalPath = Join-Path -Path $Utilities -ChildPath $filename
+    Move-Item -Path $tempPath $finalPath
+}
+
+function Get-ExternalUtilites
+{
+    $utilitiesXMLPath = Join-Path -Path $HomeLocation -ChildPath "SNXT-Utilities.xml"
+
+    [xml]$utilitiesXML = Get-Content -Path $utilitiesXMLPath
+    
+    foreach ($utility in $utilitiesXML.Utilities.ChildNodes)
+    {
+        $hasUtility = Get-Utility $utility.Filename
+        if ($hasUtility -eq $False)
+        {
+            Get-ExternalUtility $utility.Url $utility.Filename
+        }
+    }
+}
 
 function Get-Utility([string] $util)
 {

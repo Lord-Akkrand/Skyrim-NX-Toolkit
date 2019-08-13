@@ -12,7 +12,7 @@ $ToolsPaths = $Utilities, $Sound, $GraphicsTools, $NvnTools
 
 function Get-ExternalUtility([string] $url, [string]$filename)
 {
-    Create-Empty $DownloadPath $True
+    Create-Empty $DownloadPath
     Import-Module BitsTransfer
     $urlFilename = [System.IO.Path]::GetFileName($url)
     $targetPath = Join-Path -Path $DownloadPath -ChildPath $urlFilename
@@ -28,7 +28,7 @@ function Get-ExternalUtility([string] $url, [string]$filename)
     if ($urlFilename.EndsWith("zip"))
     {
         Write-Host('Unzip {0}' -f $targetPath)
-        Create-Empty $UnzipPath $True
+        Create-Empty $UnzipPath
         #extract the specific file out of the zip
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         $zip = [System.IO.Compression.ZipFile]::OpenRead($targetPath)
@@ -273,21 +273,26 @@ function Slice-ArrayPython([byte []] $data, [int]$startSlice, [int]$endSlice)
     return $data[$startSlice..$endSlice]
 }
 
-function Create-Empty([string] $path, [boolean] $optionalQuiet)
+function Delete-Folder([string] $path)
+{
+    $ListOfFiles = Get-ChildItem -Path $path -Recurse | Where-Object {!$_.PSIsContainer}
+    $assetsLength = $ListOfFiles.Count
+    for ($i = 1; $i -lt $assetsLength; $i++) { 
+        $percentComplete = ($i / $assetsLength) * 100
+        Write-Progress -Activity 'Deleting files...' -Status ('{0}/{1} {2}' -f $i, $assetsLength, $ListOfFiles[$i].Name) -PercentComplete $percentComplete
+        Remove-Item -Path $ListOfFiles[$i].FullName
+    }
+    Remove-Item -Recurse -Force $path
+}
+
+function Create-Empty([string] $path)
 {
     if (Test-Path $path -PathType Container)
     {
-        Remove-Item -Recurse -Force $path
+        Delete-Folder $path
     }
     $emptyPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Empty"
-    if ($optionalQuiet -eq $True)
-    {
-        ROBOCOPY $emptyPath $path /MIR /XF .gitignore | Out-Null
-    }
-    else
-    {
-        ROBOCOPY $emptyPath $path /MIR /XF .gitignore
-    }
+    ROBOCOPY $emptyPath $path /MIR /XF .gitignore | Out-Null
 }
 
 function Create-LogTree([string] $ModName)

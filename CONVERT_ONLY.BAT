@@ -10,7 +10,7 @@ SET TOOLKIT_EXE="%DIST_PATH%toolkit.exe"
 
 SET PATH=%PATH%;%SCRIPTS_PATH%
 
->CON CALL "PS_GET_UTILITIES"
+>CON CALL "%TOOLKIT_PATH%PS_GET_UTILITIES"
 IF ERRORLEVEL 1 GOTO utilityError
 
 SET ORIGINAL=%~f1
@@ -34,4 +34,5 @@ GOTO :EOF
 
 :utilityError
 >CON ECHO There was an error finding a 3rd-party tool.  Aborting.
+PAUSE
 GOTO :EOF

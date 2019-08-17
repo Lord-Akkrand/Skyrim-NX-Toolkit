@@ -49,7 +49,7 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
 }
 
 <#""" Converts the normalized audio """#>
-function ConvertAudio([string] $filename_input_audio, [string] $filepath_without_extension, [boolean] $isNxOpus)
+function ConvertAudio([string] $filename_input_audio, [string] $filepath_without_extension, [boolean] $isNxOpus, [boolean] $has_lip)
 {
     Begin
     {
@@ -65,6 +65,12 @@ function ConvertAudio([string] $filename_input_audio, [string] $filepath_without
         $VGAudioCLi = ""
         $filename_temp = ""
         $filename_output = ""
+        $filename_temp_lip = ""
+        if ($isNxOpus -and $has_lip) {
+            $filename_temp_lip = $filepath_without_extension + ".temp.lip"
+            $filename_lip = $filepath_without_extension + ".lip"
+            Rename-Item -Path $filename_lip -NewName $filename_temp_lip
+        }
         if ($isNxOpus)
         {
             $filename_temp = $filepath_without_extension + ".temp.fuz"
@@ -79,6 +85,10 @@ function ConvertAudio([string] $filename_input_audio, [string] $filepath_without
         }
         Trace-Verbose ('VGAudioCLi Output="{0}"' -f $VGAudioCli) $LogTreeFilename
         try {
+            if ($is_nxopus -and $has_lip)
+            {
+                Remove-Item -Path $filename_temp_lip
+            }
             Remove-Item -Path $filename_input_audio
             Rename-Item -Path $filename_temp -NewName $filename_output
             return $True
@@ -233,12 +243,9 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
         $ok = NormalizeAudio $filename_audio $filepath_without_extension $is_nxopus
         if ($ok)
         {
-            $ok = ConvertAudio $filename_wav $filepath_without_extension $is_nxopus
+            $ok = ConvertAudio $filename_wav $filepath_without_extension $is_nxopus $has_lip
         }
-        if ($ok -and $has_lip -and $is_nxopus)
-        {
-            Remove-Item -Path $filename_lip
-        }
+
         $retValue['Success'] = $ok
 	    return $retValue
     }

@@ -24,7 +24,9 @@ def NormalizeAudio(filename_input_audio, filepath_without_extension, is_nxopus):
 		commandLine = [FFMpeg, "-hide_banner", "-y", "-i", filename_input_audio, "-ac", "1", "-ar", "48000", filename_temp]
 	else:
 		commandLine = [FFMpeg, "-hide_banner", "-y", "-i", filename_input_audio, "-ar", "44100", filename_temp]
+
 	util.RunCommandLine(commandLine)
+
 	try:
 		util.RemoveFile(filename_input_audio)
 		util.RenameFile(filename_temp, filename_output)
@@ -33,10 +35,14 @@ def NormalizeAudio(filename_input_audio, filepath_without_extension, is_nxopus):
 	except:
 		return False
 
-def ConvertAudio(filename_input_audio, filepath_without_extension, is_nxopus):
+def ConvertAudio(filename_input_audio, filepath_without_extension, is_nxopus, has_lip):
 	""" converts the audio file to final sse nx format """
 
 	VGAudioCli = GetVGAudioCli()
+	if is_nx_opus and has_lip:
+		filename_lip = filepath_without_extension + ".lip"
+		filename_temp_lip = filepath_without_extension + ".temp.lip"
+		util.RenameFile(filename_lip, filename_temp_lip)
 	if is_nxopus:
 		filename_temp = filepath_without_extension + ".temp.fuz"
 		filename_output = filepath_without_extension + ".fuz"
@@ -45,8 +51,12 @@ def ConvertAudio(filename_input_audio, filepath_without_extension, is_nxopus):
 		filename_temp = filepath_without_extension + ".temp.mcadpcm"
 		filename_output = filepath_without_extension + ".mcadpcm"
 		commandLine = [VGAudioCli, "-c", filename_input_audio, filename_temp]
+
 	util.RunCommandLine(commandLine)
+
 	try:
+		if is_nxopus and has_lip:
+			util.RemoveFile(filename_temp_lip)
 		util.RemoveFile(filename_input_audio)
 		util.RenameFile(filename_temp, filename_output)
 		util.LogDebug("INFO: Converted AUDIO <{}>".format(filename_output))
@@ -134,11 +144,7 @@ def ConvertSound_Internal(filepath_without_extension):
 
 	# Convert Audio
 	if ok:
-		ok = ConvertAudio(filename_wav, filepath_without_extension, is_nxopus)
-
-	# clean up LIP file
-	if ok and has_lip and is_nxopus:
-		util.RemoveFile(filename_lip)
+		ok = ConvertAudio(filename_wav, filepath_without_extension, is_nxopus, has_lip)
 
 	return ok
 

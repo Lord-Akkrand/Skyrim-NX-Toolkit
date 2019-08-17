@@ -39,7 +39,7 @@ def ConvertAudio(filename_input_audio, filepath_without_extension, is_nxopus, ha
 	""" converts the audio file to final sse nx format """
 
 	VGAudioCli = GetVGAudioCli()
-	if is_nx_opus and has_lip:
+	if is_nxopus and has_lip:
 		filename_lip = filepath_without_extension + ".lip"
 		filename_temp_lip = filepath_without_extension + ".temp.lip"
 		util.RenameFile(filename_lip, filename_temp_lip)

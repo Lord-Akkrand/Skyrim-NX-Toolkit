@@ -1,28 +1,32 @@
 #! python3
 
+import sys
 import util
 import codecs
+import chardet
 
 def ConvertTXT_Internal(filename):
 	buffer = None
 	with open(filename, "rb") as pcFile:
 		buffer = pcFile.read()
-	
-	
-	buffer = bytearray(buffer)
-	util.LogInfo("Buffer0<{}>".format(buffer[0]))
-	util.LogInfo("Buffer0<{}>".format(buffer[1]))
-	i = 1
-	while i < len(buffer):
-		buffer[i:i] = b'\x00\x00\x00'
-		i += 4
 		
-	util.LogDebug("BUFFER<{}>".format(buffer))
-	with open(filename, "wb") as outFile:
+	encoding = chardet.detect(buffer)["encoding"]
+	buffer = buffer.decode(encoding)
+
+	linebreak = checkLineBreak(buffer)
+	if linebreak!="\r\n":
+		buffer = buffer.replace(linebreak, "\r\n")
 		
-		outFile.write(b'\xff\xfe\x00\x00')
+	with open(filename, "w", encoding="utf32", newline=None) as outFile:
 		outFile.write(buffer)
+	
 	return True
+
+def checkLineBreak(contents):
+	for b in ["\r\n","\n","\r"]:
+		if b in contents:
+			return b
+	return "\r\n"
 
 def ConvertTXT(target, filename):
 	return ConvertTXT_Internal(filename)

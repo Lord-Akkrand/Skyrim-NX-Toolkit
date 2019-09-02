@@ -50,6 +50,7 @@ BasicRules.append({"BSA":"", "Folder":"seq"})
 BasicRules.append({"BSA":"", "Folder":"shadersfx"})
 BasicRules.append({"BSA":"", "Folder":"strings"})
 BasicRules.append({"BSA":"", "Folder":"interface"})
+BasicRules.append({"BSA":"", "Folder":"video"})
 
 BasicRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
 BasicRules.append({"BSA":"", "Folder":"music"})

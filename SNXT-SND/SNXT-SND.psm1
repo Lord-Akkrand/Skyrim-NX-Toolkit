@@ -121,19 +121,6 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
 
     Process
     {
-
-        <#
-        $retValue = @{}
-        $convert_sound_zappaexe = Get-Utility "convert_sound_zappa.exe"
-        $scriptPath = Join-Path -Path $Global:SNXT.HomeLocation -ChildPath "Scripts"
-        $convert_sound_zappa = [string] (& $convert_sound_zappaexe $filepath_without_extension $scriptPath 2>&1)
-
-        Trace-Verbose ('convert_sound_zappa Output="{0}"' -f $convert_sound_zappa) $LogTreeFilename
-        $retValue.Success = $True
-        Trace-Debug ('Success Value="{0}"' -f $retValue.Success) $LogTreeFilename
-        return $retValue
-        #>
-
         $retValue = @{}
 
         $filename_wav = $filepath_without_extension + ".wav"
@@ -181,18 +168,29 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
             $findWAVE = Find-FirstMatch $audio_format $wave
             if ($findWAVE -ge 0)
             {
-                $has_wav = $True
-                $filename_audio = $filename_wav
+                if (-not $has_wav)
+                {
+                    $has_wav = $True
+                    $filename_audio = $filename_wav
+                }
+                else
+                {
+                    $filename_audio = ''
+                }
             }
             else
             {
                 $xwma = [System.Text.Encoding]::ASCII.GetBytes('XWMA')
                 Trace-Verbose ('Test XWMA="{0}"' -f [string]$xwma) $LogTreeFilename
                 $findXWMA = Find-FirstMatch $audio_format $xwma
-                if ($findXWMA -ge 0)
+                if ($findXWMA -ge 0 -and -not $has_wav)
                 {
                     $has_xwm = $True
                     $filename_audio = $filename_xwm
+                }
+                else
+                {
+                    $filename_audio = ''
                 }
             }
 
@@ -212,32 +210,41 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
             }
 
             # save AUDIO contents
-            try {
-                [System.Io.File]::WriteAllBytes( $filename_audio, $audio_data )
-                Trace-Verbose ('Created NewFile="{0}" From="{1}"' -f $filename_audio, $filename_fuz) $LogTreeFilename
-            }
-            catch {
-                Trace-Warn ('Error FailedToCreateAudio="{0}"' -f $filename_audio) $LogTreeFilename
-                $retValue['Success'] = $False
-                return $retValue
+            if ($filename_audio -ne '')
+            {
+                try {
+                    [System.Io.File]::WriteAllBytes( $filename_audio, $audio_data )
+                    Trace-Verbose ('Created NewFile="{0}" From="{1}"' -f $filename_audio, $filename_fuz) $LogTreeFilename
+                }
+                catch {
+                    Trace-Warn ('Error FailedToCreateAudio="{0}"' -f $filename_audio) $LogTreeFilename
+                    $retValue['Success'] = $False
+                    return $retValue
+                }
             }
 
             # get rid of PC FUZ
             Remove-Item -Path $filename_fuz
         }
-        elseif ($has_xwm)
-        {
-            $filename_audio = $filename_xwm
-        }
+        # prefer WAV files over XWM
         elseif ($has_wav)
         {
             $filename_audio = $filename_wav
+        }
+        elseif ($has_xwm)
+        {
+            $filename_audio = $filename_xwm
         }
         else
         {
             Trace-Warn ('Error UnreachableCodeBranch="{0}"' -f $filepath_without_extension) $LogTreeFilename
             $retValue['Success'] = $False
             return $retValue
+        }
+
+        if ($has_wav -and $has_xwm)
+        {
+            Remove-Item -Path $filename_xwm
         }
 
         $ok = NormalizeAudio $filename_audio $filepath_without_extension $is_nxopus

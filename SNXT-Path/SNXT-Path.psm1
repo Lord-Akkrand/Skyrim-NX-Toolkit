@@ -21,12 +21,12 @@ function Open-LogTree([array] $assets)
         $Task = ""
         $assetsLength = $assets.length
         $assetNumber = 0
-        
+
         foreach ($asset in $assets)
         {
             $LogTreeFilename = Get-LogTreeFilename $asset
-            $logFilename = Split-Path -Leaf $LogTreeFilename 
-            $logPath = Split-Path -Path $LogTreeFilename 
+            $logFilename = Split-Path -Leaf $LogTreeFilename
+            $logPath = Split-Path -Path $LogTreeFilename
 
             # Update Progress Bar
             $percentComplete = ($assetNumber++ / $assetsLength) * 100
@@ -66,7 +66,7 @@ $ProcessDDSScriptBlock = {
 
     $VerbosePreference = 'Continue'
     $DebugPreference = 'Continue'
-    
+
     # Read the texture information
     foreach ($texture in $jobBatch)
     {
@@ -76,7 +76,7 @@ $ProcessDDSScriptBlock = {
         $LogTreeFilename = Get-LogTreeFilename $texture
 
         Trace-Debug ('Process-DDS RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
-        
+
         Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
 
         $textureRet = @{}
@@ -138,7 +138,7 @@ function Convert-Textures([array] $textures)
             if ($batchInProgress.Count -ge $batchSize -or $textureNumber -eq $texturesLength)
             {
                 $jobBatch = [System.Collections.ArrayList]@() + $batchInProgress
-                
+
                 $task = @{
                     ScriptBlock = $ProcessDDSScriptBlock
                     Arguments = @($Global:SNXT, $jobBatch)
@@ -176,7 +176,7 @@ $ProcessHKXScriptBlock = {
 
     $VerbosePreference = 'Continue'
     $DebugPreference = 'Continue'
-    
+
     # Read the asset information
     foreach ($asset in $jobBatch)
     {
@@ -186,7 +186,7 @@ $ProcessHKXScriptBlock = {
         $LogTreeFilename = Get-LogTreeFilename $asset
 
         Trace-Debug ('Process-HKX RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
-        
+
         Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
 
         $assetRet = @{}
@@ -214,7 +214,7 @@ $ProcessHKXScriptBlock = {
 
             $assetRet['Success'] = $assetRet.Convert['Success']
         }
-       
+
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
@@ -255,7 +255,7 @@ function Convert-HKXs([array] $assets)
             if ($batchInProgress.Count -ge $batchSize -or $assetNumber -eq $assetsLength)
             {
                 $jobBatch = [System.Collections.ArrayList]@() + $batchInProgress
-                
+
                 $task = @{
                     ScriptBlock = $ProcessHKXScriptBlock
                     Arguments = @($Global:SNXT, $jobBatch)
@@ -294,7 +294,7 @@ $ProcessNIFScriptBlock = {
 
     $VerbosePreference = 'Continue'
     $DebugPreference = 'Continue'
-    
+
     # Read the asset information
     foreach ($asset in $jobBatch)
     {
@@ -304,7 +304,7 @@ $ProcessNIFScriptBlock = {
         $LogTreeFilename = Get-LogTreeFilename $asset
 
         Trace-Debug ('Process-NIF RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
-        
+
         Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
 
         $assetRet = @{}
@@ -313,7 +313,7 @@ $ProcessNIFScriptBlock = {
         $assetRet.Convert = Convert-NIF $asset $assetInfo
 
         $assetRet['Success'] = $assetRet.Convert['Success']
-       
+
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
@@ -340,7 +340,7 @@ function Convert-NIFs([array] $assets)
         $assetsLength = $assets.length
         $assetNumber = 0
         $batchSize = Get-BatchSize $assetsLength
-        
+
         $batchInProgress = [System.Collections.ArrayList]@()
         $batchCount = 0
         foreach ($asset in $assets)
@@ -354,7 +354,7 @@ function Convert-NIFs([array] $assets)
             if ($batchInProgress.Count -ge $batchSize -or $assetNumber -eq $assetsLength)
             {
                 $jobBatch = [System.Collections.ArrayList]@() + $batchInProgress
-                
+
                 $task = @{
                     ScriptBlock = $ProcessNIFScriptBlock
                     Arguments = @($Global:SNXT, $jobBatch)
@@ -393,7 +393,7 @@ $ProcessSNDScriptBlock = {
 
     $VerbosePreference = 'Continue'
     $DebugPreference = 'Continue'
-    
+
     # Read the asset information
     foreach ($asset in $jobBatch)
     {
@@ -403,7 +403,7 @@ $ProcessSNDScriptBlock = {
         $LogTreeFilename = Get-LogTreeFilename $asset
 
         Trace-Debug ('Process-SND RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
-        
+
         Trace-Verbose ('SNXT ToolkitVersion="{0}"' -f $Global:SNXT.Config.Version.ToolkitVersion) $LogTreeFilename
 
         $assetRet = @{}
@@ -412,7 +412,8 @@ $ProcessSNDScriptBlock = {
         $assetRet.Convert = Convert-SND $asset $assetInfo
 
         $assetRet['Success'] = $assetRet.Convert['Success']
-       
+        $assetRet['Skipped'] = $assetRet.Convert['Skipped']
+
         $endTime = Get-Date
         $timeSpan = New-TimeSpan -Start $startTime -End $endTime
         $timeString = Get-FormattedTime $timeSpan
@@ -439,7 +440,7 @@ function Convert-SNDs([array] $assets)
         $assetsLength = $assets.length
         $assetNumber = 0
         $batchSize = Get-BatchSize $assetsLength
-        
+
         $batchInProgress = [System.Collections.ArrayList]@()
         $batchCount = 0
         foreach ($asset in $assets)
@@ -453,7 +454,7 @@ function Convert-SNDs([array] $assets)
             if ($batchInProgress.Count -ge $batchSize -or $assetNumber -eq $assetsLength)
             {
                 $jobBatch = [System.Collections.ArrayList]@() + $batchInProgress
-                
+
                 $task = @{
                     ScriptBlock = $ProcessSNDScriptBlock
                     Arguments = @($Global:SNXT, $jobBatch)
@@ -491,7 +492,7 @@ function Get-SoundList([array] $allSounds)
     foreach ($sndfile in $allSounds)
     {
         $sndFileWExt = $sndFile.Substring(0, ($sndFile.length-4))
-        
+
         if ($sndsHash.ContainsKey($sndFileWExt) -eq $False)
         {
             $sndsHash.Add($sndFileWExt, $True)
@@ -506,7 +507,7 @@ function Get-SoundList([array] $allSounds)
 
 function Convert-Path
 {
-    Param 
+    Param
     (
     )
 
@@ -518,7 +519,7 @@ function Convert-Path
     Process
     {
         # Get a list of all the files in the path
-        $AllTheFiles = Get-ChildItem $Global:SNXT.BasePath -Recurse 
+        $AllTheFiles = Get-ChildItem $Global:SNXT.BasePath -Recurse
 
         # Filter it to all the textures
         [array]$allAssets = @()
@@ -531,7 +532,7 @@ function Convert-Path
         $allSounds = $AllTheFiles | Where-Object { $_.Extension -eq ".xwm" -or $_.Extension -eq ".fuz" -or $_.Extension -eq ".wav" } | Select-Object -ExpandProperty FullName
         $snds = Get-SoundList $allSounds
         $allAssets += $snds
-        
+
         Open-LogTree $allAssets
 
         Convert-Textures $textures

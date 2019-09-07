@@ -142,6 +142,7 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
         Trace-Verbose ('Has FUZ="{0}"' -f $has_fuz) $LogTreeFilename
 
         $lip_size = 0
+        $lip_version = 0
         $lip_data = $null
         $audio_data = $null
         $filename_audio = ''
@@ -151,6 +152,13 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
         {
             try {
                 [byte[]] $fuz_file = [System.Io.File]::ReadAllBytes( $filename_fuz )
+                $lip_version = Read-Bytes-LittleEndianUnsigned $fuz_file 0x0C 0x04
+                # check if already converted
+                if ($lip_version -ne 0x01)
+                {
+                    $retValue['Skipped'] = $True
+                    return $retValue
+                }
                 $lip_size = Read-Bytes-LittleEndianUnsigned $fuz_file 0x08 0x04
                 $lip_data = Slice-ArrayPython $fuz_file 0x0C (0x0C+$lip_size)
                 $audio_data = Slice-ArrayPython $fuz_file (0x0C+$lip_size) -1

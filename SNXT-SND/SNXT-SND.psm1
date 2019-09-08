@@ -154,7 +154,7 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
                 [byte[]] $fuz_file = [System.Io.File]::ReadAllBytes( $filename_fuz )
                 $lip_version = Read-Bytes-LittleEndianUnsigned $fuz_file 0x0C 0x04
                 # check if already converted
-                if ($lip_version -ne 0x01)
+                if ($lip_version -ne 0x00000001 -and $lip_version -ne 0x46464952)
                 {
                     $retValue['Skipped'] = $True
                     return $retValue

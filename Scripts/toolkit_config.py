@@ -17,7 +17,7 @@ DefaultValues = {
 		"MaxSoundThreads" : 5,
 		"MaxOtherThreads" : 5,
 		"MaxMeshThreads" : 5,
-		"Multiprocessing" : True
+		"Multiprocessing" : False
 	},
 	"BSA":{
 		"FullRules" : False

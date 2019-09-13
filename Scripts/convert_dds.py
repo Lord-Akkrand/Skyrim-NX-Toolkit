@@ -222,7 +222,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 		numberOfRuns = max(1, numberOfRuns)
 		util.LogDebug('adPDDS.exe will run a total of ' + str(numberOfRuns) + " times.")
 
-		adp_config = 101552000100
+		adp_config = 100009000000
 		if maxSizeSingle >= 2048:
 			adp_config += 50
 		elif maxSizeSingle >= 1024:
@@ -280,6 +280,12 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 	if not doNXConversion:
 		util.LogDebug("Debug passing on NX texture conversion")
 		return True
+
+	util.LogDebug("Compressing textures and generating mipmaps")
+	utilities_path = util.GetUtilitiesPath()
+	DDSoptx64 = os.path.join(utilities_path, "DDSoptx64.exe")
+	commandLine = [DDSoptx64, "-game",  "sk", "-optimizetexts", ddsFileName]
+
 	util.LogDebug("Now for NX texture conversion")
 	if hasSDK:
 		nvntexpkg = util.GetNvnTexpkg()

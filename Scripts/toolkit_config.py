@@ -17,13 +17,13 @@ DefaultValues = {
 		"MaxSoundThreads" : 5,
 		"MaxOtherThreads" : 5,
 		"MaxMeshThreads" : 5,
-		"Multiprocessing" : False
+		"Multiprocessing" : True
 	},
 	"BSA":{
 		"FullRules" : False
 	},
 	"Textures":{
-		"DefaultSizeLimit" : 1024*1024,
+		"DefaultSizeLimit" : 512*512,
 	"SizeRules" : "Base"
 	},
 	"Meshes":{

@@ -284,7 +284,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 	util.LogDebug("Compressing textures and generating mipmaps")
 	utilities_path = util.GetUtilitiesPath()
 	DDSoptx64 = os.path.join(utilities_path, "DDSoptx64.exe")
-	commandLine = [DDSoptx64, "-game",  "sk", "-optimizetexts", ddsFileName]
+	commandLine = [DDSoptx64, "-game",  "sk", "-deployment", ddsFileName]
 
 	util.LogDebug("Now for NX texture conversion")
 	if hasSDK:

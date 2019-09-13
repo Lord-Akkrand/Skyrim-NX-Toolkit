@@ -66,8 +66,8 @@ Rules = {}
 
 BaseRules = []
 
-#BaseRules.append({"Name":"Actors", 'Path':[r'\bactors\b'], 'Size':1024*1024})
-#BaseRules.append({"Name":"Pandorable", 'Path':[r'\bpandorable\b'], 'Size':1024*1024})
+BaseRules.append({"Name":"Actors", 'Path':[r'\bactors\b'], 'Size':1024*1024})
+BaseRules.append({"Name":"Pandorable", 'Path':[r'\bpandorable\b'], 'Size':1024*1024})
 BaseRules.append({"Name":"Landscape", 'Path':[r'\blandscape\b'], 'Size':1024*1024})
 BaseRules.append({"Name":"Architecture", 'Path':[r'\barchitecture\b'], 'Size':1024*1024})
 

@@ -208,6 +208,11 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 		#return True
 		return ConvertDDS(basePath, ddsFileName, opt_InRecursion + 1)
 
+	util.LogDebug("Compressing textures and generating mipmaps")
+	utilities_path = util.GetUtilitiesPath()
+	DDSoptx64 = os.path.join(utilities_path, "DDSoptx64.exe")
+	commandLine = [DDSoptx64, "-game",  "sk", "-deployment", ddsFileName]
+	
 	adp_dds = os.path.join(utilities_path, "AdPDDS.exe")
 	
 	if os.path.exists(adp_dds):
@@ -280,11 +285,6 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 	if not doNXConversion:
 		util.LogDebug("Debug passing on NX texture conversion")
 		return True
-
-	util.LogDebug("Compressing textures and generating mipmaps")
-	utilities_path = util.GetUtilitiesPath()
-	DDSoptx64 = os.path.join(utilities_path, "DDSoptx64.exe")
-	commandLine = [DDSoptx64, "-game",  "sk", "-deployment", ddsFileName]
 
 	util.LogDebug("Now for NX texture conversion")
 	if hasSDK:

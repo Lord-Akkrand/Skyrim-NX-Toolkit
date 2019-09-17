@@ -71,6 +71,7 @@ BaseRules.append({"Name":"Pandorable", 'Path':[r'\bpandorable\b'], 'Size':1024*1
 BaseRules.append({"Name":"Landscape", 'Path':[r'\blandscape\b'], 'Size':1024*1024})
 BaseRules.append({"Name":"Architecture", 'Path':[r'\barchitecture\b'], 'Size':1024*1024})
 BaseRules.append({"Name":"Clothes", 'Path':[r'\bclothes\b'], 'Size':1024*1024})
+BaseRules.append({"Name":"Armor", 'Path':[r'\barmor\b'], 'Size':1024*1024})
 
 Rules['Base'] = BaseRules
 # If you come across a texture that is the following type, convert it to the other type

@@ -8,7 +8,7 @@ function NormalizeAudio([string] $filename_input_audio, [string] $filepath_witho
     {
         $relativeFilename = Get-RelativeFilename $filepath_without_extension
         $LogTreeFilename = Get-LogTreeFilename $filepath_without_extension
-        Trace-Debug ('NormalizeAudio RelativeFilename="{0}"' -f $relativeFilename) $LogTreeFilename 1
+        Trace-Debug ('NormalizeAudio RelativeFilename="{0}"' -f $filename_input_audio) $LogTreeFilename 1
         $startTime = Get-Date
     }
 
@@ -147,7 +147,6 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
         $audio_data = $null
         $filename_audio = ''
 
-        # FUZ files always have precedence over loose WAV, XWM, LIP
         if ($has_fuz)
         {
             try {
@@ -169,41 +168,54 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
                 return $retValue
             }
 
-            # determine AUDIO format
+            # determine AUDIO format in FUZ
             $audio_format = Slice-ArrayPython $audio_data 0x08 0x0C
+            $xwma = [System.Text.Encoding]::ASCII.GetBytes('XWMA')
             $wave = [System.Text.Encoding]::ASCII.GetBytes('WAVE')
+            Trace-Verbose ('Test XWMA="{0}"' -f [string]$xwma) $LogTreeFilename
             Trace-Verbose ('Test WAVE="{0}"' -f [string]$wave) $LogTreeFilename
+            $findXWMA = Find-FirstMatch $audio_format $xwma
             $findWAVE = Find-FirstMatch $audio_format $wave
-            if ($findWAVE -ge 0)
+
+            # determine which audio file to use (loose WAV > loose XWM > FUZ)
+            $save_audio_from_fuz = $True
+            if ($has_wav)
             {
-                if (-not $has_wav)
-                {
-                    $has_wav = $True
-                    $filename_audio = $filename_wav
-                }
-                else
-                {
-                    $filename_audio = ''
-                }
+                $filename_audio = $filename_wav
+                $save_audio_from_fuz = $False
             }
-            else
+            elseif ($findWAVE -ge 0)
             {
-                $xwma = [System.Text.Encoding]::ASCII.GetBytes('XWMA')
-                Trace-Verbose ('Test XWMA="{0}"' -f [string]$xwma) $LogTreeFilename
-                $findXWMA = Find-FirstMatch $audio_format $xwma
-                if ($findXWMA -ge 0 -and -not $has_wav)
-                {
-                    $has_xwm = $True
-                    $filename_audio = $filename_xwm
+                $has_wav = $True
+                $filename_audio = $filename_wav
+            }
+            elseif ($has_xwm)
+            {
+                $filename_audio = $filename_xwm
+                $save_audio_from_fuz = $False
+            }
+            elseif ($findXWMA -ge 0)
+            {
+                $has_xwm = $True
+                $filename_audio = $filename_xwm
+            }
+
+            # save AUDIO contents
+            if ($save_audio_from_fuz)
+            {
+                try {
+                    [System.Io.File]::WriteAllBytes( $filename_audio, $audio_data )
+                    Trace-Verbose ('Created NewFile="{0}" From="{1}"' -f $filename_audio, $filename_fuz) $LogTreeFilename
                 }
-                else
-                {
-                    $filename_audio = ''
+                catch {
+                    Trace-Warn ('Error FailedToCreateAudio="{0}"' -f $filename_audio) $LogTreeFilename
+                    $retValue['Success'] = $False
+                    return $retValue
                 }
             }
 
             # save LIP contents
-            if ($lip_size -gt 0)
+            if ($lip_size -gt 0 -and -not $has_lip)
             {
                 try {
                     [System.Io.File]::WriteAllBytes( $filename_lip, $lip_data )
@@ -217,24 +229,9 @@ function Convert-SND([string] $filepath_without_extension, [hashtable] $info)
                 }
             }
 
-            # save AUDIO contents
-            if ($filename_audio -ne '')
-            {
-                try {
-                    [System.Io.File]::WriteAllBytes( $filename_audio, $audio_data )
-                    Trace-Verbose ('Created NewFile="{0}" From="{1}"' -f $filename_audio, $filename_fuz) $LogTreeFilename
-                }
-                catch {
-                    Trace-Warn ('Error FailedToCreateAudio="{0}"' -f $filename_audio) $LogTreeFilename
-                    $retValue['Success'] = $False
-                    return $retValue
-                }
-            }
-
             # get rid of PC FUZ
             Remove-Item -Path $filename_fuz
         }
-        # prefer WAV files over XWM
         elseif ($has_wav)
         {
             $filename_audio = $filename_wav

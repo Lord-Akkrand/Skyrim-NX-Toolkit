@@ -4,8 +4,8 @@ import sys
 import multiprocessing
 import gui
 import util, download_file, unzip_file, toolkit_config
-import convert_mod, convert_path, load_order, pack_mod, packed_load_order, repack_mod, unpack_mod
-	
+import convert_mod, convert_path, load_order, pack_mod, packed_load_order, repack_mod, unpack_mod, chain_mod
+
 if __name__ == '__main__':
 	multiprocessing.freeze_support()
 
@@ -56,6 +56,7 @@ if __name__ == '__main__':
 		origin = sys.argv[2]
 		target = sys.argv[3]
 		unpack_mod.UnpackMod_External(origin, target)
-	
-
-		
+	elif py_script == 'chain_mod':
+		data_folder = sys.argv[2]
+		load_order_filename = sys.argv[3]
+		chain_mod.ChainMod_External(data_folder, load_order_filename)

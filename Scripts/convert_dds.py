@@ -146,7 +146,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 		util.LogDebug('Checking rule: ' + str(rule))
 		for iP in range(len(relativePathList)):
 			path = relativePathList[iP]
-			m = re.search(pathStart, path)
+			m = re.search(pathStart, path, re.IGNORECASE)
 			if m != None:
 				# we have the start of a match.  See if it bears out.
 				util.LogDebug('on the trail of ' + pathStart)

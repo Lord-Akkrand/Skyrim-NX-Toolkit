@@ -162,7 +162,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 							match = False
 							break
 						internalIdx += 1
-						m = re.search(pathOngoing, nextPath)
+						m = re.search(pathOngoing, nextPath, re.IGNORECASE)
 						match = m != None
 						util.LogDebug('ongoing into ' + nextPath + ' == ' + pathOngoing)
 						if match == True:

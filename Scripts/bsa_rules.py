@@ -30,9 +30,7 @@ FullRules.append({"BSA":"Interface", "Folder":"interface"})
 
 FullRules.append({"BSA":"Textures", "Folder":"textures"})
 
-
-
-BasicRules = []	
+BasicRules = []
 # Basic Rules, only make Textures/Meshes/Animations/''
 # "BSA":"" will just be PluginName.bsa
 
@@ -56,12 +54,31 @@ BasicRules.append({"BSA":"Voices", "Folder":"sound\\voice"})
 BasicRules.append({"BSA":"", "Folder":"music"})
 BasicRules.append({"BSA":"", "Folder":"sound\\fx"})
 BasicRules.append({"BSA":"", "Folder":"sound\\ebt"})
-	
-def GetBSARules():
-	fullRules = toolkit_config.get_bool_setting("BSA", "FullRules")
-	if fullRules:
-		return FullRules
-	return BasicRules
 
-# Not implemented yet
-#BSARules.append({"NotIncluded":True, "Folder":"source"})
+CompactRules = []
+# Compact Rules, only make Textures/Meshes/MasterBSA
+# "BSA":"" will just be PluginName.bsa
+
+CompactRules.append({"BSA":"Textures", "Folder":"textures"})
+
+CompactRules.append({"BSA":"Meshes", "Folder":"meshes"})
+CompactRules.append({"BSA":"Meshes", "Folder":"lodsettings"})
+
+CompactRules.append({"BSA":"", "Folder":"grass"})
+CompactRules.append({"BSA":"", "Folder":"scripts"})
+CompactRules.append({"BSA":"", "Folder":"seq"})
+CompactRules.append({"BSA":"", "Folder":"shadersfx"})
+CompactRules.append({"BSA":"", "Folder":"strings"})
+CompactRules.append({"BSA":"", "Folder":"interface"})
+CompactRules.append({"BSA":"", "Folder":"video"})
+CompactRules.append({"BSA":"", "Folder":"sound"})
+CompactRules.append({"BSA":"", "Folder":"music"})
+
+def GetBSARules():
+	rules = toolkit_config.get_setting("BSA", "Rules").lower()
+	if rules == 'full':
+		return FullRules
+	elif rules == 'basic':
+		return BasicRules
+	else:
+		return CompactRules

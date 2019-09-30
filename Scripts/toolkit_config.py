@@ -20,7 +20,7 @@ DefaultValues = {
 		"Multiprocessing" : False
 	},
 	"BSA":{
-		"FullRules" : False
+		"Rules" : "Basic"
 	},
 	"Textures":{
 		"DefaultSizeLimit" : 512*512,

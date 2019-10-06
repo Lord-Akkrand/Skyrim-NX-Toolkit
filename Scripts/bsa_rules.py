@@ -61,9 +61,8 @@ CompactRules = []
 
 CompactRules.append({"BSA":"Textures", "Folder":"textures"})
 
-CompactRules.append({"BSA":"Meshes", "Folder":"meshes"})
-CompactRules.append({"BSA":"Meshes", "Folder":"lodsettings"})
-
+CompactRules.append({"BSA":"", "Folder":"meshes"})
+CompactRules.append({"BSA":"", "Folder":"lodsettings"})
 CompactRules.append({"BSA":"", "Folder":"grass"})
 CompactRules.append({"BSA":"", "Folder":"scripts"})
 CompactRules.append({"BSA":"", "Folder":"seq"})

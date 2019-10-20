@@ -8,7 +8,7 @@ EXIT /B 0
 :download
 ECHO texconv.exe not found >CON
 
-%TOOLKIT_EXE% download_file https://github.com/Microsoft/DirectXTex/releases/download/aug2018/texconv.exe "%TOOLKIT_PATH%Utilities\texconv.exe"
+%TOOLKIT_EXE% download_file https://github.com/microsoft/DirectXTex/releases/download/feb2019/texconv.exe "%TOOLKIT_PATH%Utilities\texconv.exe"
 
 IF EXIST "%TOOLKIT_PATH%Utilities\texconv.exe" EXIT /B 0
 EXIT /B 1

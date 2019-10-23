@@ -57,272 +57,243 @@ import xtx_extract
 
 import subprocess
 
+
 def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
-	relativeFilename = ddsFileName.replace(basePath, '')
-	ddsFilePath = os.path.dirname(ddsFileName)
-	hasSDK = util.HasSDK()
-	
-	util.LogDebug("This is the base path: " + " " +  basePath)
-	util.LogDebug("This is dds file: " + " " +  ddsFileName)
-	util.LogDebug("HAS_SDK: " +  str(hasSDK))
-		
-	util.LogDebug("convert_dds.py 2.0")
+    relativeFilename = ddsFileName.replace(basePath, '')
+    ddsFilePath = os.path.dirname(ddsFileName)
+    hasSDK = util.HasSDK()
 
-	relativePathList = relativeFilename[1:].split('\\')
-	util.LogDebug('PATH')
-	for path in relativePathList:
-		util.LogDebug(path)
-	util.LogDebug('END PATH')
-	
-	utilities_path = util.GetUtilitiesPath()
-	nvddsinfo = os.path.join(utilities_path, "nvddsinfo.exe")
-	util.LogDebug(nvddsinfo + " " +  ddsFileName)
-	dds_buffer, dds_err = util.RunCommandLine([nvddsinfo, ddsFileName])
-	
-	util.LogDebug('DDSINFO START')
-	util.LogDebug(dds_buffer)
-	util.LogDebug('DDSINFO END')
+    util.LogDebug("This is the base path: " + " " + basePath)
+    util.LogDebug("This is dds file: " + " " + ddsFileName)
+    util.LogDebug("HAS_SDK: " + str(hasSDK))
 
-	texdiag = os.path.join(utilities_path, "texdiag.exe")
-	util.LogDebug(texdiag + " " + ddsFileName)
-	td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])
-	util.LogDebug('TEXDIAG START')
-	util.LogDebug(td_buffer)
-	util.LogDebug('TEXDIAG END')
+    util.LogDebug("convert_dds.py 2.0")
 
-	def getIntPattern(name):
-		namePattern = name + r": ([\d]+)"
-		nameReturn = re.search(namePattern, dds_buffer)
-		if nameReturn != None:
-			nameReturn = nameReturn.group(1)
-		else:
-			nameReturn = -1
-		util.LogDebug(name + " is :" + str(nameReturn))
-		return int(nameReturn)
+    relativePathList = relativeFilename[1:].split('\\')
+    util.LogDebug('PATH')
+    for path in relativePathList:
+        util.LogDebug(path)
+    util.LogDebug('END PATH')
 
-	def lerp(x, a, b):
-		return ((b - a) * x) + a
-		
-	height = getIntPattern("Height")
-	width = getIntPattern("Width")
-	mipmaps = getIntPattern("Mipmap count")
-	linearSize = height * width
+    utilities_path = util.GetUtilitiesPath()
+    nvddsinfo = os.path.join(utilities_path, "nvddsinfo.exe")
+    util.LogDebug(nvddsinfo + " " + ddsFileName)
+    dds_buffer, dds_err = util.RunCommandLine([nvddsinfo, ddsFileName])
 
-	fourCCPattern = r"FourCC: '(....)'"
-	fourCC = re.search(fourCCPattern, dds_buffer)
-	if fourCC != None:
-		fourCC = fourCC.group(1)
-	else:
-		fourCC = '----'
-		
-	if fourCC == '----' or fourCC == 'DX10':
-		diffPattern = r"format = \b(.*)\b"
-		tdFormat = ''
-		m = re.search(diffPattern, td_buffer)
-		if m != None:
-			tdFormat = m.group(1)
-			util.LogDebug("Format is <" + tdFormat + ">")
-		for formatInfo in sizes.Formats:
-			if formatInfo[1] == tdFormat:
-				fourCC = formatInfo[0]
+    util.LogDebug('DDSINFO START')
+    util.LogDebug(dds_buffer)
+    util.LogDebug('DDSINFO END')
 
-	util.LogDebug("FourCC is " + str(fourCC))
+    texdiag = os.path.join(utilities_path, "texdiag.exe")
+    util.LogDebug(texdiag + " " + ddsFileName)
+    td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])
+    util.LogDebug('TEXDIAG START')
+    util.LogDebug(td_buffer)
+    util.LogDebug('TEXDIAG END')
 
-	maxSize = toolkit_config.get_int_setting("Textures", "DefaultSizeLimit")
-	forceFormat = None
-	shouldRun = False
-	util.LogDebug('File is ' + relativeFilename)
-	size_rules = toolkit_config.get_setting("Textures", "SizeRules")
-	ruleSet = None
-	if size_rules in sizes.Rules:
-		ruleSet = sizes.Rules[size_rules]
-	else:
-		ruleSet = sizes.Rules['Base']
+    def getIntPattern(name):
+        namePattern = name + r": ([\d]+)"
+        nameReturn = re.search(namePattern, dds_buffer)
+        if nameReturn != None:
+            nameReturn = nameReturn.group(1)
+        else:
+            nameReturn = -1
+        util.LogDebug(name + " is :" + str(nameReturn))
+        return int(nameReturn)
 
-	for rule in ruleSet:
-		rulePath = rule['Path']
-		pathStart = rulePath[0]
-		match = False
-		util.LogDebug('Checking rule: ' + str(rule))
-		for iP in range(len(relativePathList)):
-			path = relativePathList[iP]
-			m = re.search(pathStart, path, re.IGNORECASE)
-			if m != None:
-				# we have the start of a match.  See if it bears out.
-				util.LogDebug('on the trail of ' + pathStart)
-				match = True
-				for iL in range(1, len(rulePath)):
-					pathOngoing = rulePath[iL]
-					internalIdx = 0
-					while True:
-						nextIdx = iP + iL + internalIdx
-						if nextIdx < len(relativePathList):
-							nextPath = relativePathList[nextIdx]
-						else:
-							match = False
-							break
-						internalIdx += 1
-						m = re.search(pathOngoing, nextPath, re.IGNORECASE)
-						match = m != None
-						util.LogDebug('ongoing into ' + nextPath + ' == ' + pathOngoing)
-						if match == True:
-							break
-					if match == False:
-						break
-			if match:
-				util.LogDebug('APPLYING RULE [' + rule['Name'] + ']')
-				if 'Size' in rule:
-					maxSize = rule['Size']
-				if 'Format' in rule:
-					formatRule = rule['Format']
-					if formatRule[0] != fourCC:
-						forceFormat = formatRule[1]
-						util.LogDebug('Forcing Format from ' + fourCC + ' to ' + forceFormat)
-						
-				break
+    def lerp(x, a, b):
+        return ((b - a) * x) + a
 
-	convertTable = None
-	if hasSDK:
-		convertTable = sizes.ConvertFromToSDK
-	else:
-		convertTable = sizes.ConvertFromTo
+    height = getIntPattern("Height")
+    width = getIntPattern("Width")
+    mipmaps = getIntPattern("Mipmap count")
+    linearSize = height * width
 
-	util.LogDebug("Check force conversion for fourCC " + fourCC)
-	for conv in convertTable:
-		util.LogDebug('Checking ' + conv[0])
-		if fourCC == conv[0]:
-			forceFormat = conv[1][1]
-			util.LogDebug('Match.  Force convert to ' + forceFormat)
-			break
+    fourCCPattern = r"FourCC: '(....)'"
+    fourCC = re.search(fourCCPattern, dds_buffer)
+    if fourCC != None:
+        fourCC = fourCC.group(1)
+    else:
+        fourCC = '----'
 
-	if forceFormat!= None:
-		if opt_InRecursion > 5:
-			util.LogError("Infinite Recursion???")
-			return False
-		texconv = os.path.join(utilities_path, "texconv.exe")
-		commandLine = [texconv, "-y", "-f", conv[1][1]]
-		commandLine += [ddsFileName]
-		commandLine += ["-o", ddsFilePath]
-		(output, err) = util.RunCommandLine(commandLine)
-		util.LogDebug("Done a pre-resize conversion, coming back in here for pass " + str(opt_InRecursion + 1))
-		#return True
-		return ConvertDDS(basePath, ddsFileName, opt_InRecursion + 1)
+    if fourCC == '----' or fourCC == 'DX10':
+        diffPattern = r"format = \b(.*)\b"
+        tdFormat = ''
+        m = re.search(diffPattern, td_buffer)
+        if m != None:
+            tdFormat = m.group(1)
+            util.LogDebug("Format is <" + tdFormat + ">")
+        for formatInfo in sizes.Formats:
+            if formatInfo[1] == tdFormat:
+                fourCC = formatInfo[0]
 
-	util.LogDebug("Compressing textures and generating mipmaps")
-	utilities_path = util.GetUtilitiesPath()
-	DDSoptx64 = os.path.join(utilities_path, "DDSoptx64.exe")
-	commandLine = [DDSoptx64, "-game",  "sk", "-deployment", ddsFileName]
-	
-	adp_dds = os.path.join(utilities_path, "AdPDDS.exe")
-	
-	if os.path.exists(adp_dds):
-		maxSizeSingle = math.sqrt(maxSize)
-		numberOfRuns = 0
-		currentSingleSize = math.sqrt(linearSize)
-		util.LogDebug('adPDDS.exe exists.  MaxSingleSize is ' + str(maxSizeSingle) + " CurrentSingleSize is " + str(currentSingleSize))
-		while (currentSingleSize > maxSizeSingle):
-			numberOfRuns += 1
-			currentSingleSize *= 0.5
-			util.LogDebug('adPDDS.exe will halve to ' + str(currentSingleSize) + " in run " + str(numberOfRuns))
-		numberOfRuns = max(1, numberOfRuns)
-		util.LogDebug('adPDDS.exe will run a total of ' + str(numberOfRuns) + " times.")
+    util.LogDebug("FourCC is " + str(fourCC))
 
-		adp_config = 100009000000
-		if maxSizeSingle >= 2048:
-			adp_config += 50
-		elif maxSizeSingle >= 1024:
-			adp_config += 40
-		elif maxSizeSingle >= 512:
-			adp_config += 30
-		elif maxSizeSingle >= 256:
-			adp_config += 20
-		else:
-			adp_config += 10
-		commandLine = [adp_dds, str(adp_config), ddsFileName]
-		(output, err) = util.RunCommandLine(commandLine)
-		#subsequent runs, remove the 'Rebuild' mipmaps back to 'Make'
-		adp_config -= 0
-		numberExtraRuns = numberOfRuns - 1
-		if numberExtraRuns > 0:
-			util.LogDebug("Going to run AdpDDS.exe " + str(numberExtraRuns) + " extra times to get the size down")
-			for i in range(numberExtraRuns):
-				commandLine = [adp_dds, str(adp_config), ddsFileName]
-				(output, err) = util.RunCommandLine(commandLine)
-	else:
-		shouldRun = shouldRun or linearSize > maxSize
-		shouldRun = shouldRun or (forceFormat != None)
-		if shouldRun:
-			resizePercentage = 1
-			newLinearSize = linearSize
-			newWidth = width
-			newHeight = height
-			newMipmaps = mipmaps
-			while newLinearSize > maxSize:
-				resizePercentage *= 0.5
-				newWidth = int(width * resizePercentage)
-				newHeight = int(height * resizePercentage)
-				newLinearSize = newWidth * newHeight
-				newMipmaps -= 1
-				util.LogDebug('Resizing ' + str(resizePercentage) + ' results in ' + str(newWidth) + 'x' + str(newHeight))
-			texconv = os.path.join(utilities_path, "texconv.exe")
-			commandLine = [texconv, "-pow2", "-fl", "9.3", "-y"]
-			if newWidth < width:
-				commandLine += ["-w", str(newWidth)]
-			if newHeight < height:
-				commandLine += ["-h", str(newHeight)]
-			if newMipmaps < mipmaps:
-				commandLine += ["-m", str(newMipmaps)]
-			
-			if forceFormat != None:
-				commandLine += ["-f", forceFormat]
-			
-			commandLine += [ddsFileName]
-			commandLine += ["-o", ddsFilePath]
-			(output, err) = util.RunCommandLine(commandLine)
-		else:
-			util.LogDebug("TexConv will not run")
-	doNXConversion = True
-	if not doNXConversion:
-		util.LogDebug("Debug passing on NX texture conversion")
-		return True
+    maxSize = toolkit_config.get_int_setting("Textures", "DefaultSizeLimit")
+    forceFormat = None
+    shouldRun = False
+    util.LogDebug('File is ' + relativeFilename)
+    size_rules = toolkit_config.get_setting("Textures", "SizeRules")
+    ruleSet = None
+    if size_rules in sizes.Rules:
+        ruleSet = sizes.Rules[size_rules]
+    else:
+        ruleSet = sizes.Rules['Base']
 
-	util.LogDebug("Now for NX texture conversion")
-	if hasSDK:
-		nvntexpkg = util.GetNvnTexpkg()
-		out_filename = ddsFileName + "out.xtx"
-		out_file = os.path.join(ddsFilePath, out_filename)
-		commandLine = [nvntexpkg, "-i", ddsFileName, "-v", "--printinfo", "-o", out_file]
-		(convOutput, convErrors) = util.RunCommandLine(commandLine)
-		
-		#if "Everything went OK" in convOutput:
-		if os.path.exists(out_file):
-			util.ForceMove(out_file, ddsFileName)
-			util.LogDebug("SDK conversion success for {}".format(ddsFileName))
-			return True
-	else:
-		out_filename = ddsFileName + "out.xtx"
-		out_file = os.path.join(ddsFilePath, out_filename)
-		try:
-			xtx_extract.main_external(["-o", out_file, ddsFileName])
-			#commandLine = ["py", "-3", xtx_extract, ddsFileName]
-			#util.RunCommandLine(commandLine)
-			
-			#out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
-			if os.path.exists(out_file):
-				util.ForceMove(out_file, ddsFileName)
-				util.LogDebug("XTX conversion success for {}".format(ddsFileName))
-				return True
-		except:
-			pass
-	util.LogError("Error During Conversion of {}".format(ddsFileName))
-	return False
+    for rule in ruleSet:
+        rulePath = rule['Path']
+        pathStart = rulePath[0]
+        match = False
+        util.LogDebug('Checking rule: ' + str(rule))
+        for iP in range(len(relativePathList)):
+            path = relativePathList[iP]
+            m = re.search(pathStart, path, re.IGNORECASE)
+            if m != None:
+                # we have the start of a match.  See if it bears out.
+                util.LogDebug('on the trail of ' + pathStart)
+                match = True
+                for iL in range(1, len(rulePath)):
+                    pathOngoing = rulePath[iL]
+                    internalIdx = 0
+                    while True:
+                        nextIdx = iP + iL + internalIdx
+                        if nextIdx < len(relativePathList):
+                            nextPath = relativePathList[nextIdx]
+                        else:
+                            match = False
+                            break
+                        internalIdx += 1
+                        m = re.search(pathOngoing, nextPath, re.IGNORECASE)
+                        match = m != None
+                        util.LogDebug('ongoing into ' +
+                                      nextPath + ' == ' + pathOngoing)
+                        if match == True:
+                            break
+                    if match == False:
+                        break
+            if match:
+                util.LogDebug('APPLYING RULE [' + rule['Name'] + ']')
+                if 'Size' in rule:
+                    maxSize = rule['Size']
+                if 'Format' in rule:
+                    formatRule = rule['Format']
+                    if formatRule[0] != fourCC:
+                        forceFormat = formatRule[1]
+                        util.LogDebug('Forcing Format from ' +
+                                      fourCC + ' to ' + forceFormat)
+
+                break
+
+    convertTable = None
+    if hasSDK:
+        convertTable = sizes.ConvertFromToSDK
+    else:
+        convertTable = sizes.ConvertFromTo
+
+    util.LogDebug("Check force conversion for fourCC " + fourCC)
+    for conv in convertTable:
+        util.LogDebug('Checking ' + conv[0])
+        if fourCC == conv[0]:
+            forceFormat = conv[1][1]
+            util.LogDebug('Match.  Force convert to ' + forceFormat)
+            break
+
+    if forceFormat != None:
+        if opt_InRecursion > 5:
+            util.LogError("Infinite Recursion???")
+            return False
+        texconv = os.path.join(utilities_path, "texconv.exe")
+        commandLine = [texconv, "-y", "-f", conv[1][1]]
+        commandLine += [ddsFileName]
+        commandLine += ["-o", ddsFilePath]
+        (output, err) = util.RunCommandLine(commandLine)
+        util.LogDebug(
+            "Done a pre-resize conversion, coming back in here for pass " + str(opt_InRecursion + 1))
+        # return True
+        return ConvertDDS(basePath, ddsFileName, opt_InRecursion + 1)
+
+    shouldRun = shouldRun or linearSize > maxSize
+    if shouldRun:
+        resizePercentage = 1
+        newLinearSize = linearSize
+        newWidth = width
+        newHeight = height
+        rebuildMipmaps = mipmaps > 1
+        while newLinearSize > maxSize:
+            resizePercentage *= 0.5
+            newWidth = int(width * resizePercentage)
+            newHeight = int(height * resizePercentage)
+            newLinearSize = newWidth * newHeight
+            util.LogDebug('Resizing ' + str(resizePercentage) +
+                          ' results in ' + str(newWidth) + 'x' + str(newHeight))
+        texconv = os.path.join(utilities_path, "texconv.exe")
+        commandLine = [texconv, "-nologo", "-sepalpha", "-pow2"]
+        if newWidth < width:
+            commandLine += ["-w", str(newWidth)]
+        if newHeight < height:
+            commandLine += ["-h", str(newHeight)]
+        finalCommandLine = commandLine[:]
+
+        commandLine += ["-m", "1", "-y"]
+        commandLine += [ddsFileName]
+        commandLine += ["-o", ddsFilePath]
+
+        (output, err) = util.RunCommandLine(commandLine)
+        if rebuildMipmaps:
+            finalCommandLine += ["-m", "0", "-y"]
+            finalCommandLine += [ddsFileName]
+            finalCommandLine += ["-o", ddsFilePath]
+            (output, err) = util.RunCommandLine(finalCommandLine)
+    else:
+        util.LogDebug("TexConv will not run")
+
+    doNXConversion = True
+    if not doNXConversion:
+        util.LogDebug("Debug passing on NX texture conversion")
+        return True
+
+    util.LogDebug("Now for NX texture conversion")
+    if hasSDK:
+        nvntexpkg = util.GetNvnTexpkg()
+        out_filename = ddsFileName + "out.xtx"
+        out_file = os.path.join(ddsFilePath, out_filename)
+        commandLine = [nvntexpkg, "-i", ddsFileName,
+                       "-v", "--printinfo", "-o", out_file]
+        (convOutput, convErrors) = util.RunCommandLine(commandLine)
+
+        # if "Everything went OK" in convOutput:
+        if os.path.exists(out_file):
+            util.ForceMove(out_file, ddsFileName)
+            util.LogDebug("SDK conversion success for {}".format(ddsFileName))
+            return True
+    else:
+        out_filename = ddsFileName + "out.xtx"
+        out_file = os.path.join(ddsFilePath, out_filename)
+        try:
+            xtx_extract.main_external(["-o", out_file, ddsFileName])
+            #commandLine = ["py", "-3", xtx_extract, ddsFileName]
+            # util.RunCommandLine(commandLine)
+
+            #out_file = os.path.join(ddsFilePath, ddsFileName[:-4] + ".xtx")
+            if os.path.exists(out_file):
+                util.ForceMove(out_file, ddsFileName)
+                util.LogDebug(
+                    "XTX conversion success for {}".format(ddsFileName))
+                return True
+        except:
+            pass
+    util.LogError("Error During Conversion of {}".format(ddsFileName))
+    return False
+
+
 def ConvertDDSAsync(basePath, ddsFileName, logname, ret):
-	util.InitialiseMPLog(logname)
-	retVal = ConvertDDS(basePath, ddsFileName)
-	util.LogDebug("retVal for {} was <{}>".format(ddsFileName, str(retVal)))
-	ret["retVal"] = retVal
+    util.InitialiseMPLog(logname)
+    retVal = ConvertDDS(basePath, ddsFileName)
+    util.LogDebug("retVal for {} was <{}>".format(ddsFileName, str(retVal)))
+    ret["retVal"] = retVal
+
 
 if __name__ == '__main__':
-	basePath = sys.argv[1]
-	ddsFileName = sys.argv[2]
-	ConvertDDS(basePath, ddsFileName)
+    basePath = sys.argv[1]
+    ddsFileName = sys.argv[2]
+    ConvertDDS(basePath, ddsFileName)

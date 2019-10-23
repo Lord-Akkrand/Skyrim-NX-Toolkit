@@ -67,55 +67,26 @@ Rules = {}
 BaseRules = []
 
 BaseRules.append({"Name":"Terrain", 'Path':[r'\bterrain\b'], 'Size':1024*1024})
-
 BaseRules.append({"Name":"Actors", 'Path':[r'\bactors\b'], 'Size':1024*1024})
-
 BaseRules.append({"Name":"Landscape", 'Path':[r'\blandscape\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"LandscapeDLC1", 'Path':[r'\bdlc1\b', r'\blandscape\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"LandscapeDLC2", 'Path':[r'\bdlc2\b', r'\blandscape\b'], 'Size':1024*1024})
-
 BaseRules.append({"Name":"Architecture", 'Path':[r'\barchitecture\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"ArchitectureDLC1", 'Path':[r'\bdlc1\b', r'\barchitecture\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"ArchitectureDLC2", 'Path':[r'\bdlc2\b', r'\barchitecture\b'], 'Size':1024*1024})
-
 BaseRules.append({"Name":"Clothes", 'Path':[r'\bclothes\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"ClothesDLC1", 'Path':[r'\bdlc1\b', r'\bclothes\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"ClothesDLC2", 'Path':[r'\bdlc2\b', r'\bclothes\b'], 'Size':1024*1024})
-
 BaseRules.append({"Name":"Armor", 'Path':[r'\barmor\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"ArmorDLC1", 'Path':[r'\bdlc1\b', r'\barmor\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"ArmorDLC2", 'Path':[r'\bdlc2\b', r'\barmor\b'], 'Size':1024*1024})
-
-# SMIM RULES
-
-BaseRules.append({"Name":"ActorSMIM", 'Path':[r'\bsmim\b', r'\bactors\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"LandscapeSMIM", 'Path':[r'\bsmim\b', r'\blandscape\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"ArchitectureSMIM", 'Path':[r'\bsmim\b', r'\barchitecture\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"ClothesSMIM", 'Path':[r'\bsmim\b', r'\bclothes\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"LandscapeSMIM", 'Path':[r'\bsmim\b', r'\blandscape\b'], 'Size':1024*1024})
-
-# OTHER MODS
-
 BaseRules.append({"Name":"Pandorable", 'Path':[r'\bpandorable\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"018Auri", 'Path':[r'\b018Auri\b'], 'Size':1024*1024})
-BaseRules.append({"Name":"Arissa", 'Path':[r'\barissa\b'], 'Size':1024*1024})
+
 
 Rules['Base'] = BaseRules
 # If you come across a texture that is the following type, convert it to the other type
 
 ConvertFromTo = []
 ConvertFromTo.append(('DX10',DXT5))
-ConvertFromTo.append(('BGRA',RGBA))
 ConvertFromTo.append(('BC3_UNORM_SRGB',DXT5))
-ConvertFromTo.append(('BC4U',DXT5))
 ConvertFromTo.append(('R8G8_UNORM',DXT5))
-
+ConvertFromTo.append(('BGRA',DXT1))
 
 ConvertFromToSDK = []
-ConvertFromToSDK.append(('R8UN',DXT1))
-ConvertFromToSDK.append(('BC3_UNORM_SRGB',DXT5))
-ConvertFromToSDK.append(('DX10',DXT5))
-ConvertFromToSDK.append(('BC4U',DXT5))
-ConvertFromToSDK.append(('R8G8_UNORM',DXT5))
+ConvertFromToSDK.append(('BC3_UNORM_SRGB',DX10))
+ConvertFromToSDK.append(('R8G8_UNORM',DX10))
+ConvertFromToSDK.append(('R8UN',DX10))
 
 

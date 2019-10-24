@@ -84,13 +84,6 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
     util.LogDebug(dds_buffer)
     util.LogDebug('DDSINFO END')
 
-    texdiag = os.path.join(utilities_path, "texdiag.exe")
-    util.LogDebug(texdiag + " " + ddsFileName)
-    td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])
-    util.LogDebug('TEXDIAG START')
-    util.LogDebug(td_buffer)
-    util.LogDebug('TEXDIAG END')
-
     def getIntPattern(name):
         namePattern = name + r": ([\d]+)"
         nameReturn = re.search(namePattern, dds_buffer)
@@ -115,6 +108,22 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
         fourCC = fourCC.group(1)
     else:
         fourCC = '----'
+
+    if fourCC == 'DXT1':
+        util.LogDebug("Running nvcompress on DXT1 texture")
+        nvcompress = os.path.join(utilities_path, "nvcompress.exe")
+        (nvc_buffer, nvc_err) = util.RunCommandLine(
+            [nvcompress, "-bc1", ddsFileName, ddsFileName])
+    texdiag = os.path.join(utilities_path, "texdiag.exe")
+    util.LogDebug(texdiag + " " + ddsFileName)
+    td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])
+    util.LogDebug('TEXDIAG START')
+    util.LogDebug(td_buffer)
+    util.LogDebug('TEXDIAG END')
+    m = re.search(r"FAILED", td_buffer)
+    if m != None:
+        util.LogError("texconv FAILED")
+        return False
 
     if fourCC == '----' or fourCC == 'DX10':
         diffPattern = r"format = \b(.*)\b"

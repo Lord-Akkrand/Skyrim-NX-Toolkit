@@ -1,5 +1,6 @@
 This is where you need to put:
 - nvddsinfo.exe <https://github.com/castano/nvidia-texture-tools/releases>
+- nvcompress.exe <https://github.com/castano/nvidia-texture-tools/releases>
 - textconv.exe <https://github.com/Microsoft/DirectXTex/releases>
 - texdiag.exe <https://github.com/Microsoft/DirectXTex/releases>
 - ffmpeg.exe <https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip>

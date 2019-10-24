@@ -117,9 +117,6 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
     texdiag = os.path.join(utilities_path, "texdiag.exe")
     util.LogDebug(texdiag + " " + ddsFileName)
     td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])
-    util.LogDebug('TEXDIAG START')
-    util.LogDebug(td_buffer)
-    util.LogDebug('TEXDIAG END')
     m = re.search(r"FAILED", td_buffer)
     if m != None:
         util.LogError("texconv FAILED")

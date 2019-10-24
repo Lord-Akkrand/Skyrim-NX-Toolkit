@@ -114,6 +114,12 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
         nvcompress = os.path.join(utilities_path, "nvcompress.exe")
         (nvc_buffer, nvc_err) = util.RunCommandLine(
             [nvcompress, "-bc1", ddsFileName, ddsFileName])
+		
+    if fourCC == 'DXT5':
+        util.LogDebug("Running nvcompress on DXT5 texture")
+        nvcompress = os.path.join(utilities_path, "nvcompress.exe")
+        (nvc_buffer, nvc_err) = util.RunCommandLine(
+            [nvcompress, "-bc3", ddsFileName, ddsFileName])
     texdiag = os.path.join(utilities_path, "texdiag.exe")
     util.LogDebug(texdiag + " " + ddsFileName)
     td_buffer, td_err = util.RunCommandLine([texdiag, "info", ddsFileName])

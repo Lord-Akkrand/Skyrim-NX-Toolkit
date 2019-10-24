@@ -1,6 +1,8 @@
 ﻿<Utilities>
   <Utility URL="https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip" Filename="ffmpeg.exe" />
   <Utility URL="https://github.com/castano/nvidia-texture-tools/releases/download/2.1.1/nvidia-texture-tools-2.1.1-win64.zip" Filename="nvddsinfo.exe" />
-  <Utility URL="https://github.com/Microsoft/DirectXTex/releases/download/aug2018/texconv.exe" Filename="texconv.exe" />
-  <Utility URL="https://github.com/Microsoft/DirectXTex/releases/download/aug2018/texdiag.exe" Filename="texdiag.exe" />
+  <Utility URL="https://github.com/castano/nvidia-texture-tools/releases/download/2.1.1/nvidia-texture-tools-2.1.1-win64.zip" Filename="nvcompress.exe" />
+  <Utility URL="https://github.com/castano/nvidia-texture-tools/releases/download/2.1.1/nvidia-texture-tools-2.1.1-win64.zip" Filename="nvtt.dll" />
+  <Utility URL="https://github.com/microsoft/DirectXTex/releases/download/feb2019/texconv.exe" Filename="texconv.exe" />
+  <Utility URL="https://github.com/microsoft/DirectXTex/releases/download/feb2019/texdiag.exe" Filename="texdiag.exe" />
 </Utilities>

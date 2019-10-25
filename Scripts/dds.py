@@ -24,6 +24,7 @@
 """dds.py: DDS reader and header generator."""
 
 import struct
+import util
 
 try:
     import form_conv_cy as form_conv
@@ -35,8 +36,8 @@ def readDDS(f, SRGB):
         inb = inf.read()
 
     if len(inb) < 0x80 or inb[:4] != b'DDS ':
-        print("")
-        print(f + " is not a valid DDS file!")
+        util.LogDebug("")
+        util.LogDebug(f + " is not a valid DDS file!")
         return 0, 0, 0, b'', 0, [], 0, []
 
     width = struct.unpack("<I", inb[16:20])[0]
@@ -45,8 +46,8 @@ def readDDS(f, SRGB):
     fourcc = inb[84:88]
 
     if fourcc == b'DX10':
-        print("")
-        print("DX10 DDS files are not supported.")
+        util.LogDebug("")
+        util.LogDebug("DX10 DDS files are not supported.")
         return 0, 0, 0, b'', 0, [], 0, []
 
     pflags = struct.unpack("<I", inb[80:84])[0]
@@ -58,8 +59,8 @@ def readDDS(f, SRGB):
     caps = struct.unpack("<I", inb[108:112])[0]
 
     if caps not in [0x1000, 0x401008]:
-        print("")
-        print("Invalid texture.")
+        util.LogDebug("")
+        util.LogDebug("Invalid texture (caps[" + str(caps) + "] not in [0x1000, 0x401008]).")
         return 0, 0, 0, b'', 0, [], 0, []
 
     abgr8_masks = {0xff: 0, 0xff00: 1, 0xff0000: 2, 0xff000000: 3, 0: 5}
@@ -94,8 +95,8 @@ def readDDS(f, SRGB):
         has_alpha = True
 
     else:
-        print("")
-        print("Invalid texture.")
+        util.LogDebug("")
+        util.LogDebug("Invalid texture.  pflags = " + str(pflags))
         return 0, 0, 0, b'', 0, [], 0, []
 
     format_ = 0
@@ -192,13 +193,13 @@ def readDDS(f, SRGB):
         mipSize = 0
 
     if len(inb) < 0x80+size+mipSize:
-        print("")
-        print(f + " is not a valid DDS file!")
+        util.LogDebug("")
+        util.LogDebug(f + " is not a valid DDS file!")
         return 0, 0, 0, b'', 0, [], 0, []
 
     if format_ == 0:
-        print("")
-        print("Unsupported DDS format!")
+        util.LogDebug("")
+        util.LogDebug("Unsupported DDS format!")
         return 0, 0, 0, b'', 0, [], 0, []
 
     

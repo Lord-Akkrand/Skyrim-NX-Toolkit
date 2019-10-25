@@ -132,7 +132,7 @@ def ConvertDDS(basePath, ddsFileName, opt_InRecursion=1):
 
     maxSize = toolkit_config.get_int_setting("Textures", "DefaultSizeLimit")
     forceFormat = None
-    shouldRun = False
+    shouldRun = not hasSDK
     util.LogDebug('File is ' + relativeFilename)
     size_rules = toolkit_config.get_setting("Textures", "SizeRules")
     ruleSet = None

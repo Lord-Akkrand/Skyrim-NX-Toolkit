@@ -44,6 +44,7 @@ R8UN = ('R8UN', 'R8_UNORM')
 DX10 = ('DX10','BC7_UNORM')
 DX10_SRGB = ('BC3_UNORM_SRGB', 'BC3_UNORM_SRGB')
 R8G8UN = ('R8G8_UNORM', 'R8G8_UNORM')
+B8G8R8X8_UNORM = ('B8G8R8X8_UNORM', 'B8G8R8X8_UNORM')
 
 Formats = []
 Formats.append(DXT1)
@@ -55,6 +56,7 @@ Formats.append(R8UN)
 Formats.append(DX10)
 Formats.append(DX10_SRGB)
 Formats.append(R8G8UN)
+Formats.append(B8G8R8X8_UNORM)
 
 Rules = {}
 
@@ -83,6 +85,7 @@ ConvertFromTo.append(('DX10',DXT5))
 ConvertFromTo.append(('BC3_UNORM_SRGB',DXT5))
 ConvertFromTo.append(('R8G8_UNORM',DXT5))
 ConvertFromTo.append(('BGRA',DXT1))
+ConvertFromTo.append(('B8G8R8X8_UNORM',DXT5))
 
 ConvertFromToSDK = []
 ConvertFromToSDK.append(('BC3_UNORM_SRGB',DX10))

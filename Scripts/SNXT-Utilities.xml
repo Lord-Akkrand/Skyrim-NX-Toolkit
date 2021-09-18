@@ -1,0 +1,4 @@
+﻿<Utilities>
+  <Utility URL="https://github.com/GyanD/codexffmpeg/releases/download/2021-09-16-git-8f92a1862a/ffmpeg-2021-09-16-git-8f92a1862a-full_build.zip" Filename="ffmpeg.exe" />
+  <Utility URL="https://github.com/castano/nvidia-texture-tools/releases/download/2.1.1/nvidia-texture-tools-2.1.1-win64.zip" Filename="nvddsinfo.exe" />
+</Utilities>

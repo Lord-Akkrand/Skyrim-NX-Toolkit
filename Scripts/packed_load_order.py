@@ -180,7 +180,7 @@ def LoadOrder(origin, target, loadOrderName):
 			for file in os.listdir(pluginFolder):
 				util.LogDebug("   Found " + file)
 				filename = os.path.join(pluginFolder, file)
-				if file.endswith(".esm") or file.endswith(".esp"):
+				if file.endswith(".esm"):
 					InsertTestFile(file, filename)
 				elif file.endswith(".ini"):
 					InsertIni(filename)
